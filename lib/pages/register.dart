@@ -1,110 +1,99 @@
 import 'package:flutter/material.dart';
 
-void main() => runApp(HOCAApp());
-
-class HOCAApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-    );
-  }
-}
-
-class LoginPage extends StatelessWidget {
+class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text("Create Account"),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Go back to the login page
+          },
+        ),
+      ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Logo or Image
-            Center(
-              child: Image.asset(
-                'assets/"hoca-logo.png"', // replace with your logo image
-                height: 100,
+            Text(
+              "Register to get started",
+              style: TextStyle(fontSize: 16, color: Colors.grey),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "Firstname",
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 30),
-
-            // Welcome Text
-            Center(
-              child: Text(
-                "Welcome to HOCA",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.blueAccent,
-                ),
+            SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "Lastname",
+                border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 10),
-
-            // Subtitle
-            Center(
-              child: Text(
-                "Please Login to your account",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey[600],
-                ),
+            SizedBox(height: 16),
+            TextField(
+              decoration: InputDecoration(
+                labelText: "Phone number",
+                border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.phone,
             ),
-            SizedBox(height: 30),
-
-            // Email TextField
+            SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
                 labelText: "Email",
-                hintText: "example@gmail.com",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                border: OutlineInputBorder(),
               ),
+              keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 20),
-
-            // Password TextField
+            SizedBox(height: 16),
             TextField(
               decoration: InputDecoration(
                 labelText: "Password",
-                hintText: "Enter password",
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                border: OutlineInputBorder(),
               ),
               obscureText: true,
             ),
-            SizedBox(height: 30),
-
-            // Login Button
-            ElevatedButton(
-              onPressed: () {
-                // Handle login logic here
+            SizedBox(height: 16),
+            GestureDetector(
+              onTap: () {
+                // TODO: Add functionality for uploading or taking a photo
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                padding: EdgeInsets.symmetric(vertical: 15),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+              child: Container(
+                height: 150,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              ),
-              child: Text(
-                "Login",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                child: Center(
+                  child: Text(
+                    "Upload or Take a photo",
+                    style: TextStyle(color: Colors.grey),
+                  ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
-
-            // Register Text
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: Add sign-up functionality
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue, // Button color
+                foregroundColor: Colors.white, // Text color
+                minimumSize: Size(double.infinity, 50), // Full-width button
+              ),
+              child: Text("Sign up"),
+            ),
           ],
         ),
       ),

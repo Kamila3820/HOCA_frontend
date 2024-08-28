@@ -1,15 +1,5 @@
 import 'package:flutter/material.dart';
-
-void main() => runApp(HOCAApp());
-
-class HOCAApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LoginPage(),
-    );
-  }
-}
+import 'register.dart'; // Import the register page
 
 class LoginPage extends StatelessWidget {
   @override
@@ -25,7 +15,7 @@ class LoginPage extends StatelessWidget {
             // Logo or Image
             Center(
               child: Image.asset(
-                'assets/"hoca-logo.png"', // replace with your logo image
+                'assets/"hoca-logo.png"',
                 height: 100,
               ),
             ),
@@ -108,7 +98,11 @@ class LoginPage extends StatelessWidget {
             Center(
               child: GestureDetector(
                 onTap: () {
-                  // Handle navigation to register page
+                  // Navigate to the sign-up page
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUpPage()),
+                  );
                 },
                 child: Text(
                   "Don't have an account yet? Register now",
