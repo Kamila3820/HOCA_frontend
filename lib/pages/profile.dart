@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'profile.dart'; // Ensure this is the correct path to your ProfilePage
 
 class ProfilePage extends StatelessWidget {
   @override

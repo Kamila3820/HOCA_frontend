@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'pages/login.dart';
+import 'pages/profile.dart';
 
 void main() => runApp(HOCAApp());
 
