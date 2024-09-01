@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'workingpage.dart';
 
 class OrderPlacedPage extends StatelessWidget {
   @override
@@ -87,7 +88,7 @@ class OrderPlacedPage extends StatelessWidget {
           );
         },
         style: ElevatedButton.styleFrom(
-          primary: Colors.red,
+          backgroundColor: Colors.red,
           padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
         child: Text('CANCEL', style: TextStyle(color: Colors.white)),
