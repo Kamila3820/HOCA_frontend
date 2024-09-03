@@ -3,42 +3,42 @@ import 'package:flutter/material.dart';
 class RatingDialogPage extends StatelessWidget {
   final String workerName;
 
-  RatingDialogPage({required this.workerName});
+  const RatingDialogPage({super.key, required this.workerName});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Rating your experience!'),
+        title: const Text('Rating your experience!'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Text(
+            const Text(
               'To gives recommend to a worker',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
-            Text(workerName, style: TextStyle(fontSize: 20)),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
+            Text(workerName, style: const TextStyle(fontSize: 20)),
+            const SizedBox(height: 20),
             _buildRatingStars('Work'),
             _buildRatingStars('Security'),
-            SizedBox(height: 20),
-            TextField(
+            const SizedBox(height: 20),
+            const TextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 labelText: 'Share your experience',
                 hintText: 'Let us know your great experience!',
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 // Handle rating submission
                 Navigator.pop(context);
               },
-              child: Text('Send rating'),
+              child: const Text('Send rating'),
             ),
           ],
         ),
@@ -50,16 +50,16 @@ class RatingDialogPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(category, style: TextStyle(fontSize: 16)),
+        Text(category, style: const TextStyle(fontSize: 16)),
         Row(
           children: List.generate(5, (index) {
-            return Icon(
+            return const Icon(
               Icons.star_border,
               color: Colors.amber,
             );
           }),
         ),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
       ],
     );
   }

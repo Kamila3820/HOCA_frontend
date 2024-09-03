@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class CompletePage extends StatelessWidget {
+  const CompletePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -21,9 +23,9 @@ class CompletePage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildWorkerInfo('Artiwara Kongmalai', 'Complete!'),
-            Spacer(),
+            const Spacer(),
             _buildCompletionBadge(),
-            Spacer(),
+            const Spacer(),
             _buildDoneButton(context),
           ],
         ),
@@ -34,10 +36,10 @@ class CompletePage extends StatelessWidget {
 
   Widget _buildWorkerInfo(String name, String status) {
     return ListTile(
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
         backgroundImage: NetworkImage('https://via.placeholder.com/150'),
       ),
-      title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(status),
     );
   }
@@ -51,8 +53,9 @@ class CompletePage extends StatelessWidget {
             width: 100,
             height: 100,
           ),
-          SizedBox(height: 20),
-          Text('All Done! All Task Finished', style: TextStyle(fontSize: 18)),
+          const SizedBox(height: 20),
+          const Text('All Done! All Task Finished',
+              style: TextStyle(fontSize: 18)),
         ],
       ),
     );
@@ -66,16 +69,16 @@ class CompletePage extends StatelessWidget {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
-        child: Text('DONE', style: TextStyle(color: Colors.white)),
+        child: const Text('DONE', style: TextStyle(color: Colors.white)),
       ),
     );
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',

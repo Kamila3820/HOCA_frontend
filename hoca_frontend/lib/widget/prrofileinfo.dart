@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 
 class WorkerProfilePage extends StatelessWidget {
+  const WorkerProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Worker Profile'),
+        title: const Text('Worker Profile'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {
               // Handle more options
             },
@@ -29,35 +31,35 @@ class WorkerProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 50,
                 backgroundImage: NetworkImage(
                     'https://via.placeholder.com/150'), // Worker image
               ),
-              SizedBox(height: 10),
-              Text(
+              const SizedBox(height: 10),
+              const Text(
                 'Artiwara Kongmalai',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              Text(
+              const Text(
                 '(5 times)',
                 style: TextStyle(
                   color: Colors.grey,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.star, color: Colors.yellow[700]),
-                  SizedBox(width: 5),
-                  Text('8.0', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 5),
+                  const Text('8.0', style: TextStyle(fontSize: 18)),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Wrap(
                 spacing: 10,
                 children: [
@@ -66,20 +68,20 @@ class WorkerProfilePage extends StatelessWidget {
                   _buildTaskChip('Wash dishes'),
                 ],
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildVerifiedBadge(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildContactInfo(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildDescription(),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildReviewSection(),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -117,7 +119,7 @@ class WorkerProfilePage extends StatelessWidget {
   }
 
   Widget _buildVerifiedBadge() {
-    return Row(
+    return const Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Icon(Icons.verified, color: Colors.green),
@@ -131,7 +133,7 @@ class WorkerProfilePage extends StatelessWidget {
   }
 
   Widget _buildContactInfo() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
@@ -171,12 +173,12 @@ class WorkerProfilePage extends StatelessWidget {
 
   Widget _buildDescription() {
     return Container(
-      padding: EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.grey[200],
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Column(
+      child: const Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -202,7 +204,7 @@ class WorkerProfilePage extends StatelessWidget {
   }
 
   Widget _buildReviewSection() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(

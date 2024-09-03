@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hoca_frontend/pages/register.dart';
 
 class RegisterText extends StatelessWidget {
+  const RegisterText({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -10,7 +12,7 @@ class RegisterText extends StatelessWidget {
           // Navigate to the sign-up page
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => SignUpPage()),
+            MaterialPageRoute(builder: (context) => const SignUpPage()),
           );
         },
         child: const Text(

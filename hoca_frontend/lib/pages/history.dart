@@ -41,7 +41,7 @@ class HistoryPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('History'),
+        title: const Text('History'),
       ),
       body: ListView.builder(
         itemCount: historyItems.length,
@@ -51,7 +51,7 @@ class HistoryPage extends StatelessWidget {
             title: Text(item['name']),
             subtitle: Text(item['date']),
             trailing: Container(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
                 color: item['ratingColor'],
                 borderRadius: BorderRadius.circular(5),

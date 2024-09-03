@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'completepage.dart';
 
 class PaymentPage extends StatelessWidget {
+  const PaymentPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -22,11 +24,11 @@ class PaymentPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildWorkerInfo('Artiwara Kongmalai', 'Working time!'),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildOrderId(),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             _buildQRCode(),
-            Spacer(),
+            const Spacer(),
             _buildPaymentButton(context),
           ],
         ),
@@ -37,16 +39,16 @@ class PaymentPage extends StatelessWidget {
 
   Widget _buildWorkerInfo(String name, String status) {
     return ListTile(
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
         backgroundImage: NetworkImage('https://via.placeholder.com/150'),
       ),
-      title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(status),
     );
   }
 
   Widget _buildOrderId() {
-    return Text('Order ID: 12345678');
+    return const Text('Order ID: 12345678');
   }
 
   Widget _buildQRCode() {
@@ -55,7 +57,7 @@ class PaymentPage extends StatelessWidget {
         width: 200,
         height: 200,
         color: Colors.grey[300],
-        child: Center(child: Text('QR Code Placeholder')),
+        child: const Center(child: Text('QR Code Placeholder')),
       ),
     );
   }
@@ -66,23 +68,23 @@ class PaymentPage extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => CompletePage()),
+            MaterialPageRoute(builder: (context) => const CompletePage()),
           );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor:
               Colors.green, // Replace 'primary' with 'backgroundColor'
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
-        child:
-            Text('Payment Successful', style: TextStyle(color: Colors.white)),
+        child: const Text('Payment Successful',
+            style: TextStyle(color: Colors.white)),
       ),
     );
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',
