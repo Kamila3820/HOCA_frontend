@@ -7,8 +7,9 @@ class LogoSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: Image.asset(
-        'assets/hoca-logo.png',
-        height: 100,
+        'assets/images/hoca-logo.png',
+        height: 300,
+        width: 300,
       ),
     );
   }
