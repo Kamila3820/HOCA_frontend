@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
 class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Create Account"),
+        title: const Text("Create Account"),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.pop(context); // Go back to the login page
           },
@@ -20,49 +22,49 @@ class SignUpPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               "Register to get started",
               style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: "Firstname",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: "Lastname",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: "Phone number",
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.phone,
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: "Email",
                 border: OutlineInputBorder(),
               ),
               keyboardType: TextInputType.emailAddress,
             ),
-            SizedBox(height: 16),
-            TextField(
+            const SizedBox(height: 16),
+            const TextField(
               decoration: InputDecoration(
                 labelText: "Password",
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             GestureDetector(
               onTap: () {
                 // TODO: Add functionality for uploading or taking a photo
@@ -74,7 +76,7 @@ class SignUpPage extends StatelessWidget {
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Center(
+                child: const Center(
                   child: Text(
                     "Upload or Take a photo",
                     style: TextStyle(color: Colors.grey),
@@ -82,7 +84,7 @@ class SignUpPage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 24),
+            const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
                 // TODO: Add sign-up functionality
@@ -90,9 +92,10 @@ class SignUpPage extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue, // Button color
                 foregroundColor: Colors.white, // Text color
-                minimumSize: Size(double.infinity, 50), // Full-width button
+                minimumSize:
+                    const Size(double.infinity, 50), // Full-width button
               ),
-              child: Text("Sign up"),
+              child: const Text("Sign up"),
             ),
           ],
         ),

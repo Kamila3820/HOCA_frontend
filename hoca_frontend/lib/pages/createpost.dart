@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class CreatePostPage extends StatelessWidget {
+  const CreatePostPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,12 +10,12 @@ class CreatePostPage extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
             Navigator.of(context).pop();
           },
         ),
-        title: Text(
+        title: const Text(
           "Create Worker",
           style: TextStyle(
             color: Colors.black,
@@ -34,20 +36,20 @@ class CreatePostPage extends StatelessWidget {
               _buildTextField(label: "ID Line"),
               _buildTextField(label: "Phone Number"),
               _buildDropdownField(label: "Gender", items: ["Male", "Female"]),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 "Categories",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               _buildCategoryChips(),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildTextField(
                 label: "Description",
                 maxLines: 4,
                 keyboardType: TextInputType.multiline,
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
             ],
           ),
         ),

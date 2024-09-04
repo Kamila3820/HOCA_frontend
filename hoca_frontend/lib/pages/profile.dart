@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -9,7 +11,7 @@ class ProfilePage extends StatelessWidget {
         backgroundColor: Colors.blueAccent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.white),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -20,9 +22,9 @@ class ProfilePage extends StatelessWidget {
           children: [
             // Profile Image and Basic Info
             Container(
-              padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               color: Colors.blueAccent,
-              child: Column(
+              child: const Column(
                 children: [
                   CircleAvatar(
                     radius: 50,
@@ -54,7 +56,7 @@ class ProfilePage extends StatelessWidget {
             ),
 
             // Services Offered
-            Padding(
+            const Padding(
               padding: EdgeInsets.all(16),
               child: Wrap(
                 spacing: 8,
@@ -74,7 +76,7 @@ class ProfilePage extends StatelessWidget {
             ),
 
             // Contact Information and Location
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -129,7 +131,7 @@ class ProfilePage extends StatelessWidget {
             ),
 
             // Pricing Information
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(vertical: 20, horizontal: 16),
               child: Row(
                 children: [
@@ -146,7 +148,7 @@ class ProfilePage extends StatelessWidget {
             ),
 
             // Description and Review Section
-            Padding(
+            const Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +203,7 @@ class ProfilePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -231,7 +233,7 @@ class ProfilePage extends StatelessWidget {
 class BulletList extends StatelessWidget {
   final List<String> items;
 
-  BulletList({required this.items});
+  const BulletList({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -242,8 +244,9 @@ class BulletList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 2.0),
                 child: Row(
                   children: [
-                    Icon(Icons.brightness_1, size: 8, color: Colors.black54),
-                    SizedBox(width: 5),
+                    const Icon(Icons.brightness_1,
+                        size: 8, color: Colors.black54),
+                    const SizedBox(width: 5),
                     Expanded(child: Text(item)),
                   ],
                 ),
@@ -258,8 +261,11 @@ class ReviewWidget extends StatelessWidget {
   final String date;
   final String review;
 
-  ReviewWidget(
-      {required this.reviewer, required this.date, required this.review});
+  const ReviewWidget(
+      {super.key,
+      required this.reviewer,
+      required this.date,
+      required this.review});
 
   @override
   Widget build(BuildContext context) {
@@ -271,18 +277,19 @@ class ReviewWidget extends StatelessWidget {
             CircleAvatar(
               child: Text(reviewer[0]),
             ),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(reviewer, style: TextStyle(fontWeight: FontWeight.bold)),
-                Text(date, style: TextStyle(color: Colors.grey)),
+                Text(reviewer,
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(date, style: const TextStyle(color: Colors.grey)),
               ],
             ),
           ],
         ),
-        SizedBox(height: 10),
-        Text(review, style: TextStyle(color: Colors.black)),
+        const SizedBox(height: 10),
+        Text(review, style: const TextStyle(color: Colors.black)),
       ],
     );
   }

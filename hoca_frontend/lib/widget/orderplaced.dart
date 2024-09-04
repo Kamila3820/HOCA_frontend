@@ -2,15 +2,17 @@ import 'package:flutter/material.dart';
 import 'workingpage.dart';
 
 class OrderPlacedPage extends StatelessWidget {
+  const OrderPlacedPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -23,11 +25,11 @@ class OrderPlacedPage extends StatelessWidget {
           children: [
             _buildWorkerInfo(
                 'Artiwara Kongmalai', 'Waiting for houseworker to confirm'),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildAmountInfo('800 THB - QR Payment'),
-            SizedBox(height: 40),
+            const SizedBox(height: 40),
             _buildDistanceSlider(),
-            Spacer(),
+            const Spacer(),
             _buildCancelButton(context),
           ],
         ),
@@ -38,10 +40,10 @@ class OrderPlacedPage extends StatelessWidget {
 
   Widget _buildWorkerInfo(String name, String status) {
     return ListTile(
-      leading: CircleAvatar(
+      leading: const CircleAvatar(
         backgroundImage: NetworkImage('https://via.placeholder.com/150'),
       ),
-      title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
+      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
       subtitle: Text(status),
     );
   }
@@ -49,14 +51,14 @@ class OrderPlacedPage extends StatelessWidget {
   Widget _buildAmountInfo(String amount) {
     return Row(
       children: [
-        Text(
+        const Text(
           'Amount',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        Spacer(),
+        const Spacer(),
         Text(
           amount,
-          style: TextStyle(fontSize: 18),
+          style: const TextStyle(fontSize: 18),
         ),
       ],
     );
@@ -66,14 +68,14 @@ class OrderPlacedPage extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Finding your worker...'),
+        const Text('Finding your worker...'),
         Slider(
           value: 15,
           min: 0,
           max: 30,
           onChanged: (value) {},
         ),
-        Center(child: Text('15 Km')),
+        const Center(child: Text('15 Km')),
       ],
     );
   }
@@ -84,21 +86,21 @@ class OrderPlacedPage extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => WorkingPage()),
+            MaterialPageRoute(builder: (context) => const WorkingPage()),
           );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red,
-          padding: EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
-        child: Text('CANCEL', style: TextStyle(color: Colors.white)),
+        child: const Text('CANCEL', style: TextStyle(color: Colors.white)),
       ),
     );
   }
 
   Widget _buildBottomNavigationBar(BuildContext context) {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: 'Home',

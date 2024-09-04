@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home'),
+        title: const Text('Home'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_none),
+            icon: const Icon(Icons.notifications_none),
             onPressed: () {},
           ),
         ],
@@ -20,25 +22,26 @@ class HomePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Welcome!, Suphanut',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             GestureDetector(
               onTap: () {
                 // Handle location selection
               },
               child: Container(
-                padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
                   color: Colors.grey[200],
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
                     Icon(Icons.location_on),
                     SizedBox(width: 10),
@@ -49,15 +52,15 @@ class HomePage extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Service',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -67,18 +70,18 @@ class HomePage extends StatelessWidget {
                 _buildServiceOption('Gardening', Icons.grass),
               ],
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Worker Available',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   mainAxisSpacing: 10,
                   crossAxisSpacing: 10,
@@ -94,7 +97,7 @@ class HomePage extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
@@ -128,14 +131,14 @@ class HomePage extends StatelessWidget {
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(10),
+          padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.grey[300],
             borderRadius: BorderRadius.circular(8),
           ),
           child: Icon(icon, size: 30),
         ),
-        SizedBox(height: 5),
+        const SizedBox(height: 5),
         Text(title),
       ],
     );
@@ -150,7 +153,8 @@ class HomePage extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
                 child: Image.network(
                   'https://via.placeholder.com/150', // Placeholder for worker's image
                   height: 120,
@@ -162,12 +166,12 @@ class HomePage extends StatelessWidget {
                 top: 10,
                 left: 10,
                 child: Container(
-                  padding: EdgeInsets.all(5),
+                  padding: const EdgeInsets.all(5),
                   decoration: BoxDecoration(
                     color: Colors.blue,
                     borderRadius: BorderRadius.circular(5),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Verified',
                     style: TextStyle(color: Colors.white),
                   ),
@@ -180,27 +184,28 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Teerasil Dangda',
+                const Text('Teerasil Dangda',
                     style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                Text('Male, 2.4 km'),
-                SizedBox(height: 5),
-                Text('House/Dormitory room'),
-                SizedBox(height: 10),
+                const SizedBox(height: 5),
+                const Text('Male, 2.4 km'),
+                const SizedBox(height: 5),
+                const Text('House/Dormitory room'),
+                const SizedBox(height: 10),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
+                    const Text(
                       '420 THB / hr',
                       style: TextStyle(fontWeight: FontWeight.bold),
                     ),
                     Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.yellow[700],
                         borderRadius: BorderRadius.circular(5),
                       ),
-                      child: Row(
+                      child: const Row(
                         children: [
                           Icon(Icons.star, size: 14, color: Colors.white),
                           SizedBox(width: 3),

@@ -12,7 +12,7 @@ import 'package:hoca_frontend/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(HOCAApp());
+    await tester.pumpWidget(const HOCAApp());
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);
