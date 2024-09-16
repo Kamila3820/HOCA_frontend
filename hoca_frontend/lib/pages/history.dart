@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'rating.dart';
 
 class HistoryPage extends StatelessWidget {
@@ -36,6 +37,8 @@ class HistoryPage extends StatelessWidget {
       'ratingColor': Colors.transparent,
     },
   ];
+
+HistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {

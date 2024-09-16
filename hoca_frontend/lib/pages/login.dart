@@ -9,15 +9,15 @@ class LoginPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _formKey = GlobalKey<FormState>();
-    final _emailController = TextEditingController();
-    final _passwordController = TextEditingController();
+    final formKey = GlobalKey<FormState>();
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
 
-    void _validateAndLogin() {
-      if (_formKey.currentState?.validate() ?? false) {
+    void validateAndLogin() {
+      if (formKey.currentState?.validate() ?? false) {
         // Handle login logic here
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Processing Data')),
+          const SnackBar(content: Text('Login Complete')),
         );
         
         // Navigate to HomePage
@@ -34,30 +34,27 @@ class LoginPage extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Form(
-            key: _formKey,
+            key: formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 50), // Optional space from top
-                // Replace with your logo section widget
+                const SizedBox(height: 50), 
                 const LogoSection(),
                 const SizedBox(height: 30),
-                // Replace with your welcome text widget
                 const WelcomeText(),
                 const SizedBox(height: 10),
                 EmailTextField(
-                  controller: _emailController,
+                  controller: emailController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter an email';
                     }
-                    // Additional email validation can go here
                     return null;
                   },
                 ),
                 const SizedBox(height: 20),
                 PasswordTextField(
-                  controller: _passwordController,
+                  controller: passwordController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
@@ -69,9 +66,8 @@ class LoginPage extends StatelessWidget {
                   },
                 ),
                 const SizedBox(height: 30),
-                LoginButton(onPressed: _validateAndLogin),
+                LoginButton(onPressed: validateAndLogin),
                 const SizedBox(height: 20),
-                // Replace with your register text widget
                 const RegisterText(),
               ],
             ),

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class CancelOrderScreen extends StatelessWidget {
+  const CancelOrderScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -13,14 +15,14 @@ class CancelOrderScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildOrderDetails(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             _buildCancelForm(),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
               onPressed: () {
                 // Send cancellation reason
               },
-              child: Text('SEND'),
+              child: const Text('SEND'),
             ),
           ],
         ),
@@ -30,9 +32,9 @@ class CancelOrderScreen extends StatelessWidget {
   }
 
   Widget _buildOrderDetails() {
-    return Card(
+    return const Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -57,9 +59,9 @@ class CancelOrderScreen extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('I want to cancel the order due to...'),
+        const Text('I want to cancel the order due to...'),
         RadioListTile(
-          title: Text('Urgent Business'),
+          title: const Text('Urgent Business'),
           value: 1,
           groupValue: 0,
           onChanged: (value) {
@@ -67,7 +69,7 @@ class CancelOrderScreen extends StatelessWidget {
           },
         ),
         RadioListTile(
-          title: Text('Bad Weather'),
+          title: const Text('Bad Weather'),
           value: 2,
           groupValue: 0,
           onChanged: (value) {
@@ -75,7 +77,7 @@ class CancelOrderScreen extends StatelessWidget {
           },
         ),
         RadioListTile(
-          title: Text('Amount of work & Place to work'),
+          title: const Text('Amount of work & Place to work'),
           value: 3,
           groupValue: 0,
           onChanged: (value) {
@@ -83,7 +85,7 @@ class CancelOrderScreen extends StatelessWidget {
           },
         ),
         RadioListTile(
-          title: Text('Other Problems'),
+          title: const Text('Other Problems'),
           value: 4,
           groupValue: 0,
           onChanged: (value) {
@@ -96,7 +98,7 @@ class CancelOrderScreen extends StatelessWidget {
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Progress'),

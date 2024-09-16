@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 
 class NotiPage extends StatelessWidget {
+  const NotiPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome!, Suphanut'),
+        title: const Text('Welcome!, Suphanut'),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications),
+            icon: const Icon(Icons.notifications),
             onPressed: () {
               Navigator.pushNamed(context, '/notifications');
             },
@@ -16,20 +18,20 @@ class NotiPage extends StatelessWidget {
         ],
       ),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
+            const Row(
               children: [
                 Icon(Icons.location_pin),
                 SizedBox(width: 8),
                 Text('15/34 Thungkhru, Bangkok'),
               ],
             ),
-            SizedBox(height: 16),
-            Text('Service', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
+            const Text('Service', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -39,15 +41,15 @@ class NotiPage extends StatelessWidget {
                 ServiceButton(icon: Icons.grass, label: 'Gardening'),
               ],
             ),
-            SizedBox(height: 16),
-            Text('Worker Available', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
+            const SizedBox(height: 16),
+            const Text('Worker Available', style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 8),
             WorkerList(),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Progress'),
@@ -62,7 +64,7 @@ class ServiceButton extends StatelessWidget {
   final IconData icon;
   final String label;
 
-  ServiceButton({required this.icon, required this.label});
+  const ServiceButton({super.key, required this.icon, required this.label});
 
   @override
   Widget build(BuildContext context) {
@@ -79,6 +81,8 @@ class ServiceButton extends StatelessWidget {
 }
 
 class WorkerList extends StatelessWidget {
+  const WorkerList({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -107,7 +111,7 @@ class WorkerCard extends StatelessWidget {
   final String distance;
   final String price;
 
-  WorkerCard({
+  const WorkerCard({super.key, 
     required this.name,
     required this.rating,
     required this.distance,
@@ -117,9 +121,9 @@ class WorkerCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.symmetric(vertical: 8.0),
+      margin: const EdgeInsets.symmetric(vertical: 8.0),
       child: ListTile(
-        leading: CircleAvatar(
+        leading: const CircleAvatar(
           backgroundImage:
               AssetImage('assets/worker.jpg'), // Replace with your image
         ),

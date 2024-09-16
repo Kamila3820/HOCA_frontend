@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class OrderConfirmationScreen extends StatelessWidget {
+  const OrderConfirmationScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -13,7 +15,7 @@ class OrderConfirmationScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildOrderDetails(),
-            Spacer(),
+            const Spacer(),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -24,7 +26,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.red,
                   ),
-                  child: Text('CANCEL'),
+                  child: const Text('CANCEL'),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -33,7 +35,7 @@ class OrderConfirmationScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green,
                   ),
-                  child: Text('CONFIRM'),
+                  child: const Text('CONFIRM'),
                 ),
               ],
             )
@@ -45,9 +47,9 @@ class OrderConfirmationScreen extends StatelessWidget {
   }
 
   Widget _buildOrderDetails() {
-    return Card(
+    return const Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -74,7 +76,7 @@ class OrderConfirmationScreen extends StatelessWidget {
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Progress'),

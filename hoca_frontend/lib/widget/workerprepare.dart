@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
 class WorkerPreparingScreen extends StatelessWidget {
+  const WorkerPreparingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Progress'),
+        title: const Text('Progress'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -13,9 +15,9 @@ class WorkerPreparingScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _buildOrderDetails(),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             _buildMap(),
-            Spacer(),
+            const Spacer(),
             ElevatedButton(
               onPressed: () {
                 // Ready to work action
@@ -23,7 +25,7 @@ class WorkerPreparingScreen extends StatelessWidget {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
               ),
-              child: Text('READY TO WORK'),
+              child: const Text('READY TO WORK'),
             ),
           ],
         ),
@@ -33,9 +35,9 @@ class WorkerPreparingScreen extends StatelessWidget {
   }
 
   Widget _buildOrderDetails() {
-    return Card(
+    return const Card(
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -61,13 +63,13 @@ class WorkerPreparingScreen extends StatelessWidget {
     return Container(
       height: 200,
       color: Colors.grey[300],
-      child: Center(child: Text('Map Placeholder')),
+      child: const Center(child: Text('Map Placeholder')),
     );
   }
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      items: [
+      items: const [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
         BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Progress'),
