@@ -17,21 +17,21 @@ class NotiPage extends StatelessWidget {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Row(
+            Row(
               children: [
                 Icon(Icons.location_pin),
                 SizedBox(width: 8),
                 Text('15/34 Thungkhru, Bangkok'),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text('Service', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 8),
+            SizedBox(height: 16),
+            Text('Service', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 8),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -41,9 +41,9 @@ class NotiPage extends StatelessWidget {
                 ServiceButton(icon: Icons.grass, label: 'Gardening'),
               ],
             ),
-            const SizedBox(height: 16),
-            const Text('Worker Available', style: TextStyle(fontSize: 18)),
-            const SizedBox(height: 8),
+            SizedBox(height: 16),
+            Text('Worker Available', style: TextStyle(fontSize: 18)),
+            SizedBox(height: 8),
             WorkerList(),
           ],
         ),
@@ -85,7 +85,7 @@ class WorkerList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return const Column(
       children: [
         WorkerCard(
           name: 'Teerasil Dangda',
