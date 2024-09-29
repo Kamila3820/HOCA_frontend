@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'subcategory.dart';  // Import the new sub-category page
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -64,10 +65,10 @@ class HomePage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildServiceOption('Cleaning', Icons.cleaning_services),
-                _buildServiceOption('Clothes', Icons.local_laundry_service),
-                _buildServiceOption('Pets', Icons.pets),
-                _buildServiceOption('Gardening', Icons.grass),
+                _buildServiceOption(context, 'Cleaning', Icons.cleaning_services),
+                _buildServiceOption(context, 'Clothes', Icons.local_laundry_service),
+                _buildServiceOption(context, 'Pets', Icons.pets),
+                _buildServiceOption(context, 'Gardening', Icons.grass),
               ],
             ),
             const SizedBox(height: 20),
@@ -127,20 +128,31 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget _buildServiceOption(String title, IconData icon) {
-    return Column(
-      children: [
-        Container(
-          padding: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(8),
+  Widget _buildServiceOption(BuildContext context, String title, IconData icon) {
+    return GestureDetector(
+      onTap: () {
+        // Navigate to the sub-category page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SubCategoryPage(categoryTitle: title),
           ),
-          child: Icon(icon, size: 30),
-        ),
-        const SizedBox(height: 5),
-        Text(title),
-      ],
+        );
+      },
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.grey[300],
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, size: 30),
+          ),
+          const SizedBox(height: 5),
+          Text(title),
+        ],
+      ),
     );
   }
 
