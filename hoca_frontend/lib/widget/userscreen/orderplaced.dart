@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'completepage.dart';
+import '../workerscreen/workingpage.dart';
 
-class PaymentPage extends StatelessWidget {
-  const PaymentPage({super.key});
+class OrderPlacedPage extends StatelessWidget {
+  const OrderPlacedPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,13 +23,14 @@ class PaymentPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWorkerInfo('Artiwara Kongmalai', 'Working time!'),
+            _buildWorkerInfo(
+                'Artiwara Kongmalai', 'Waiting for houseworker to confirm'),
             const SizedBox(height: 20),
-            _buildOrderId(),
+            _buildAmountInfo('800 THB - QR Payment'),
             const SizedBox(height: 40),
-            _buildQRCode(),
+            _buildDistanceSlider(),
             const Spacer(),
-            _buildPaymentButton(context),
+            _buildCancelButton(context),
           ],
         ),
       ),
@@ -47,37 +48,52 @@ class PaymentPage extends StatelessWidget {
     );
   }
 
-  Widget _buildOrderId() {
-    return const Text('Order ID: 12345678');
-  }
-
-  Widget _buildQRCode() {
-    return Center(
-      child: Container(
-        width: 200,
-        height: 200,
-        color: Colors.grey[300],
-        child: const Center(child: Text('QR Code Placeholder')),
-      ),
+  Widget _buildAmountInfo(String amount) {
+    return Row(
+      children: [
+        const Text(
+          'Amount',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+        const Spacer(),
+        Text(
+          amount,
+          style: const TextStyle(fontSize: 18),
+        ),
+      ],
     );
   }
 
-  Widget _buildPaymentButton(BuildContext context) {
+  Widget _buildDistanceSlider() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text('Finding your worker...'),
+        Slider(
+          value: 15,
+          min: 0,
+          max: 30,
+          onChanged: (value) {},
+        ),
+        const Center(child: Text('15 Km')),
+      ],
+    );
+  }
+
+  Widget _buildCancelButton(BuildContext context) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const CompletePage()),
+            MaterialPageRoute(builder: (context) => const WorkingPage()),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor:
-              Colors.green, // Replace 'primary' with 'backgroundColor'
+          backgroundColor: Colors.red,
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
-        child: const Text('Payment Successful',
-            style: TextStyle(color: Colors.white)),
+        child: const Text('CANCEL', style: TextStyle(color: Colors.white)),
       ),
     );
   }

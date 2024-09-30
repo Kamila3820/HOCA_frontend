@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'payment.dart';
+import '../completepage.dart';
 
-class WorkingPage extends StatelessWidget {
-  const WorkingPage({super.key});
+class PaymentPage extends StatelessWidget {
+  const PaymentPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,14 +23,13 @@ class WorkingPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildWorkerInfo(
-                'Artiwara Kongmalai', 'Arriving to the destination'),
+            _buildWorkerInfo('Artiwara Kongmalai', 'Working time!'),
             const SizedBox(height: 20),
-            _buildAmountInfo('800 THB - QR Payment'),
+            _buildOrderId(),
             const SizedBox(height: 40),
-            _buildMap(),
+            _buildQRCode(),
             const Spacer(),
-            _buildWorkingButton(context),
+            _buildPaymentButton(context),
           ],
         ),
       ),
@@ -48,45 +47,37 @@ class WorkingPage extends StatelessWidget {
     );
   }
 
-  Widget _buildAmountInfo(String amount) {
-    return Row(
-      children: [
-        const Text(
-          'Amount',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-        ),
-        const Spacer(),
-        Text(
-          amount,
-          style: const TextStyle(fontSize: 18),
-        ),
-      ],
+  Widget _buildOrderId() {
+    return const Text('Order ID: 12345678');
+  }
+
+  Widget _buildQRCode() {
+    return Center(
+      child: Container(
+        width: 200,
+        height: 200,
+        color: Colors.grey[300],
+        child: const Center(child: Text('QR Code Placeholder')),
+      ),
     );
   }
 
-  Widget _buildMap() {
-    return Container(
-      height: 300,
-      color: Colors.grey[300],
-      child: const Center(child: Text('Map View Placeholder')),
-    );
-  }
-
-  Widget _buildWorkingButton(BuildContext context) {
+  Widget _buildPaymentButton(BuildContext context) {
     return Center(
       child: ElevatedButton(
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const PaymentPage()),
+            MaterialPageRoute(builder: (context) => const CompletePage()),
           );
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.green, // Updated property
+          backgroundColor:
+              Colors.green, // Replace 'primary' with 'backgroundColor'
           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
         ),
-        child:
-            const Text('Working Time!', style: TextStyle(color: Colors.white)),
+        child: const Text('Payment Successful',
+            style: TextStyle(color: Colors.white)),
       ),
     );
   }
