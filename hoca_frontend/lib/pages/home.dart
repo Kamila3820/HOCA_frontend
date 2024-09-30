@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
 import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
+import 'package:hoca_frontend/pages/location.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 
 class HomePage extends StatelessWidget {
@@ -88,7 +89,12 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 10),
                 GestureDetector(
                   onTap: () {
-                    // Handle location selection
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const LocationPage(),
+                      ),
+                    );
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
