@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class WorkerPreparingScreen extends StatelessWidget {
+class WorkerPreparingScreen extends StatefulWidget {
   const WorkerPreparingScreen({super.key});
+
+  @override
+  State<WorkerPreparingScreen> createState() => _WorkerPreparingScreenState();
+}
+
+class _WorkerPreparingScreenState extends State<WorkerPreparingScreen> {
+  late GoogleMapController _mapController;
+  final LatLng _initialPosition = const LatLng(13.7290, 100.7756); // Example LatLng, adjust to your needs
+  final Set<Marker> _markers = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _markers.add(
+      Marker(
+        markerId: const MarkerId('worker_location'),
+        position: const LatLng(13.7290, 100.7756), // Worker location
+        infoWindow: const InfoWindow(title: 'Worker Location'),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +69,7 @@ class WorkerPreparingScreen extends StatelessWidget {
               ),
               title: Text('Jintara Malawan'),
               subtitle: Text('08x-765-4321'),
-              trailing: Text('500 THB - QR Payment'),
+              trailing: Text('800 THB - QR Payment'),
             ),
             SizedBox(height: 10),
             Text('Artiwara need your help'),
@@ -62,8 +84,23 @@ class WorkerPreparingScreen extends StatelessWidget {
   Widget _buildMap() {
     return Container(
       height: 200,
-      color: Colors.grey[300],
-      child: const Center(child: Text('Map Placeholder')),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.blueAccent),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: _initialPosition,
+            zoom: 12.0,
+          ),
+          markers: _markers,
+          onMapCreated: (controller) {
+            _mapController = controller;
+          },
+        ),
+      ),
     );
   }
 
