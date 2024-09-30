@@ -3,7 +3,6 @@ import 'package:hoca_frontend/components/login/login_components.dart';
 
 import 'home.dart';
 
-
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
@@ -19,11 +18,11 @@ class LoginPage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login Complete')),
         );
-        
+
         // Navigate to HomePage
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => HomePage()),
         );
       }
     }
@@ -38,7 +37,7 @@ class LoginPage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const SizedBox(height: 50), 
+                const SizedBox(height: 50),
                 const LogoSection(),
                 const SizedBox(height: 30),
                 const WelcomeText(),
@@ -47,7 +46,9 @@ class LoginPage extends StatelessWidget {
                   controller: emailController,
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter an email';
+                      return 'Please enter your email';
+                    } else if (!RegExp(r'\S+@\S+\.\S+').hasMatch(value)) {
+                      return 'Please enter a valid email';
                     }
                     return null;
                   },
