@@ -77,9 +77,9 @@ class _LocationPageState extends State<LocationPage> {
           children: [
             // Location icon using Image.asset
             Image.asset(
-              'assets/location_icon.png', // Make sure this file exists in your assets
-              width: 100,
-              height: 100,
+              'assets/images/location_icon.png', // Make sure this file exists in your assets
+              width: 200,
+              height: 200,
             ),
             const SizedBox(height: 20),
             const Text(
