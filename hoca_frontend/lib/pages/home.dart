@@ -5,6 +5,10 @@ import 'package:hoca_frontend/components/home/home_components.dart';
 import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
 import 'package:hoca_frontend/pages/location.dart';
 import 'package:hoca_frontend/pages/notification.dart';
+import 'package:hoca_frontend/pages/service/cleaning.dart';
+import 'package:hoca_frontend/pages/service/clothes.dart';
+import 'package:hoca_frontend/pages/service/gardening.dart';
+import 'package:hoca_frontend/pages/service/pets.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -146,10 +150,53 @@ class HomePage extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    buildServiceOption('Cleaning', FontAwesomeIcons.broom),
-                    buildServiceOption('Clothes', FontAwesomeIcons.shirt),
-                    buildServiceOption('Pets', Icons.pets),
-                    buildServiceOption('Gardening', FontAwesomeIcons.seedling),
+                    GestureDetector(
+                      onTap: () {
+                         Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const CleanPage(),
+                      ),
+                    );
+                      },
+                      child: buildServiceOption(
+                          'Cleaning', FontAwesomeIcons.broom),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                         Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ClothesPage(),
+                      ),
+                    );
+                      },
+                      child:
+                          buildServiceOption('Clothes', FontAwesomeIcons.shirt),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                         Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const PetsPage(),
+                      ),
+                    );
+                      },
+                      child: buildServiceOption('Pets', Icons.pets),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                         Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const GardeningPage(),
+                      ),
+                    );
+                      },
+                      child: buildServiceOption(
+                          'Gardening', FontAwesomeIcons.seedling),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 65),
@@ -197,9 +244,12 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(currentPage: 'Home'), // Add the bottom navigation bar
-      floatingActionButton: const CustomFloatingActionButton(), // Add the floating action button
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked, // Center the floating action button
+      bottomNavigationBar: const CustomBottomNavigationBar(
+          currentPage: 'Home'), // Add the bottom navigation bar
+      floatingActionButton:
+          const CustomFloatingActionButton(), // Add the floating action button
+      floatingActionButtonLocation: FloatingActionButtonLocation
+          .centerDocked, // Center the floating action button
     );
   }
 }
