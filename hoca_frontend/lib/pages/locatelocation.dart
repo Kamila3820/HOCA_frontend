@@ -4,7 +4,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 class LocateLocationPage extends StatelessWidget {
   final LatLng? location; // Accept location as a parameter
 
-  const LocateLocationPage({Key? key, this.location}) : super(key: key);
+  const LocateLocationPage({super.key, this.location});
 
   @override
   Widget build(BuildContext context) {
