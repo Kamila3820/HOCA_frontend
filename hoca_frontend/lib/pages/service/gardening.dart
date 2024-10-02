@@ -80,7 +80,7 @@ Widget build(BuildContext context) {
                 ),
                 itemCount: 2,
                 itemBuilder: (context, index) {
-                  return buildWorkerCard();
+                  return buildWorkerCard(context);
                 },
               ),
             ),

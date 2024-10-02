@@ -52,9 +52,9 @@ class CleanPage extends StatelessWidget {
           ),
           const SizedBox(height: 25), // Space between the blue box and the text
           Align(
-            alignment: Alignment.centerLeft, // Align text to the right
+            alignment: Alignment.centerLeft,
             child: Padding(
-              padding: const EdgeInsets.only(left: 20.0), // Optional padding on the right
+              padding: const EdgeInsets.only(left: 20.0),
               child: Text(
                 'Total Found: 6',
                 style: GoogleFonts.poppins(
@@ -80,7 +80,7 @@ class CleanPage extends StatelessWidget {
                 ),
                 itemCount: 6,
                 itemBuilder: (context, index) {
-                  return buildWorkerCard();
+                  return buildWorkerCard(context); // Passing the BuildContext argument
                 },
               ),
             ),

@@ -235,7 +235,7 @@ class HomePage extends StatelessWidget {
                     ),
                     itemCount: 4,
                     itemBuilder: (context, index) {
-                      return buildWorkerCard();
+                      return buildWorkerCard(context);
                     },
                   ),
                 ),
