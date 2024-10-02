@@ -1,17 +1,84 @@
-flutter/ephemeral/
+# Flutter specific folders
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.dart_tool/
+.buildlog/
+.pub-cache/
+.idea/
+.vscode/
 
-# Visual Studio user-specific files.
+# Build files
+build/
+android/app/build/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+macos/Flutter/GeneratedPluginRegistrant.swift
+macos/Flutter/ephemeral/
+
+# Generated localization files
+*.arb
+
+# Web related
+web/.dart_tool/
+web/.packages
+web/build/
+
+# Android specific
+*.apk
+*.aar
+*.iml
+local.properties
+
+# iOS specific
+*.mode1v3
+*.mode2v3
+*.pbxuser
+*.xcworkspace
+ios/Flutter/flutter_export_environment.sh
+
+# Windows specific
+windows/flutter/ephemeral/
+
+# Linux specific
+linux/flutter/ephemeral/
+
+# Miscellaneous
+*.log
+*.tmp
+*.swp
+*.lock
+
+# Dart VM files
+*.dart.js
+*.info.json
+*.js.deps
+*.js.map
+
+# Ignore VS Code workspace settings
+.vscode/settings.json
+.vscode/tasks.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Visual Studio files
 *.suo
 *.user
 *.userosscache
 *.sln.docstates
-
-# Visual Studio build-related files.
+*.VC.db
+.vscode/
 x64/
 x86/
 
-# Visual Studio cache files
-# files ending in .cache can be ignored
+# Cache files
 *.[Cc]ache
-# but keep track of directories ending in .cache
-!*.[Cc]ache/
+!*/.cache/
+
+# Flutter metadata
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter/
