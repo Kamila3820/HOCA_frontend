@@ -1,59 +1,53 @@
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-void main() {
-  runApp(MyApp());
-}
+class LocateLocationPage extends StatelessWidget {
+  final LatLng? location; // Accept location as a parameter
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const LocateLocationPage({Key? key, this.location}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: LocationPage(),
-    );
-  }
-}
-
-class LocationPage extends StatefulWidget {
-  const LocationPage({super.key});
-
-  @override
-  _LocationPageState createState() => _LocationPageState();
-}
-
-class _LocationPageState extends State<LocationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            // Add back button functionality here
-          },
-        ),
-        title: TextField(
-          decoration: InputDecoration(
-            hintText: 'Search for your location',
-            border: InputBorder.none,
-            filled: true,
-            fillColor: Colors.white,
-            contentPadding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          ),
-        ),
-        backgroundColor: Colors.lightBlue[200], // Matches the blue background
-        elevation: 0, // Removes shadow below AppBar
+        title: const Text('Location Details'),
+        backgroundColor: Colors.lightBlue,
       ),
-      body: ListView(
-        children: [
-          ListTile(
-            leading: Icon(Icons.location_on, color: Colors.black),
-            title: Text('Thung Kru, Bangkok'),
-          ),
-        ],
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (location != null) ...[
+              Text(
+                'Selected Location:',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Latitude: ${location!.latitude}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              Text(
+                'Longitude: ${location!.longitude}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  // You can implement further actions, such as saving the location
+                  Navigator.of(context).pop(); // Navigate back
+                },
+                child: const Text('Done'),
+              ),
+            ] else ...[
+              const Text(
+                'No location selected.',
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+            ],
+          ],
+        ),
       ),
-      backgroundColor: Colors.grey[200], // Matches the background color
     );
   }
 }

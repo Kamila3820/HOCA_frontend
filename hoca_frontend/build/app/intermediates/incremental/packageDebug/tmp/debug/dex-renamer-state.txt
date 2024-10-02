@@ -1,4 +1,4 @@
-#Wed Oct 02 10:24:56 ICT 2024
+#Wed Oct 02 11:30:51 ICT 2024
 base.0=C\:\\Users\\puvad\\Documents\\GitHub\\HOCA_frontend\\hoca_frontend\\build\\app\\intermediates\\dex\\debug\\mergeExtDexDebug\\classes.dex
 base.1=C\:\\Users\\puvad\\Documents\\GitHub\\HOCA_frontend\\hoca_frontend\\build\\app\\intermediates\\dex\\debug\\mergeLibDexDebug\\0\\classes.dex
 base.2=C\:\\Users\\puvad\\Documents\\GitHub\\HOCA_frontend\\hoca_frontend\\build\\app\\intermediates\\dex\\debug\\mergeProjectDexDebug\\0\\classes.dex

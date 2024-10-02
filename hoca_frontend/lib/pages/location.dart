@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:location/location.dart'; // Add this import for location services
+import 'locatelocation.dart'; // Import locatelocation.dart
 
 class LocationPage extends StatefulWidget {
   const LocationPage({super.key});
@@ -17,6 +19,16 @@ class _LocationPageState extends State<LocationPage> {
     zoom: 12,
   );
 
+  // Navigate to the locate location screen
+  void _navigateToLocateLocation() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LocateLocationPage(location: selectedLocation),
+      ),
+    );
+  }
+
   void _onSelectLocation(LatLng location) {
     setState(() {
       selectedLocation = location;
@@ -33,7 +45,7 @@ class _LocationPageState extends State<LocationPage> {
           height: MediaQuery.of(context).size.height * 0.75,
           child: GoogleMap(
             initialCameraPosition: _initialCameraPosition,
-            onTap: _onSelectLocation,
+            onTap: _onSelectLocation, // Allow selecting location by tapping
             markers: selectedLocation != null
                 ? {
                     Marker(
@@ -49,10 +61,25 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   Future<void> _locateMe() async {
-    // Simulate location detection logic
-    setState(() {
-      selectedLocation = const LatLng(13.7563, 100.5018); // Set to Bangkok example
-    });
+    // Create an instance of the Location class
+    Location location = Location();
+    
+    // Request permission
+    PermissionStatus permissionStatus = await location.requestPermission();
+
+    if (permissionStatus == PermissionStatus.granted) {
+      // Get the current location
+      LocationData currentLocation = await location.getLocation();
+      setState(() {
+        selectedLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+      });
+      // Navigate to locatelocation.dart after simulating "Locate Me"
+      _navigateToLocateLocation();
+    } else {
+      // Handle permission denied
+      print('Location permission denied');
+      // Optionally, show a dialog or a message to the user
+    }
   }
 
   @override
@@ -77,13 +104,13 @@ class _LocationPageState extends State<LocationPage> {
           children: [
             // Location icon using Image.asset
             Image.asset(
-              'assets/images/location_icon.png', // Make sure this file exists in your assets
+              'assets/images/location_icon.png', // Ensure this file exists in your assets
               width: 200,
               height: 200,
             ),
             const SizedBox(height: 20),
             const Text(
-              'After click Locate Me, your locations\nwill automatically find you',
+              'After clicking Locate Me, your location\nwill automatically find you',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
