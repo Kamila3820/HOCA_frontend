@@ -25,9 +25,13 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
       appBar: AppBar(
         title: const Text(
           'Location Details',
-          style: TextStyle(color: Colors.black, fontSize: 18), // Align with prototype
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 16, // Adjust font size
+            fontWeight: FontWeight.w600, // Use a bolder weight to match Figma
+          ),
         ),
-        backgroundColor: Colors.white, // Match prototype background
+        backgroundColor: Colors.white, // Match Figma background
         iconTheme: const IconThemeData(color: Colors.black), // Set icon color to black
         elevation: 0, // Remove app bar shadow
         centerTitle: true, // Center the title
@@ -35,13 +39,15 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Padding to match the prototype
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0), // Padding to match the Figma
             child: TextField(
               decoration: InputDecoration(
                 hintText: 'Search for your location',
+                hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)), // Adjust hint text color
                 prefixIcon: const Icon(Icons.search, color: Colors.black54),
                 filled: true,
-                fillColor: Colors.grey[200], // Match prototype background for the search bar
+                fillColor: Colors.grey[200], // Match Figma background for the search bar
+                contentPadding: const EdgeInsets.symmetric(vertical: 12), // Add padding inside text field
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
@@ -78,12 +84,12 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
                   Navigator.of(context).pop(_selectedLocation);
                 }
               },
-              child: const Text('Confirm'),
+              child: const Text('Confirm', style: TextStyle(fontSize: 16)), // Adjust text size
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue, // Use light blue as in prototype
-                minimumSize: const Size(double.infinity, 50), // Set button size to match the prototype
+                backgroundColor: Colors.lightBlue, // Use light blue as in Figma
+                minimumSize: const Size(double.infinity, 48), // Adjust button height slightly
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10), // Rounded button as in prototype
+                  borderRadius: BorderRadius.circular(8), // Match border radius from Figma
                 ),
               ),
             ),
