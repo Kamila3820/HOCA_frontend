@@ -46,7 +46,7 @@ class _LocationPageState extends State<LocationPage> {
         return SizedBox(
           height: MediaQuery.of(context).size.height * 0.75,
           child: GoogleMap(
-            initialCameraPosition: _initialCameraPosition,
+            initialCameraPosition: _initialCameraPosition, // ใช้ _initialCameraPosition ที่นี่
             onTap: _onSelectLocation, // Allow selecting location by tapping
             markers: selectedLocation != null
                 ? {
@@ -158,37 +158,24 @@ class _LocationPageState extends State<LocationPage> {
                   ),
                   const SizedBox(height: 30),
                   ElevatedButton(
-                      onPressed: _locateMe, // Locate the user
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF87C4FF),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 110, vertical: 10),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                    onPressed: _locateMe, // Locate the user
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF87C4FF),
+                      padding: const EdgeInsets.symmetric(horizontal: 110, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      'Locate Me',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 22,
+                          color: Colors.white,
                         ),
                       ),
-                      child: Text(
-                        'Locate Me',
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            fontSize: 22,
-                            color: Colors.white,
-                          ),
-                        ),
-                      )),
-                  const SizedBox(height: 20),
-                  TextButton(
-                      onPressed: _showMap, // Open map for manual selection
-                      child: Text(
-                        'Add location manually',
-                        style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(
-                            color: Color(0xFF87C4FF),
-                            fontWeight: FontWeight.w500,
-                            fontSize: 22,
-                          ),
-                        ),
-                      )),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   if (selectedLocation != null)
                     Text(
