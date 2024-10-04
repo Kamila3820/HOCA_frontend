@@ -72,6 +72,9 @@ flutter:
     - assets/images/hoca-logo.png
     - assets/images/location_icon.png
     - assets/.env
+    - assets/images/Domi.png
+    - assets/images/House.png
+    - assets/images/Room.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

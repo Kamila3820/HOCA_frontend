@@ -65,7 +65,7 @@ class _LocationPageState extends State<LocationPage> {
   Future<void> _locateMe() async {
     // Create an instance of the Location class
     Location location = Location();
-    
+
     // Request permission
     PermissionStatus permissionStatus = await location.requestPermission();
 
@@ -73,7 +73,8 @@ class _LocationPageState extends State<LocationPage> {
       // Get the current location
       LocationData currentLocation = await location.getLocation();
       setState(() {
-        selectedLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+        selectedLocation =
+            LatLng(currentLocation.latitude!, currentLocation.longitude!);
       });
       // Navigate to locatelocation.dart after simulating "Locate Me"
       _navigateToLocateLocation();
@@ -95,8 +96,8 @@ class _LocationPageState extends State<LocationPage> {
             height: 150.0,
             width: double.infinity,
             decoration: BoxDecoration(
-              // color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.6), // 60% opacity
-            ),
+                // color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.6), // 60% opacity
+                ),
             child: Padding(
               padding: const EdgeInsets.only(top: 30, left: 20, right: 10),
               child: Stack(
@@ -104,7 +105,8 @@ class _LocationPageState extends State<LocationPage> {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Color.fromARGB(255, 0, 0, 0), size: 35.0),
+                      icon: const Icon(Icons.arrow_back,
+                          color: Color.fromARGB(255, 0, 0, 0), size: 35.0),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -133,61 +135,60 @@ class _LocationPageState extends State<LocationPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Location icon using Image.asset
-                   Padding(
-          padding: const EdgeInsets.only(bottom: 70.0),
-          child: Center(
-            child: Image.asset(
-              'assets/images/location_icon.png', // Ensure this file exists in your assets
-              width: 200,
-              height: 200,
-            ),
-          ),
-        ),
-                  const SizedBox(height: 20),
-                  Text(
-  'After clicking Locate Me, your location\nwill automatically find you',
-  textAlign: TextAlign.center,
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      fontSize: 16,
-      color: Colors.grey,
-    ),
-  ),
-),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    onPressed: _locateMe, // Locate the user
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF87C4FF),
-                      padding: const EdgeInsets.symmetric(horizontal: 110, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 70.0),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/location_icon.png', // Ensure this file exists in your assets
+                        width: 200,
+                        height: 200,
                       ),
                     ),
-                    child: Text(
-  'Locate Me',
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      fontSize: 22,
-      color: Colors.white,
-    ),
-  ),
-)
                   ),
                   const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: _showMap, // Open map for manual selection
-                    child: Text(
-  'Add location manually',
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      color: Color(0xFF87C4FF),
-      fontWeight: FontWeight.w500,
-      fontSize: 22,
-    ),
-  ),
-)
+                  Text(
+                    'After clicking Locate Me, your location\nwill automatically find you',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
                   ),
+                  const SizedBox(height: 30),
+                  ElevatedButton(
+                      onPressed: _locateMe, // Locate the user
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF87C4FF),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 110, vertical: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        'Locate Me',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            fontSize: 22,
+                            color: Colors.white,
+                          ),
+                        ),
+                      )),
+                  const SizedBox(height: 20),
+                  TextButton(
+                      onPressed: _showMap, // Open map for manual selection
+                      child: Text(
+                        'Add location manually',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            color: Color(0xFF87C4FF),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 22,
+                          ),
+                        ),
+                      )),
                   const SizedBox(height: 20),
                   if (selectedLocation != null)
                     Text(
