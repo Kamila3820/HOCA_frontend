@@ -46,7 +46,7 @@ class _LocationPageState extends State<LocationPage> {
         return SizedBox(
           height: MediaQuery.of(context).size.height * 0.75,
           child: GoogleMap(
-            initialCameraPosition: _initialCameraPosition,
+            initialCameraPosition: _initialCameraPosition, // ใช้ _initialCameraPosition ที่นี่
             onTap: _onSelectLocation, // Allow selecting location by tapping
             markers: selectedLocation != null
                 ? {
@@ -133,27 +133,27 @@ class _LocationPageState extends State<LocationPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   // Location icon using Image.asset
-                   Padding(
-          padding: const EdgeInsets.only(bottom: 70.0),
-          child: Center(
-            child: Image.asset(
-              'assets/images/location_icon.png', // Ensure this file exists in your assets
-              width: 200,
-              height: 200,
-            ),
-          ),
-        ),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 70.0),
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/location_icon.png', // Ensure this file exists in your assets
+                        width: 200,
+                        height: 200,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 20),
                   Text(
-  'After clicking Locate Me, your location\nwill automatically find you',
-  textAlign: TextAlign.center,
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      fontSize: 16,
-      color: Colors.grey,
-    ),
-  ),
-),
+                    'After clicking Locate Me, your location\nwill automatically find you',
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     onPressed: _locateMe, // Locate the user
@@ -165,28 +165,14 @@ class _LocationPageState extends State<LocationPage> {
                       ),
                     ),
                     child: Text(
-  'Locate Me',
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      fontSize: 22,
-      color: Colors.white,
-    ),
-  ),
-)
-                  ),
-                  const SizedBox(height: 20),
-                  TextButton(
-                    onPressed: _showMap, // Open map for manual selection
-                    child: Text(
-  'Add location manually',
-  style: GoogleFonts.poppins(
-    textStyle: const TextStyle(
-      color: Color(0xFF87C4FF),
-      fontWeight: FontWeight.w500,
-      fontSize: 22,
-    ),
-  ),
-)
+                      'Locate Me',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 22,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 20),
                   if (selectedLocation != null)
