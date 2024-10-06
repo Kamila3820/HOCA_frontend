@@ -14,16 +14,17 @@ class WorkerPreparingScreen extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          _buildStepIndicator(),
-          _buildWorkerInfo(),
-          const Spacer(),
-          _buildVacuumIcon(),
-          const SizedBox(height: 20),
-          _buildReadyToWorkButton(),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _buildStepIndicator(),
+            _buildWorkerInfo(),
+            _buildServiceTimeline(),
+            _buildUploadSection(),
+            _buildCompleteButton(),
+          ],
+        ),
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
@@ -37,8 +38,8 @@ class WorkerPreparingScreen extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
           _buildStep('Confirm', isActive: false),
-          _buildStep('Preparing', isActive: true),
-          _buildStep('Working', isActive: false),
+          _buildStep('Preparing', isActive: false),
+          _buildStep('Working', isActive: true),
           _buildStep('Complete', isActive: false),
         ],
       ),
@@ -79,52 +80,80 @@ class WorkerPreparingScreen extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text('7 MAR 2024 19:03', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('time 7 MAR 2024 19:03', style: TextStyle(color: Colors.grey, fontSize: 12)),
               ],
             ),
             const SizedBox(height: 12),
             Text('Amount', style: TextStyle(fontWeight: FontWeight.bold)),
             Text('800 THB - QR Payment', style: TextStyle(color: Colors.green)),
-            const SizedBox(height: 12),
-            Text('Client need your help', style: TextStyle(fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            Row(
-              children: [
-                Icon(Icons.person, size: 16),
-                Expanded(child: LinearProgressIndicator(value: 0.5)),
-                Icon(Icons.location_on, size: 16),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('15 km'),
-                Text('Arriving in 20 mins'),
-              ],
-            ),
+            Text('Artiwara 0817654321', style: TextStyle(color: Colors.blue)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildVacuumIcon() {
-    return Icon(Icons.cleaning_services, size: 100, color: Colors.grey);
-  }
-
-  Widget _buildReadyToWorkButton() {
+  Widget _buildServiceTimeline() {
     return Padding(
       padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Service Timeline', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          _buildTimelineItem('Mop The Floor', isDone: true),
+          _buildTimelineItem('Wash Dishes', isDone: true),
+          _buildTimelineItem('Iron Clothes', isDone: false),
+          _buildTimelineItem('Mop The Floor', isDone: false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTimelineItem(String task, {required bool isDone}) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDone ? Colors.green : Colors.grey[300],
+          ),
+          child: isDone ? Icon(Icons.check, color: Colors.white, size: 16) : null,
+        ),
+        const SizedBox(width: 12),
+        Text(task),
+      ],
+    );
+  }
+
+  Widget _buildUploadSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Upload The Work Done', style: TextStyle(fontWeight: FontWeight.bold)),
+          Icon(Icons.add, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompleteButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ElevatedButton(
         onPressed: () {
-          // Handle ready to work action
+          // Handle complete action
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green,
           padding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        child: const Text('READY TO WORK', style: TextStyle(fontSize: 18)),
+        child: const Text('COMPLETE', style: TextStyle(fontSize: 18)),
       ),
     );
   }
