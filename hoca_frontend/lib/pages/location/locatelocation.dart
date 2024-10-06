@@ -16,7 +16,8 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
   @override
   void initState() {
     super.initState();
-    _selectedLocation = widget.location ?? LatLng(13.652494, 100.494949); // Default to Thung Kru, Bangkok
+    
+    _selectedLocation = widget.location ?? LatLng(13.7563, 100.5018); 
   }
 
   @override
@@ -58,7 +59,7 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation!,
+                target: _selectedLocation!, 
                 zoom: 14.0,
               ),
               markers: _selectedLocation != null
@@ -71,7 +72,7 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
                   : {},
               onTap: (LatLng tappedLocation) {
                 setState(() {
-                  _selectedLocation = tappedLocation;
+                  _selectedLocation = tappedLocation; 
                 });
               },
             ),
@@ -81,7 +82,7 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
             child: ElevatedButton(
               onPressed: () {
                 if (_selectedLocation != null) {
-                  Navigator.of(context).pop(_selectedLocation);
+                  Navigator.of(context).pop(_selectedLocation); 
                 }
               },
               child: const Text('Confirm', style: TextStyle(fontSize: 16)), // Adjust text size
