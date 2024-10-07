@@ -1,45 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-void main() => runApp(const MyApp());
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'User Progress',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const ProgressScreen(),
-    );
-  }
-}
-
-class ProgressScreen extends StatefulWidget {
-  const ProgressScreen({super.key});
-
-  @override
-  _ProgressScreenState createState() => _ProgressScreenState();
-}
-
-class _ProgressScreenState extends State<ProgressScreen> {
-  GoogleMapController? mapController;
-
-  final LatLng _center = const LatLng(13.729598, 100.775603); // Example LatLng
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
+class ProgressScreen extends StatelessWidget {
+  const ProgressScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Progress'),
-        backgroundColor: Colors.blue[100],
+        backgroundColor: Colors.lightBlue[100],
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -47,114 +16,166 @@ class _ProgressScreenState extends State<ProgressScreen> {
           },
         ),
       ),
-      body: Column(
-        children: [
-          // Step indicator (Confirm, Preparing, Working, Complete)
-          Container(
-            padding: const EdgeInsets.all(16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Step indicator
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                stepIndicator("Confirm"),
-                stepIndicator("Preparing", isActive: true),
-                stepIndicator("Working"),
-                stepIndicator("Complete"),
+                _buildStepIndicator('Confirm', isActive: false),
+                _buildStepIndicator('Preparing', isActive: true),
+                _buildStepIndicator('Working', isActive: false),
+                _buildStepIndicator('Complete', isActive: false),
               ],
             ),
-          ),
-          
-          // Profile Info and Details
-          const Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: Card(
-              child: ListTile(
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://via.placeholder.com/150'), // Profile picture
-                ),
-                title: Text('Artiwara Kongmalai'),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+            const SizedBox(height: 24),
+
+            // User info card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Row(
                   children: [
-                    SizedBox(height: 4.0),
-                    Text('Arriving to the destination'),
-                    Text('Amount: 800 THB - QR Payment'),
+                    const CircleAvatar(
+                      backgroundImage: NetworkImage('https://example.com/placeholder.jpg'),
+                      radius: 30,
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Artiwara Kongmalai',
+                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: const [
+                              Icon(Icons.directions_walk, size: 16),
+                              SizedBox(width: 4),
+                              Text('Arriving to the destination'),
+                            ],
+                          ),
+                          const SizedBox(height: 4),
+                          Row(
+                            children: const [
+                              Text('Amount:'),
+                              SizedBox(width: 4),
+                              Text(
+                                '800 THB - QR Payment',
+                                style: TextStyle(color: Colors.green),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
+            const SizedBox(height: 16),
 
-          // Worker info and ETA
-          const Card(
-            margin: EdgeInsets.symmetric(horizontal: 16.0),
-            child: ListTile(
-              leading: Icon(Icons.build, color: Colors.green),
-              title: Text('Worker: Jintara 0123456789'),
-              subtitle: Text('Worker on the way!'),
-              trailing: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('15 Mins'),
-                ],
+            // Worker info card
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text('Worker on the way!'),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.person, color: Colors.blue),
+                        const SizedBox(width: 8),
+                        const Text('Worker: Jintara 0123456789'),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: Colors.blue,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: const Text(
+                            '15 Mins',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+                    const LinearProgressIndicator(value: 0.5),
+                  ],
+                ),
               ),
             ),
-          ),
+            const SizedBox(height: 24),
 
-          // Google Map Widget
-          Expanded(
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 15.0,
+            // Map placeholder
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Center(
+                  child: Icon(Icons.map, size: 64, color: Colors.grey),
+                ),
               ),
             ),
-          ),
-        ],
+            const SizedBox(height: 16),
+
+            // Wait message
+            const Center(
+              child: Text(
+                'Please wait a moment, Worker on the way!',
+                style: TextStyle(fontSize: 16),
+              ),
+            ),
+          ],
+        ),
       ),
-
-      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 1, // Set the active page
+        currentIndex: 2,
+        type: BottomNavigationBarType.fixed,
         items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+            icon: Icon(Icons.add_circle_outline, size: 32),
+            label: '',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.update),
-            label: 'Progress',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.update), label: 'Progress'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
   }
 
-  // Step indicator widget
-  Widget stepIndicator(String title, {bool isActive = false}) {
+  Widget _buildStepIndicator(String title, {required bool isActive}) {
     return Column(
       children: [
         Text(
           title,
           style: TextStyle(
-            color: isActive ? Colors.blue : Colors.black45,
+            color: isActive ? Colors.blue : Colors.grey,
             fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
           ),
         ),
-        if (isActive)
-          Container(
-            width: 8,
-            height: 8,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.blue,
-            ),
-          )
+        const SizedBox(height: 4),
+        Container(
+          width: 8,
+          height: 8,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isActive ? Colors.blue : Colors.grey,
+          ),
+        ),
       ],
     );
   }

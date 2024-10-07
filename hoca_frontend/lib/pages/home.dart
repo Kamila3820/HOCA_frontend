@@ -3,7 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
 import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
-import 'package:hoca_frontend/pages/location.dart';
+import 'package:hoca_frontend/pages/location/location.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 import 'package:hoca_frontend/pages/service/cleaning.dart';
 import 'package:hoca_frontend/pages/service/clothes.dart';
