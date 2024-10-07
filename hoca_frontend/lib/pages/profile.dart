@@ -183,7 +183,7 @@ class ProfilePage extends StatelessWidget {
                   ),
                   Divider(),
                   Text(
-                    'John Mayer\'s Review:',
+                    'Karl Anthony\'s Review:',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,

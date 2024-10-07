@@ -62,7 +62,7 @@ class OrderConfirmationScreen extends StatelessWidget {
               trailing: Text('500 THB - QR Payment'),
             ),
             SizedBox(height: 10),
-            Text('Artiwara need your help'),
+            Text('Client need your help'),
             Text('Distance: 15 km'),
             Text('Address: Condominium H4 Floor 4 Room 423'),
             SizedBox(height: 10),
