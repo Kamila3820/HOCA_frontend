@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/components/home/Subservice%20Widget.dart';
 import 'package:hoca_frontend/pages/reserve/reserve.dart';
+
 
 Widget buildWorkerCard(BuildContext context) {
   return GestureDetector(
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ReservePage()), // Replace with your ReservePage
+        MaterialPageRoute(builder: (context) => ReservePage()),
       );
     },
     child: Card(
@@ -19,10 +21,10 @@ Widget buildWorkerCard(BuildContext context) {
           borderRadius: BorderRadius.circular(12),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2), // Shadow color with opacity
-              spreadRadius: 1, // How much the shadow spreads
-              blurRadius: 3, // How blurry the shadow is
-              offset: const Offset(0, 2), // Position of the shadow (x, y)
+              color: Colors.black.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 3,
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -31,10 +33,10 @@ Widget buildWorkerCard(BuildContext context) {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                'https://via.placeholder.com/150', // Replace with your image URL
+                'https://via.placeholder.com/150',
                 width: double.infinity,
-                height: 180, // Adjust the height as needed
-                fit: BoxFit.cover, // Adjust the image fit
+                height: 180,
+                fit: BoxFit.cover,
               ),
             ),
             Positioned(
@@ -69,7 +71,7 @@ Widget buildWorkerCard(BuildContext context) {
                     ),
                     const SizedBox(width: 4),
                     const Stack(
-                      alignment: Alignment.center, // Center the black star on the yellow star
+                      alignment: Alignment.center,
                       children: [
                         Icon(
                           Icons.star,
@@ -79,7 +81,7 @@ Widget buildWorkerCard(BuildContext context) {
                         Icon(
                           Icons.star,
                           color: Colors.black,
-                          size: 10, // Smaller size for the black star
+                          size: 10,
                         ),
                       ],
                     ),
@@ -102,13 +104,13 @@ Widget buildWorkerCard(BuildContext context) {
               top: 155,
               left: 12,
               child: Container(
-                width: 45, // Set the desired width for the green box
-                height: 15, // Set the desired height for the green box
+                width: 45,
+                height: 15,
                 decoration: const BoxDecoration(
                   color: Color(0xFF90D26D),
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(6),    // Adjust the radius for the top-left corner
-                    bottomRight: Radius.circular(6), // Adjust the radius for the bottom-right corner
+                    topLeft: Radius.circular(6),
+                    bottomRight: Radius.circular(6),
                   ),
                 ),
                 child: Center(
@@ -126,7 +128,7 @@ Widget buildWorkerCard(BuildContext context) {
               ),
             ),
             Positioned(
-              top: 190, // Position under the image
+              top: 190,
               left: 2,
               right: 0,
               child: Padding(
@@ -134,95 +136,17 @@ Widget buildWorkerCard(BuildContext context) {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Iron clothes',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 6,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    SubserviceWidget(text: 'Iron clothes'),
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Mop Floor',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 6,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    SubserviceWidget(text: 'Mop Floor'),
                     const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Wash Dishes',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 6,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    SubserviceWidget(text: 'Wash Dishes'),
                   ],
                 ),
               ),
             ),
             Positioned(
-              top: 210, // Adjust this value to position the column below the row of boxes
+              top: 210,
               left: 12,
               right: 12,
               child: Column(
@@ -240,7 +164,7 @@ Widget buildWorkerCard(BuildContext context) {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    margin: const EdgeInsets.only(left: 3), // Adjust this value to move text to the right
+                    margin: const EdgeInsets.only(left: 3),
                     child: Text(
                       'Male',
                       style: GoogleFonts.poppins(
@@ -253,15 +177,15 @@ Widget buildWorkerCard(BuildContext context) {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    margin: const EdgeInsets.only(left: 3), // Same left margin for consistency
+                    margin: const EdgeInsets.only(left: 3),
                     child: Row(
                       children: [
                         const Icon(
-                          Icons.location_on, // Location icon
-                          color: Color(0xFF39A7FF), // Change the color as needed
-                          size: 12, // Adjust the size of the icon
+                          Icons.location_on,
+                          color: Color(0xFF39A7FF),
+                          size: 12,
                         ),
-                        const SizedBox(width: 4), // Space between the icon and text
+                        const SizedBox(width: 4),
                         Text(
                           '3.6 km',
                           style: GoogleFonts.poppins(
@@ -276,7 +200,7 @@ Widget buildWorkerCard(BuildContext context) {
                   ),
                   const SizedBox(height: 4),
                   Container(
-                    margin: const EdgeInsets.only(left: 3), // Same left margin for consistency
+                    margin: const EdgeInsets.only(left: 3),
                     child: Text(
                       'Condo room/ House',
                       style: GoogleFonts.poppins(
@@ -291,8 +215,8 @@ Widget buildWorkerCard(BuildContext context) {
               ),
             ),
             Positioned(
-              bottom: 10, // Position it near the bottom of the card
-              right: 12, // Align it to the right
+              bottom: 10,
+              right: 12,
               child: Text(
                 '400 THB/ hr.',
                 style: GoogleFonts.poppins(
