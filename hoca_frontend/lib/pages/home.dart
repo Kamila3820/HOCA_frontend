@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
+import 'package:hoca_frontend/components/navbar/creatpostbutton.dart';
 import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
 import 'package:hoca_frontend/models/homepost.dart';
 import 'package:hoca_frontend/models/post.dart';
@@ -108,37 +109,67 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void navigateBasedOnCategory(Post post) {
+  void navigateBasedOnCategory(Post post) async {
   if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
     List<Post> filteredPosts = posts.where((post) =>
     post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
-    Navigator.push(
+    var result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => CleanPage(posts: filteredPosts),  // Navigate to CleanPage
       ),
     );
+    if (result == true) {
+      setState(() {
+          filteredPosts = posts;  // Reset the filteredPosts list to all posts
+      });
+      reload();
+    }
   } else if (post.categoryID == 4 || post.categoryID == 5) {
-    Navigator.push(
+    List<Post> filteredPosts = posts.where((post) =>
+    post.categoryID == 4 || post.categoryID == 5).toList();
+    var result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const ClothesPage(),  // Navigate to ClothesPage
+        builder: (context) => ClothesPage(posts: filteredPosts),  // Navigate to ClothesPage
       ),
     );
+    if (result == true) {
+      setState(() {
+          filteredPosts = posts;  // Reset the filteredPosts list to all posts
+      });
+      reload();
+    }
   } else if (post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8) {
-    Navigator.push(
+    List<Post> filteredPosts = posts.where((post) =>
+    post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
+    var result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const GardeningPage(),  // Navigate to GardeningPage
+        builder: (context) => GardeningPage(posts: filteredPosts,),  // Navigate to GardeningPage
       ),
     );
+    if (result == true) {
+      setState(() {
+          filteredPosts = posts;  // Reset the filteredPosts list to all posts
+      });
+      reload();
+    }
   } else if (post.categoryID == 9) {
-    Navigator.push(
+    List<Post> filteredPosts = posts.where((post) =>
+    post.categoryID == 9).toList();
+    var result = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const PetsPage(),  // Navigate to PetsPage
+        builder: (context) => PetsPage(posts: filteredPosts,),  // Navigate to PetsPage
       ),
     );
+    if (result == true) {
+      setState(() {
+          filteredPosts = posts;  // Reset the filteredPosts list to all posts
+        });
+      reload();
+    }
   }
 }
 
@@ -386,19 +417,11 @@ class _HomePageState extends State<HomePage> {
                     },
                   ),
                 ),
-
-
               ],
             ),
           ),
         ],
       ),
-      // bottomNavigationBar: const CustomBottomNavigationBar(
-      //     currentPage: 'Home'), // Add the bottom navigation bar
-      // floatingActionButton:
-      //     const CustomFloatingActionButton(), // Add the floating action button
-      // floatingActionButtonLocation: FloatingActionButtonLocation
-      //     .centerDocked, // Center the floating action button
     );
   }
 }
