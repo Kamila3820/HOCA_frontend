@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Widget buildIconWithLabelWithColor(
-  IconData icon,
-  String label,
-  String currentPage,
-  VoidCallback onTap, // Change this to VoidCallback for better clarity
-) {
-  bool isSelected = label == currentPage;
-
-  return GestureDetector( // Make the widget clickable
+Widget buildIconWithLabelWithColor({
+  required IconData icon,
+  required String label,
+  required bool isSelected,
+  required VoidCallback onTap,
+}) {
+  return GestureDetector(
     onTap: onTap, // Call the provided onTap function when tapped
     child: Column(
       mainAxisAlignment: MainAxisAlignment.center,

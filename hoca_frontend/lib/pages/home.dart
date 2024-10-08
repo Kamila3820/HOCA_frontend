@@ -393,12 +393,12 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(
-          currentPage: 'Home'), // Add the bottom navigation bar
-      floatingActionButton:
-          const CustomFloatingActionButton(), // Add the floating action button
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .centerDocked, // Center the floating action button
+      // bottomNavigationBar: const CustomBottomNavigationBar(
+      //     currentPage: 'Home'), // Add the bottom navigation bar
+      // floatingActionButton:
+      //     const CustomFloatingActionButton(), // Add the floating action button
+      // floatingActionButtonLocation: FloatingActionButtonLocation
+      //     .centerDocked, // Center the floating action button
     );
   }
 }
