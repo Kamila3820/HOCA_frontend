@@ -17,12 +17,12 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
         ),
-        title: Text("Reserve Payment"),
+        title: const Text("Reserve Payment"),
         centerTitle: true,
       ),
       body: Padding(
@@ -31,10 +31,10 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Payment method selection
-            Text("Select a payment method", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
+            const Text("Select a payment method", style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
             RadioListTile(
-              title: Text("Cash"),
+              title: const Text("Cash"),
               value: 'Cash',
               groupValue: paymentMethod,
               onChanged: (value) {
@@ -44,7 +44,7 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
               },
             ),
             RadioListTile(
-              title: Text("QR code Payment"),
+              title: const Text("QR code Payment"),
               value: 'QR code Payment',
               groupValue: paymentMethod,
               onChanged: (value) {
@@ -53,34 +53,34 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
                 });
               },
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Place type input
-            Text("Specify a type of your place", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
+            const Text("Specify a type of your place", style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
             TextField(
               onChanged: (value) {
                 placeType = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Type of place",
                 hintText: "Dormitory room 17",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             // Note input
-            Text("Note to a worker (if any)", style: TextStyle(fontSize: 18)),
-            SizedBox(height: 10),
+            const Text("Note to a worker (if any)", style: TextStyle(fontSize: 18)),
+            const SizedBox(height: 10),
             TextField(
               onChanged: (value) {
                 workerNote = value;
               },
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 labelText: "Note",
                 border: OutlineInputBorder(),
               ),
             ),
-            SizedBox(height: 30),
+            const SizedBox(height: 30),
             // Buttons
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -89,7 +89,7 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
                   onPressed: () {
                     Navigator.pop(context); // Close the page
                   },
-                  child: Text("Cancel", style: TextStyle(color: Colors.red)),
+                  child: const Text("Cancel", style: TextStyle(color: Colors.red)),
                 ),
                 ElevatedButton(
                   onPressed: () {
@@ -97,7 +97,7 @@ class _ReservePaymentPageState extends State<ReservePaymentPage> {
                     Navigator.pop(context); // Close the page after placing order
                     // You can add logic here to send the order data to a backend
                   },
-                  child: Text("Place order"),
+                  child: const Text("Place order"),
                 ),
               ],
             ),

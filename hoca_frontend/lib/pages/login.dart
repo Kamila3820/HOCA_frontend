@@ -1,32 +1,70 @@
+import 'package:dio/dio.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/login/login_components.dart';
+import 'package:hoca_frontend/models/login.dart';
+import 'package:hoca_frontend/pages/location.dart';
 import 'package:page_transition/page_transition.dart'; // Import the page_transition package
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'home.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class LoginPage extends StatefulWidget {
+  const LoginPage({Key? key}) : super(key: key);
+  static const routeName = "/login_page";
+
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  void callLogin() async {
+    Caller.dio.post("/v1/account/login", data: {
+      "email": emailController.text,
+      "password": passwordController.text,
+    }).then((response) async {
+      // * Parse response
+      final Map<String, dynamic> responseData = jsonDecode(response.toString());
+
+    // Retrieve the token from the response
+    final token = responseData["token"];
+    print(token);
+
+      // * Load shared preferences
+      final prefs = await SharedPreferences
+          .getInstance(); //shared_preferences same as cookies
+      prefs.setString('token', token);
+
+      // * Set caller token value
+      Caller.setToken(token);
+
+      Navigator.pushReplacement(
+        context,
+        PageTransition(
+          type: PageTransitionType.rightToLeft,
+          child: const HomePage(),
+          duration: const Duration(milliseconds: 550),
+          curve: Curves.easeInOut,
+        ),
+      );
+    }).onError((DioException error, _) {
+      // * Apply default error handling
+      Caller.handle(context, error);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
 
     void validateAndLogin() {
       if (formKey.currentState?.validate() ?? false) {
-        // Handle login logic here
-
-        // Navigate to HomePage with right-to-left page transition
-        Navigator.push(
-          context,
-          PageTransition(
-            type: PageTransitionType.rightToLeft, // Right-to-left transition
-            child: HomePage(),
-            duration: const Duration(milliseconds: 550), // Duration of the transition
-            curve: Curves.easeInOut, // Animation curve
-          ),
-        );
+        // Call the login function
+        callLogin();
       }
     }
 

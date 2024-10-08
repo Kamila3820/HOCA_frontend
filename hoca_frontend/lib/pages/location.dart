@@ -33,7 +33,10 @@ class _LocationPageState extends State<LocationPage> {
     setState(() {
       selectedLocation = location;
     });
-    Navigator.of(context).pop(); // Close the map after selection
+    Navigator.of(context).pop({
+      'latitude': selectedLocation!.latitude,
+      'longitude': selectedLocation!.longitude
+    }); // Close the map after selection
   }
 
   Future<void> _showMap() async {
@@ -61,26 +64,25 @@ class _LocationPageState extends State<LocationPage> {
   }
 
   Future<void> _locateMe() async {
-    // Create an instance of the Location class
-    Location location = Location();
-    
-    // Request permission
-    PermissionStatus permissionStatus = await location.requestPermission();
+  Location location = Location();
+  PermissionStatus permissionStatus = await location.requestPermission();
 
-    if (permissionStatus == PermissionStatus.granted) {
-      // Get the current location
-      LocationData currentLocation = await location.getLocation();
-      setState(() {
-        selectedLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
-      });
-      // Navigate to locatelocation.dart after simulating "Locate Me"
-      _navigateToLocateLocation();
-    } else {
-      // Handle permission denied
-      print('Location permission denied');
-      // Optionally, show a dialog or a message to the user
-    }
+  if (permissionStatus == PermissionStatus.granted) {
+    LocationData currentLocation = await location.getLocation();
+    setState(() {
+      selectedLocation = LatLng(currentLocation.latitude!, currentLocation.longitude!);
+    });
+    // Return the location back to HomePage
+    Navigator.of(context).pop({
+      'latitude': selectedLocation!.latitude,
+      'longitude': selectedLocation!.longitude
+    });
+  } else {
+    // Handle permission denied
+    print('Location permission denied');
   }
+}
+
 
   @override
   Widget build(BuildContext context) {

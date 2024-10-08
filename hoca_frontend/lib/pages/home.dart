@@ -1,17 +1,148 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
 import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
+import 'package:hoca_frontend/models/homepost.dart';
+import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/location.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 import 'package:hoca_frontend/pages/service/cleaning.dart';
 import 'package:hoca_frontend/pages/service/clothes.dart';
 import 'package:hoca_frontend/pages/service/gardening.dart';
 import 'package:hoca_frontend/pages/service/pets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  List<Post> posts = [];
+  String? selectedLatitude = "";  
+  String? selectedLongitude = ""; 
+
+  @override
+  void initState() {
+    super.initState();
+    load("", "");
+  }
+
+  load(String latitude, String longitude) async {
+    String url = "/v1/post/list?lat=$latitude&long=$longitude";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+
+    print("Making request to URL: $url");
+    print("Using token: $token");
+    Caller.dio.get(
+      url,
+      options: Options(
+      headers: {
+        'x-auth-token': '$token',  // Add token to header
+      },
+    ),
+      ).then((response) {
+        print(response.data);
+          if (mounted) {
+            setState(() {
+              // Directly map the response data to List<Post>
+              posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
+            });
+          }
+    }).onError((DioException error, _) {
+      Caller.handle(context, error);
+    });
+  }
+
+  reload() {
+    if (selectedLatitude == null || selectedLongitude == null) {
+      _showLocationAlert(); 
+    } else {
+      load(selectedLatitude!, selectedLongitude!); 
+    }
+  }
+
+  _showLocationAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Location Required'),
+          content: const Text('Please choose a location to see available services.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Dismiss the dialog
+                _navigateToLocationPage();  // Navigate to the location selection page
+              },
+              child: const Text('Choose Location'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  _navigateToLocationPage() async {
+    var result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LocationPage(),
+      ),
+    );
+
+    if (result != null) {
+      setState(() {
+        selectedLatitude = result['latitude'].toString();
+        selectedLongitude = result['longitude'].toString();
+      });
+
+      load(selectedLatitude!, selectedLongitude!);  // Reload data with new location
+    }
+  }
+
+  void navigateBasedOnCategory(Post post) {
+  if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
+    List<Post> filteredPosts = posts.where((post) =>
+    post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CleanPage(posts: filteredPosts),  // Navigate to CleanPage
+      ),
+    );
+  } else if (post.categoryID == 4 || post.categoryID == 5) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ClothesPage(),  // Navigate to ClothesPage
+      ),
+    );
+  } else if (post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const GardeningPage(),  // Navigate to GardeningPage
+      ),
+    );
+  } else if (post.categoryID == 9) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const PetsPage(),  // Navigate to PetsPage
+      ),
+    );
+  }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -92,13 +223,21 @@ class HomePage extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 GestureDetector(
-                  onTap: () {
-                    Navigator.push(
+                  onTap: () async {
+                    var result = await Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => const LocationPage(),
                       ),
                     );
+
+                    if (result != null) {
+                      selectedLatitude = result['latitude'].toString();
+                      selectedLongitude = result['longitude'].toString();
+
+                      // Use the latitude and longitude
+                      load(selectedLatitude!, selectedLongitude!);
+                    }
                   },
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
@@ -151,51 +290,57 @@ class HomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
-                      onTap: () {
-                         Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const CleanPage(),
+                        onTap: () {
+                          // Filter the posts for cleaning categories (1, 2, 3)
+                          List<Post> filteredPosts = posts.where((post) => post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
+                          setState(() {
+                            posts = filteredPosts; // Update the posts list with filtered posts
+                          });
+                          if (filteredPosts.isNotEmpty) {
+                            navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                          }
+                        },
+                        child: buildServiceOption('Cleaning', FontAwesomeIcons.broom),
                       ),
-                    );
+
+                    GestureDetector(
+                      onTap: () {
+                        // Filter the posts for clothes categories (4, 5)
+                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 4 || post.categoryID == 5).toList();
+                        setState(() {
+                          posts = filteredPosts; // Update the posts list with filtered posts
+                        });
+                        if (filteredPosts.isNotEmpty) {
+                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                        }
                       },
-                      child: buildServiceOption(
-                          'Cleaning', FontAwesomeIcons.broom),
+                      child: buildServiceOption('Clothes', FontAwesomeIcons.shirt),
                     ),
                     GestureDetector(
                       onTap: () {
-                         Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ClothesPage(),
-                      ),
-                    );
+                        // Filter the posts for gardening categories (6, 7, 8)
+                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
+                        setState(() {
+                          posts = filteredPosts; // Update the posts list with filtered posts
+                        });
+                        if (filteredPosts.isNotEmpty) {
+                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                        }
                       },
-                      child:
-                          buildServiceOption('Clothes', FontAwesomeIcons.shirt),
+                      child: buildServiceOption('Gardening', FontAwesomeIcons.seedling),
                     ),
                     GestureDetector(
                       onTap: () {
-                         Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const PetsPage(),
-                      ),
-                    );
+                        // Filter the posts for pets categories (9)
+                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 9).toList();
+                        setState(() {
+                          posts = filteredPosts; // Update the posts list with filtered posts
+                        });
+                        if (filteredPosts.isNotEmpty) {
+                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                        }
                       },
                       child: buildServiceOption('Pets', Icons.pets),
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                         Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const GardeningPage(),
-                      ),
-                    );
-                      },
-                      child: buildServiceOption(
-                          'Gardening', FontAwesomeIcons.seedling),
                     ),
                   ],
                 ),
@@ -213,7 +358,7 @@ class HomePage extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      'Total Found: 4 in your area',
+                      'Total Found: ${posts.length} in your area', // Use posts.length for the count
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 14,
@@ -226,19 +371,23 @@ class HomePage extends StatelessWidget {
                 const SizedBox(height: 8),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
                       mainAxisSpacing: 15,
                       crossAxisSpacing: 10,
                       childAspectRatio: 0.58,
                     ),
-                    itemCount: 4,
+                    itemCount: posts.length, // Use posts.length directly
                     itemBuilder: (context, index) {
-                      return buildWorkerCard(context);
+                      return WorkerPost(
+                        post: posts[index],  // Directly pass the post
+                        reload: reload,      // Pass the reload function
+                      );
                     },
                   ),
                 ),
+
+
               ],
             ),
           ),

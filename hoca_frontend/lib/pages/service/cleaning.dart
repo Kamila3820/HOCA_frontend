@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/home/buildWorkerCard.dart';
+import 'package:hoca_frontend/models/post.dart'; // Import your Post model
 
 class CleanPage extends StatelessWidget {
-  const CleanPage({super.key});
+  final List<Post> posts; // Accept the posts as a parameter
+
+  const CleanPage({super.key, required this.posts}); // Require the posts
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +59,7 @@ class CleanPage extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.only(left: 20.0),
               child: Text(
-                'Total Found: 6',
+                'Total Found: ${posts.length}', // Show the number of filtered posts
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 18,
@@ -78,9 +81,12 @@ class CleanPage extends StatelessWidget {
                   crossAxisSpacing: 20, // Space between columns
                   childAspectRatio: 0.58,
                 ),
-                itemCount: 6,
+                itemCount: posts.length, // Number of posts
                 itemBuilder: (context, index) {
-                  return buildWorkerCard(context); // Passing the BuildContext argument
+                  return WorkerPost(
+                        post: posts[index],  // Directly pass the post
+                        reload: () {},      // Pass the reload function
+                      ); // Pass each post to buildWorkerCard
                 },
               ),
             ),

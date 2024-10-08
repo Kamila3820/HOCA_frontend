@@ -1,8 +1,74 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/models/homepost.dart';
+import 'package:hoca_frontend/models/placetype.dart';
+import 'package:hoca_frontend/models/post.dart';
+import 'package:hoca_frontend/models/posts.dart';
 import 'package:hoca_frontend/pages/reserve/reserve.dart';
 
-Widget buildWorkerCard(BuildContext context) {
+class WorkerPost extends StatefulWidget {
+  final Post post;
+  const WorkerPost({
+    super.key,
+    required this.post,
+    required this.reload,
+  });
+  final VoidCallback reload;
+
+  @override
+  State<WorkerPost> createState() => _WorkerPostState();
+}
+
+class _WorkerPostState extends State<WorkerPost> {
+  HomePost? posts;
+  Posts? post;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  String getPlaceTypeNames(List<PlaceType> placeTypes) {
+  return placeTypes.map((placeType) => placeType.name ?? "Unknown").join(" / ");
+}
+
+  @override
+  Widget build(BuildContext context) {
+    String categoryType = "";
+
+    if (widget.post.categoryID == 1) {
+      categoryType = "Deep cleaning";
+    }
+    if (widget.post.categoryID == 2) {
+      categoryType = "Floor care";
+    }
+    if (widget.post.categoryID == 3) {
+      categoryType = "Window care";
+    }
+    if (widget.post.categoryID == 4) {
+      categoryType = "Laundry";
+    }
+    if (widget.post.categoryID == 5) {
+      categoryType = "Sewing";
+    }
+    if (widget.post.categoryID == 6) {
+      categoryType = "Lawn mowing";
+    }
+    if (widget.post.categoryID == 7) {
+      categoryType = "Watering";
+    }
+    if (widget.post.categoryID == 8) {
+      categoryType = "Yard cleanup";
+    }
+    if (widget.post.categoryID == 9) {
+      categoryType = "Pet sitting";
+    }
+   
+    // Get the place type names from placeTypeID
+     String placeTypeNames = widget.post.placeTypeID != null && widget.post.placeTypeID!.isNotEmpty
+      ? getPlaceTypeNames(widget.post.placeTypeID!)
+      : "Unknown"; // Fallback if there are no place types
+
   return GestureDetector(
     onTap: () {
       Navigator.push(
@@ -31,13 +97,14 @@ Widget buildWorkerCard(BuildContext context) {
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
               child: Image.network(
-                'https://via.placeholder.com/150', // Replace with your image URL
+                widget.post.avatarUrl!, // Replace with your image URL
                 width: double.infinity,
                 height: 180, // Adjust the height as needed
                 fit: BoxFit.cover, // Adjust the image fit
               ),
             ),
-            Positioned(
+            if (widget.post.totalScore != 0.0)
+              Positioned(
               top: 10,
               right: 10,
               child: Container(
@@ -85,7 +152,7 @@ Widget buildWorkerCard(BuildContext context) {
                     ),
                     const SizedBox(width: 4),
                     Text(
-                      '8.0',
+                      widget.post.totalScore.toString(),
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontWeight: FontWeight.bold,
@@ -150,7 +217,7 @@ Widget buildWorkerCard(BuildContext context) {
                           ],
                         ),
                         child: Text(
-                          'Iron clothes',
+                          categoryType,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             textStyle: const TextStyle(
@@ -161,62 +228,7 @@ Widget buildWorkerCard(BuildContext context) {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Mop Floor',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 6,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          'Wash Dishes',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 6,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+                    
                   ],
                 ),
               ),
@@ -229,7 +241,7 @@ Widget buildWorkerCard(BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Artiwara Kongmalai',
+                    widget.post.name!,
                     style: GoogleFonts.poppins(
                       textStyle: const TextStyle(
                         fontSize: 10,
@@ -242,7 +254,7 @@ Widget buildWorkerCard(BuildContext context) {
                   Container(
                     margin: const EdgeInsets.only(left: 3), // Adjust this value to move text to the right
                     child: Text(
-                      'Male',
+                      widget.post.gender!,
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 10,
@@ -263,7 +275,7 @@ Widget buildWorkerCard(BuildContext context) {
                         ),
                         const SizedBox(width: 4), // Space between the icon and text
                         Text(
-                          '3.6 km',
+                          widget.post.distance! + " km",
                           style: GoogleFonts.poppins(
                             textStyle: const TextStyle(
                               fontSize: 10,
@@ -278,7 +290,7 @@ Widget buildWorkerCard(BuildContext context) {
                   Container(
                     margin: const EdgeInsets.only(left: 3), // Same left margin for consistency
                     child: Text(
-                      'Condo room/ House',
+                      placeTypeNames,
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 10,
@@ -294,7 +306,7 @@ Widget buildWorkerCard(BuildContext context) {
               bottom: 10, // Position it near the bottom of the card
               right: 12, // Align it to the right
               child: Text(
-                '400 THB/ hr.',
+                "฿ "+ widget.post.price.toString(),
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 10,
@@ -309,4 +321,5 @@ Widget buildWorkerCard(BuildContext context) {
       ),
     ),
   );
+}
 }

@@ -40,9 +40,9 @@ class ReservePage extends StatelessWidget {
             const Text("(5 times)", style: TextStyle(color: Colors.grey)),
             const SizedBox(height: 10),
             // Rating
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.star, color: Colors.amber),
                 SizedBox(width: 5),
                 Text("8.0", style: TextStyle(fontSize: 18)),
@@ -60,9 +60,9 @@ class ReservePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Verified badge
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.verified, color: Colors.green),
                 SizedBox(width: 5),
                 Text("verified", style: TextStyle(color: Colors.green)),
@@ -95,9 +95,9 @@ class ReservePage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             // Reviews
-            Align(
+            const Align(
               alignment: Alignment.centerLeft,
-              child: const Text(
+              child: Text(
                 "John Mayer's Review:",
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),

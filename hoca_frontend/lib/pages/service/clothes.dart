@@ -68,23 +68,23 @@ Widget build(BuildContext context) {
             ),
           ),
           const SizedBox(height: 8),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0), // Space on left and right
-              child: GridView.builder(
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 20, // Space between rows
-                  crossAxisSpacing: 20, // Space between columns
-                  childAspectRatio: 0.58,
-                ),
-                itemCount: 3,
-                itemBuilder: (context, index) {
-                  return buildWorkerCard(context);
-                },
-              ),
-            ),
-          ),
+          // Expanded(
+          //   child: Padding(
+          //     padding: const EdgeInsets.symmetric(horizontal: 15.0), // Space on left and right
+          //     child: GridView.builder(
+          //       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          //         crossAxisCount: 2,
+          //         mainAxisSpacing: 20, // Space between rows
+          //         crossAxisSpacing: 20, // Space between columns
+          //         childAspectRatio: 0.58,
+          //       ),
+          //       itemCount: 3,
+          //       itemBuilder: (context, index) {
+          //         return buildWorkerCard(context);
+          //       },
+          //     ),
+          //   ),
+          // ),
         ],
       ),
     );
