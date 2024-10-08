@@ -41,12 +41,10 @@ dependencies:
   flutter_dotenv: ^5.0.2
   location: ^6.0.2
   page_transition: ^2.1.0
-  flutter_platform_alert: ^0.6.1
-  json_annotation: ^4.9.0
+  geocoding: ^2.0.0
   dio: ^5.7.0
   shared_preferences: ^2.3.2
-  url_launcher: ^6.3.0
-  webview_flutter: ^4.0.0
+  flutter_platform_alert: ^0.6.1
 
 
 
@@ -62,7 +60,6 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: 5.0.0
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
