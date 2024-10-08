@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class PostLocation extends StatefulWidget {
@@ -121,10 +121,11 @@ class _PostLocationState extends State<PostLocation> {
               child: const Text(
                 'Confirm',
                 style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  fontFamily: 'Poppins', // Set font to Poppins
+                  fontSize: 25, // Adjust text size
+                  fontWeight: FontWeight.bold, // Set text to bold
+                  color: Color.fromARGB(
+                      255, 255, 255, 255), // Set desired text color
                 ),
               ),
             ),

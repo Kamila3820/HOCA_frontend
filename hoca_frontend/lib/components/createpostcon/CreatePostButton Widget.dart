@@ -82,6 +82,7 @@ class CreatePostButton extends StatelessWidget {
           style: GoogleFonts.poppins(
             textStyle: const TextStyle(
               fontSize: 20,
+              fontWeight: FontWeight.bold,
               color: Colors.white,
             ),
           ),

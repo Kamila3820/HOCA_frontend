@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:location/location.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/components/createpostcon/CreatePostButton%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
+import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
-import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/createpost/postlocation.dart'; // Import the new screen
+import 'package:hoca_frontend/pages/home.dart';
+import 'package:location/location.dart';
 
 class CreatePostCon extends StatefulWidget {
   const CreatePostCon({super.key});
@@ -98,45 +98,12 @@ class _CreatePostConState extends State<CreatePostCon> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                height: 370.0,
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF87C4FF).withOpacity(0.6),
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(90),
-                    bottomRight: Radius.circular(90),
-                  ),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: 160, left: 20, right: 10),
-                  child: Stack(
-                    children: [
-                      Align(
-                        alignment: Alignment.centerLeft,
-                        child: IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ),
-                      Center(
-                        child: Text(
-                          'Create Worker',
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 30,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+              HeaderContainer(
+                onBackPressed: () {
+                  Navigator.pop(context); // Go back to the previous page
+                },
               ),
+
             ],
           ),
           LocationBox(),
