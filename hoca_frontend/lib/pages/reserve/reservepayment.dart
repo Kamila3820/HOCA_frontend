@@ -115,15 +115,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please specify the type of your place';
-                }
-                if (value.length > 100) {
-                  return 'Place type should not exceed 100 characters';
-                }
-                return null;
-              },
+              
               onSaved: (value) {
                 _placeType = value;
               },
