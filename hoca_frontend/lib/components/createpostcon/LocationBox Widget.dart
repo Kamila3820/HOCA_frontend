@@ -36,7 +36,7 @@ class LocationBox extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '679/210 Prachauthit 45 Thung Khru, Bangkok',
+              'Locate Your Location',
               style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
                   fontSize: 12,

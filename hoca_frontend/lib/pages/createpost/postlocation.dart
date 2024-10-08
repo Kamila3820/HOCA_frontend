@@ -3,24 +3,27 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 
 class PostLocation extends StatefulWidget {
-  final LatLng initialLocation;  // ใช้ LatLng จาก google_maps_flutter
+  final LatLng? initialLocation; // Nullable to allow default
 
-  const PostLocation({Key? key, required this.initialLocation}) : super(key: key);
+  const PostLocation({Key? key, this.initialLocation}) : super(key: key);
 
   @override
   _PostLocationState createState() => _PostLocationState();
 }
 
 class _PostLocationState extends State<PostLocation> {
-  LatLng? _selectedLocation;
+  LatLng _selectedLocation = const LatLng(13.7563, 100.5018); // Default Bangkok coordinates
   String? _selectedAddress;
   GoogleMapController? _mapController;
 
   @override
   void initState() {
     super.initState();
-    _selectedLocation = widget.initialLocation;
-    _getAddressFromLatLng(_selectedLocation!);
+    // If initialLocation is passed, use it; otherwise, default to Bangkok
+    if (widget.initialLocation != null) {
+      _selectedLocation = widget.initialLocation!;
+    }
+    _getAddressFromLatLng(_selectedLocation);
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
@@ -39,6 +42,15 @@ class _PostLocationState extends State<PostLocation> {
     } catch (e) {
       print("Error: $e");
     }
+  }
+
+  // Use animateCamera to move the camera smoothly to the selected location
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+    // Animate the camera to move to the selected location (Bangkok)
+    _mapController!.animateCamera(
+      CameraUpdate.newLatLngZoom(_selectedLocation, 14.0),
+    );
   }
 
   @override
@@ -63,27 +75,22 @@ class _PostLocationState extends State<PostLocation> {
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation ?? const LatLng(13.7563, 100.5018), // ตำแหน่งเริ่มต้นที่กรุงเทพฯ
+                target: _selectedLocation, // Use the selected location (Bangkok by default)
                 zoom: 14.0,
               ),
-              markers: _selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: const MarkerId('selected-location'),
-                        position: _selectedLocation!,
-                        draggable: true,  // สามารถลากหมุดได้
-                        onDragEnd: (LatLng newPosition) {
-                          setState(() {
-                            _selectedLocation = newPosition;
-                          });
-                          _getAddressFromLatLng(newPosition);
-                        },
-                      ),
-                    }
-                  : {},
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
+              markers: {
+                Marker(
+                  markerId: const MarkerId('selected-location'),
+                  position: _selectedLocation,
+                ),
               },
+              onTap: (LatLng tappedLocation) {
+                setState(() {
+                  _selectedLocation = tappedLocation;
+                });
+                _getAddressFromLatLng(tappedLocation);
+              },
+              onMapCreated: _onMapCreated, // Animate camera when the map is created
             ),
           ),
           Padding(
