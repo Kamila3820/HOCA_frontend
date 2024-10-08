@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PostLocation extends StatefulWidget {
-  final LatLng? initialLocation; // Nullable to allow default
+  final LatLng? initialLocation;
 
   const PostLocation({Key? key, this.initialLocation}) : super(key: key);
 
@@ -12,18 +13,24 @@ class PostLocation extends StatefulWidget {
 }
 
 class _PostLocationState extends State<PostLocation> {
-  LatLng _selectedLocation = const LatLng(13.7563, 100.5018); // Default Bangkok coordinates
+  static const LatLng _bangkokLocation = LatLng(13.7563, 100.5018);
+  late LatLng _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
 
   @override
   void initState() {
     super.initState();
-    // If initialLocation is passed, use it; otherwise, default to Bangkok
-    if (widget.initialLocation != null) {
-      _selectedLocation = widget.initialLocation!;
-    }
+    _selectedLocation = widget.initialLocation ?? _bangkokLocation;
     _getAddressFromLatLng(_selectedLocation);
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    var status = await Permission.location.status;
+    if (!status.isGranted) {
+      await Permission.location.request();
+    }
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
@@ -35,22 +42,21 @@ class _PostLocationState extends State<PostLocation> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          _selectedAddress =
-              "${place.street}, ${place.subLocality}, ${place.locality}, ${place.country}";
+          _selectedAddress = "${place.name}, ${place.locality}, ${place.country}";
         });
       }
     } catch (e) {
       print("Error: $e");
+      setState(() {
+        _selectedAddress = "Unknown location";
+      });
     }
   }
 
-  // Use animateCamera to move the camera smoothly to the selected location
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    // Animate the camera to move to the selected location (Bangkok)
-    _mapController!.animateCamera(
-      CameraUpdate.newLatLngZoom(_selectedLocation, 14.0),
-    );
+    // Force the camera to move to Bangkok
+    controller.animateCamera(CameraUpdate.newLatLngZoom(_bangkokLocation, 14.0));
   }
 
   @override
@@ -75,7 +81,7 @@ class _PostLocationState extends State<PostLocation> {
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation, // Use the selected location (Bangkok by default)
+                target: _selectedLocation,
                 zoom: 14.0,
               ),
               markers: {
@@ -90,28 +96,37 @@ class _PostLocationState extends State<PostLocation> {
                 });
                 _getAddressFromLatLng(tappedLocation);
               },
-              onMapCreated: _onMapCreated, // Animate camera when the map is created
+              onMapCreated: _onMapCreated,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                if (_selectedLocation != null && _selectedAddress != null) {
+                if (_selectedAddress != null) {
                   Navigator.of(context).pop({
-                    'location': _selectedLocation,
+                    'latitude': _selectedLocation.latitude,
+                    'longitude': _selectedLocation.longitude,
                     'address': _selectedAddress,
                   });
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: const Color(0xFF87C4FF),
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Confirm', style: TextStyle(fontSize: 16)),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],
