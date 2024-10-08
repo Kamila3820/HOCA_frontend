@@ -55,7 +55,7 @@ class HomePage extends StatelessWidget {
                               children: [
                                 const TextSpan(text: 'Welcome!, '),
                                 TextSpan(
-                                  text: 'Suphanut',
+                                  text: 'Thanadol',
                                   style: GoogleFonts.poppins(
                                     textStyle: const TextStyle(
                                       fontWeight: FontWeight.bold,
