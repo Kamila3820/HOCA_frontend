@@ -2,29 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:hoca_frontend/pages/createpost/createpost.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
-  const CustomFloatingActionButton({super.key, required Null Function() onPressed});
+  final VoidCallback? onPressed;
+
+  const CustomFloatingActionButton({
+    Key? key,
+    this.onPressed,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(
-          top: 20), // Adjust the value to move it lower
+      padding: const EdgeInsets.only(top: 20),
       child: Container(
-        width: 70, // Set the desired width
-        height: 70, // Set the desired height
+        width: 70,
+        height: 70,
         decoration: const BoxDecoration(
-          color: Colors.transparent, // Set container background to transparent
+          color: Colors.transparent,
         ),
         child: FloatingActionButton(
-          onPressed: () {
+          onPressed: onPressed ?? () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) =>  CreatePostPage()),
+              MaterialPageRoute(builder: (context) => CreatePostPage()),
             );
           },
           backgroundColor: const Color(0xFF7E869E).withOpacity(0.5),
-          shape: const CircleBorder(), // Keep the round shape
+          shape: const CircleBorder(),
           elevation: 0,
           child: const Icon(Icons.add,
               size: 50, color: Color.fromARGB(147, 13, 13, 13)),
