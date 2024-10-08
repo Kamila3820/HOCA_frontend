@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:hoca_frontend/components/navbar/buildIcon.dart';
-import 'package:hoca_frontend/pages/createpost/createpost.dart';
-import 'package:hoca_frontend/pages/history.dart';
-import 'package:hoca_frontend/pages/home.dart';
-import 'package:hoca_frontend/pages/profile.dart';
+
+import 'buildIcon.dart'; // Assuming buildIconWithLabelWithColor is in buildIcon.dart
 
 class CustomBottomNavigationBar extends StatelessWidget {
-  final String currentPage;
+  final int currentIndex;
+  final Function(int) onItemTapped;
 
   const CustomBottomNavigationBar({
     super.key,
-    required this.currentPage,
+    required this.currentIndex,
+    required this.onItemTapped,
   });
 
   @override
@@ -43,95 +42,33 @@ class CustomBottomNavigationBar extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 buildIconWithLabelWithColor(
-                  FontAwesomeIcons.home,
-                  "Home",
-                  currentPage,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePage(),
-                      ),
-                    );
-                  },
+                  icon: FontAwesomeIcons.home,
+                  label: "Home",
+                  isSelected: currentIndex == 0,
+                  onTap: () => onItemTapped(0),
                 ),
                 buildIconWithLabelWithColor(
-                  Icons.history,
-                  "History",
-                  currentPage,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HistoryPage(),
-                      ),
-                    );
-                  },
+                  icon: Icons.history,
+                  label: "History",
+                  isSelected: currentIndex == 1,
+                  onTap: () => onItemTapped(1),
                 ),
-                const SizedBox(width: 40),
+                const SizedBox(width: 40), // Placeholder for the FAB
                 buildIconWithLabelWithColor(
-                  FontAwesomeIcons.fileAlt,
-                  "Progress",
-                  currentPage,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => HistoryPage(),
-                      ),
-                    );
-                  },
+                  icon: FontAwesomeIcons.fileAlt,
+                  label: "Progress",
+                  isSelected: currentIndex == 2,
+                  onTap: () => onItemTapped(2),
                 ),
                 buildIconWithLabelWithColor(
-                  FontAwesomeIcons.userCircle,
-                  "Profile",
-                  currentPage,
-                  () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const ProfilePage(),
-                      ),
-                    );
-                  },
+                  icon: FontAwesomeIcons.userCircle,
+                  label: "Profile",
+                  isSelected: currentIndex == 3,
+                  onTap: () => onItemTapped(3),
                 ),
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-}
-
-
-class CustomFloatingActionButton extends StatelessWidget {
-  const CustomFloatingActionButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(
-          top: 20), // Adjust the value to move it lower
-      child: Container(
-        width: 70, // Set the desired width
-        height: 70, // Set the desired height
-        decoration: const BoxDecoration(
-          color: Colors.transparent, // Set container background to transparent
-        ),
-        child: FloatingActionButton(
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>  CreatePostPage()),
-            );
-          },
-          backgroundColor: const Color(0xFF7E869E).withOpacity(0.5),
-          shape: const CircleBorder(), // Keep the round shape
-          elevation: 0,
-          child: const Icon(Icons.add,
-              size: 50, color: Color.fromARGB(147, 13, 13, 13)),
         ),
       ),
     );

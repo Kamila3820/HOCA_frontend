@@ -22,15 +22,7 @@ class HistoryPage extends StatelessWidget {
               padding: const EdgeInsets.only(top: 10, left: 20, right: 20),
               child: Stack(
                 children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ),
+                  
                   Center(
                     child: Text(
                       'History',

@@ -5,7 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/pages/home.dart';
 
 class PaymentDialog extends StatefulWidget {
-  const PaymentDialog({Key? key}) : super(key: key);
+  const PaymentDialog({super.key});
 
   @override
   _PaymentDialogState createState() => _PaymentDialogState();
@@ -24,15 +24,18 @@ class _PaymentDialogState extends State<PaymentDialog> {
       builder: (BuildContext context) {
         return AlertDialog(
           backgroundColor: Color(0xFF3EA03C),
-          title: Text('Success', style: GoogleFonts.poppins(fontWeight: FontWeight.bold,color: Color.fromARGB(255, 255, 255, 255),)),
+          title: Text('Success',
+              style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                color: Color.fromARGB(255, 255, 255, 255),
+              )),
           content: Text(
-  'Order placed successfully!',
-  style: GoogleFonts.poppins(
-    color: Color.fromARGB(255, 255, 255, 255),
-     fontSize: 17,
-  ),
-),
-
+            'Order placed successfully!',
+            style: GoogleFonts.poppins(
+              color: Color.fromARGB(255, 255, 255, 255),
+              fontSize: 17,
+            ),
+          ),
         );
       },
     );
@@ -53,7 +56,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       content: Form(
         key: _formKey,
         child: Column(
@@ -73,7 +77,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 groupValue: _selectedPaymentMethod,
                 onChanged: (value) {
                   setState(() {
-                    _selectedPaymentMethod = value as String?;
+                    _selectedPaymentMethod = value;
                   });
                 },
               ),
@@ -88,7 +92,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 groupValue: _selectedPaymentMethod,
                 onChanged: (value) {
                   setState(() {
-                    _selectedPaymentMethod = value as String?;
+                    _selectedPaymentMethod = value;
                   });
                 },
               ),
@@ -171,7 +175,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                     print('Selected Payment Method: $_selectedPaymentMethod');
                     print('Place Type: $_placeType');
                     print('Note to Worker: $_noteToWorker');
-                    
+
                     // Show success alert and navigate
                     _showSuccessAlertAndNavigate(context);
                   }

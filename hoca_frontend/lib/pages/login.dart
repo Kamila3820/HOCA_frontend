@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hoca_frontend/MainNavigation.dart';
 import 'package:hoca_frontend/components/login/login_components.dart';
-import 'package:page_transition/page_transition.dart'; // Import the page_transition package
+import 'package:page_transition/page_transition.dart';
 
-import 'home.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
@@ -17,14 +17,14 @@ class LoginPage extends StatelessWidget {
       if (formKey.currentState?.validate() ?? false) {
         // Handle login logic here
 
-        // Navigate to HomePage with right-to-left page transition
-        Navigator.push(
+        // Navigate to MainNavigation with right-to-left page transition
+        Navigator.pushReplacement(
           context,
           PageTransition(
-            type: PageTransitionType.rightToLeft, // Right-to-left transition
-            child: HomePage(),
-            duration: const Duration(milliseconds: 550), // Duration of the transition
-            curve: Curves.easeInOut, // Animation curve
+            type: PageTransitionType.rightToLeft,
+            child: const MainNavigation(), // Navigate to MainNavigation
+            duration: const Duration(milliseconds: 550),
+            curve: Curves.easeInOut,
           ),
         );
       }

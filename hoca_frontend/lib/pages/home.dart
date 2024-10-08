@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
-import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
 import 'package:hoca_frontend/pages/location/location.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 import 'package:hoca_frontend/pages/service/cleaning.dart';
@@ -244,12 +243,12 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: const CustomBottomNavigationBar(
-          currentPage: 'Home'), // Add the bottom navigation bar
-      floatingActionButton:
-          const CustomFloatingActionButton(), // Add the floating action button
-      floatingActionButtonLocation: FloatingActionButtonLocation
-          .centerDocked, // Center the floating action button
+      // bottomNavigationBar: const CustomBottomNavigationBar(
+      //     currentPage: 'Home'), // Add the bottom navigation bar
+      // floatingActionButton:
+      //     const CustomFloatingActionButton(), // Add the floating action button
+      // floatingActionButtonLocation: FloatingActionButtonLocation
+      //     .centerDocked, // Center the floating action button
     );
   }
 }
