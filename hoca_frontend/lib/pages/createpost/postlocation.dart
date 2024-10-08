@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 
-class LocateLocationPage extends StatefulWidget {
-  final LatLng? location;
+class PostLocation extends StatefulWidget {
+  final LatLng initialLocation;  // ใช้ LatLng จาก google_maps_flutter
 
-  const LocateLocationPage({Key? key, this.location}) : super(key: key);
+  const PostLocation({Key? key, required this.initialLocation}) : super(key: key);
 
   @override
-  LocateLocationPageState createState() => LocateLocationPageState();
+  _PostLocationState createState() => _PostLocationState();
 }
 
-class LocateLocationPageState extends State<LocateLocationPage> {
+class _PostLocationState extends State<PostLocation> {
   LatLng? _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
@@ -19,7 +19,7 @@ class LocateLocationPageState extends State<LocateLocationPage> {
   @override
   void initState() {
     super.initState();
-    _selectedLocation = widget.location ?? const LatLng(13.7563, 100.5018);
+    _selectedLocation = widget.initialLocation;
     _getAddressFromLatLng(_selectedLocation!);
   }
 
@@ -60,27 +60,10 @@ class LocateLocationPageState extends State<LocateLocationPage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search for your location',
-                hintStyle: TextStyle(color: Colors.black.withOpacity(0.5)),
-                prefixIcon: const Icon(Icons.search, color: Colors.black54),
-                filled: true,
-                fillColor: Colors.grey[200],
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation!,
+                target: _selectedLocation ?? const LatLng(13.7563, 100.5018), // ตำแหน่งเริ่มต้นที่กรุงเทพฯ
                 zoom: 14.0,
               ),
               markers: _selectedLocation != null
@@ -88,15 +71,16 @@ class LocateLocationPageState extends State<LocateLocationPage> {
                       Marker(
                         markerId: const MarkerId('selected-location'),
                         position: _selectedLocation!,
+                        draggable: true,  // สามารถลากหมุดได้
+                        onDragEnd: (LatLng newPosition) {
+                          setState(() {
+                            _selectedLocation = newPosition;
+                          });
+                          _getAddressFromLatLng(newPosition);
+                        },
                       ),
                     }
                   : {},
-              onTap: (LatLng tappedLocation) {
-                setState(() {
-                  _selectedLocation = tappedLocation;
-                });
-                _getAddressFromLatLng(tappedLocation);
-              },
               onMapCreated: (GoogleMapController controller) {
                 _mapController = controller;
               },

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:location/location.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/components/createpostcon/CreatePostButton%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
 import 'package:hoca_frontend/pages/home.dart';
+import 'package:hoca_frontend/pages/createpost/postlocation.dart'; // Import the new screen
 
 class CreatePostCon extends StatefulWidget {
   const CreatePostCon({super.key});
@@ -18,6 +21,74 @@ class _CreatePostConState extends State<CreatePostCon> {
   final List<int> _selectedBoxIndices = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _selectedFamilyAmount;
+  LatLng? _currentLocation;
+
+  @override
+  void initState() {
+    super.initState();
+    _getCurrentLocation();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    Location location = Location();
+    bool _serviceEnabled;
+    PermissionStatus _permissionGranted;
+    LocationData _locationData;
+
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) return;
+    }
+
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) return;
+    }
+
+    _locationData = await location.getLocation();
+    setState(() {
+      _currentLocation = LatLng(_locationData.latitude!, _locationData.longitude!);
+    });
+  }
+
+  void _onLocationButtonPressed() async {
+    if (_currentLocation == null) {
+      // ตรวจสอบและขอตำแหน่งอีกครั้ง หาก _currentLocation เป็น null
+      try {
+        Location location = Location();
+        LocationData _locationData = await location.getLocation();
+        setState(() {
+          _currentLocation = LatLng(_locationData.latitude!, _locationData.longitude!);
+        });
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Unable to get current location'),
+          ),
+        );
+        return; // ออกจากฟังก์ชันหากไม่สามารถหาตำแหน่งได้
+      }
+    }
+
+    
+    if (_currentLocation != null) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PostLocation(initialLocation: _currentLocation!),
+        ),
+      );
+    } else {
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Unable to get current location'),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -85,18 +156,21 @@ class _CreatePostConState extends State<CreatePostCon> {
           Positioned(
             top: 170,
             right: 30,
-            child: Container(
-              width: 45,
-              height: 45,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: const Color(0xFF87C4FF).withOpacity(0.6),
-              ),
-              child: const Center(
-                child: FaIcon(
-                  FontAwesomeIcons.penToSquare,
-                  color: Colors.white,
-                  size: 20,
+            child: GestureDetector(
+              onTap: _onLocationButtonPressed, // Navigate to PostLocation page
+              child: Container(
+                width: 45,
+                height: 45,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFF87C4FF).withOpacity(0.6),
+                ),
+                child: const Center(
+                  child: FaIcon(
+                    FontAwesomeIcons.penToSquare,
+                    color: Colors.white,
+                    size: 20,
+                  ),
                 ),
               ),
             ),

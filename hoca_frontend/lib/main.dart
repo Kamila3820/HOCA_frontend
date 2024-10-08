@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart'; // Import the dotenv package
-
-import 'pages/login.dart'; // Import your login page
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hoca_frontend/pages/history.dart';
+import 'package:hoca_frontend/pages/home.dart';
+import 'package:hoca_frontend/pages/profile.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:hoca_frontend/widget/CustomScaffold.dart';
 
 Future<void> main() async {
-  // Ensure Flutter is initialized before loading environment variables
   WidgetsFlutterBinding.ensureInitialized();
-  
-  // Load environment variables from the .env file located in the assets folder
   await dotenv.load(fileName: "assets/.env");
-
-  // Run the app
   runApp(const HOCAApp());
 }
 
@@ -20,12 +18,53 @@ class HOCAApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'HOCA', // Title of the app
-      debugShowCheckedModeBanner: false, // Remove the debug banner
+      title: 'HOCA',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.blue, // Primary color for the app
+        primarySwatch: Colors.blue,
       ),
-      home: const LoginPage(), // Start with the login page
+      home: const MainScreen(),
+    );
+  }
+}
+
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
+
+  @override
+  _MainScreenState createState() => _MainScreenState();
+}
+
+class _MainScreenState extends State<MainScreen> {
+  int _currentIndex = 0;
+
+  final List<Widget> _pages = [
+    const HomePage(),
+    HistoryPage(),
+    const ProgressPage(),
+    const ProfilePage(),
+  ];
+
+  final List<String> _titles = [
+    'Home',
+    'History',
+    'Progress',
+    'Profile',
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _currentIndex = index;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomScaffold(
+      title: _titles[_currentIndex],
+      body: _pages[_currentIndex],
+      currentIndex: _currentIndex,
+      onItemTapped: _onItemTapped,
     );
   }
 }
