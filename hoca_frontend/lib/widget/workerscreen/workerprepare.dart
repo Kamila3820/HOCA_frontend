@@ -1,54 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 
-class WorkerPreparingScreen extends StatefulWidget {
-  const WorkerPreparingScreen({super.key});
-
-  @override
-  State<WorkerPreparingScreen> createState() => _WorkerPreparingScreenState();
-}
-
-class _WorkerPreparingScreenState extends State<WorkerPreparingScreen> {
-  late GoogleMapController _mapController;
-  final LatLng _initialPosition = const LatLng(13.7290, 100.7756); // Example LatLng, adjust to your needs
-  final Set<Marker> _markers = {};
-
-  @override
-  void initState() {
-    super.initState();
-    _markers.add(
-      Marker(
-        markerId: const MarkerId('worker_location'),
-        position: const LatLng(13.7290, 100.7756), // Worker location
-        infoWindow: const InfoWindow(title: 'Worker Location'),
-      ),
-    );
-  }
+class WorkerPreparingScreen extends StatelessWidget {
+  const WorkerPreparingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Progress'),
+        backgroundColor: Colors.lightBlue[100],
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            _buildOrderDetails(),
-            const SizedBox(height: 10),
-            _buildMap(),
-            const Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                // Ready to work action
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-              ),
-              child: const Text('READY TO WORK'),
-            ),
+            _buildStepIndicator(),
+            _buildWorkerInfo(),
+            _buildServiceTimeline(),
+            _buildUploadSection(),
+            _buildCompleteButton(),
           ],
         ),
       ),
@@ -56,66 +30,148 @@ class _WorkerPreparingScreenState extends State<WorkerPreparingScreen> {
     );
   }
 
-  Widget _buildOrderDetails() {
-    return const Card(
+  Widget _buildStepIndicator() {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      color: Colors.lightBlue[100],
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          _buildStep('Confirm', isActive: false),
+          _buildStep('Preparing', isActive: false),
+          _buildStep('Working', isActive: true),
+          _buildStep('Complete', isActive: false),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildStep(String title, {required bool isActive}) {
+    return Text(
+      title,
+      style: TextStyle(
+        color: isActive ? Colors.blue : Colors.grey,
+        fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+      ),
+    );
+  }
+
+  Widget _buildWorkerInfo() {
+    return Card(
+      margin: const EdgeInsets.all(16),
       child: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ListTile(
-              leading: CircleAvatar(
-                child: Text('J'),
-              ),
-              title: Text('Jintara Malawan'),
-              subtitle: Text('08x-765-4321'),
-              trailing: Text('800 THB - QR Payment'),
+            Row(
+              children: [
+                CircleAvatar(
+                  backgroundColor: Colors.blue,
+                  child: Text('J', style: TextStyle(color: Colors.white)),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Jintara Maliwan', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('088-765-4321', style: TextStyle(color: Colors.green)),
+                    ],
+                  ),
+                ),
+                Text('time 7 MAR 2024 19:03', style: TextStyle(color: Colors.grey, fontSize: 12)),
+              ],
             ),
-            SizedBox(height: 10),
-            Text('Artiwara need your help'),
-            Text('Distance: 15 km'),
-            Text('Arriving in 20 mins'),
+            const SizedBox(height: 12),
+            Text('Amount', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('800 THB - QR Payment', style: TextStyle(color: Colors.green)),
+            const SizedBox(height: 8),
+            Text('Artiwara 0817654321', style: TextStyle(color: Colors.blue)),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildMap() {
-    return Container(
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: Colors.blueAccent),
+  Widget _buildServiceTimeline() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Service Timeline', style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          _buildTimelineItem('Mop The Floor', isDone: true),
+          _buildTimelineItem('Wash Dishes', isDone: true),
+          _buildTimelineItem('Iron Clothes', isDone: false),
+          _buildTimelineItem('Mop The Floor', isDone: false),
+        ],
       ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: GoogleMap(
-          initialCameraPosition: CameraPosition(
-            target: _initialPosition,
-            zoom: 12.0,
+    );
+  }
+
+  Widget _buildTimelineItem(String task, {required bool isDone}) {
+    return Row(
+      children: [
+        Container(
+          width: 24,
+          height: 24,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDone ? Colors.green : Colors.grey[300],
           ),
-          markers: _markers,
-          onMapCreated: (controller) {
-            _mapController = controller;
-          },
+          child: isDone ? Icon(Icons.check, color: Colors.white, size: 16) : null,
         ),
+        const SizedBox(width: 12),
+        Text(task),
+      ],
+    );
+  }
+
+  Widget _buildUploadSection() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text('Upload The Work Done', style: TextStyle(fontWeight: FontWeight.bold)),
+          Icon(Icons.add, color: Colors.grey),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCompleteButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: ElevatedButton(
+        onPressed: () {
+          // Handle complete action
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          padding: const EdgeInsets.symmetric(vertical: 16),
+        ),
+        child: const Text('COMPLETE', style: TextStyle(fontSize: 18)),
       ),
     );
   }
 
   Widget _buildBottomNavigationBar() {
     return BottomNavigationBar(
-      items: const [
+      currentIndex: 3,
+      type: BottomNavigationBarType.fixed,
+      items: [
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-        BottomNavigationBarItem(icon: Icon(Icons.work), label: 'Progress'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.add_circle_outline, size: 40),
+          label: '',
+        ),
+        BottomNavigationBarItem(icon: Icon(Icons.update), label: 'Progress'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
       ],
-      currentIndex: 2,
-      onTap: (index) {
-        // Handle bottom navigation
-      },
     );
   }
 }

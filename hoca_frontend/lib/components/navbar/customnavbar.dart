@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:hoca_frontend/components/navbar/buildIcon.dart';
-import 'package:hoca_frontend/pages/createpost.dart';
+import 'package:hoca_frontend/pages/createpost/createpost.dart';
 import 'package:hoca_frontend/pages/history.dart';
 import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/profile.dart';
@@ -124,7 +124,7 @@ class CustomFloatingActionButton extends StatelessWidget {
             Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => const CreatePostPage()),
+                  builder: (context) =>  CreatePostPage()),
             );
           },
           backgroundColor: const Color(0xFF7E869E).withOpacity(0.5),

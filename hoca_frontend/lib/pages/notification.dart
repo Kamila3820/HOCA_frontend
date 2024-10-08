@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/components/noti/buildnotificationcard.dart';
 
 class NotiPage extends StatelessWidget {
   const NotiPage({super.key});
@@ -6,131 +8,80 @@ class NotiPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Welcome!, Suphanut'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications),
-            onPressed: () {
-              Navigator.pushNamed(context, '/notifications');
-            },
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 150.0,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFF87C4FF).withOpacity(0.6), // 60% opacity
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 30, left: 20, right: 10),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Notification',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-        ],
+          const SizedBox(height: 20), // Add some spacing
+          Expanded(
+  child: ListView(
+    padding: const EdgeInsets.symmetric(horizontal: 20),
+    children: [
+      buildNotificationCard(
+        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
+        title: 'Confirmation',
+        message: "Please confirm a new Karl Anthony's order within 15 minutes otherwise it will cancel automatically",
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.location_pin),
-                SizedBox(width: 8),
-                Text('15/34 Thungkhru, Bangkok'),
-              ],
-            ),
-            SizedBox(height: 16),
-            Text('Service', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                ServiceButton(icon: Icons.cleaning_services, label: 'Cleaning'),
-                ServiceButton(icon: Icons.shopping_bag, label: 'Clothes'),
-                ServiceButton(icon: Icons.pets, label: 'Pets'),
-                ServiceButton(icon: Icons.grass, label: 'Gardening'),
-              ],
-            ),
-            SizedBox(height: 16),
-            Text('Worker Available', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 8),
-            WorkerList(),
-          ],
-        ),
+      const SizedBox(height: 10),
+      buildNotificationCard(
+        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
+        title: 'Rating',
+        message: "You've received a rating score from James588",
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: 'Progress'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+      const SizedBox(height: 10),
+      buildNotificationCard(
+        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
+        title: 'Alert',
+        message: "Your account will be locked after 3 failed login attempts.",
+      ),
+      const SizedBox(height: 10),
+      buildNotificationCard(
+        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
+        title: 'Promo Code',
+        message: "Use code 'SAVE20' for 20% off your next purchase.",
+      ),
+    ],
+  ),
+),
+
         ],
       ),
     );
   }
-}
 
-class ServiceButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
 
-  const ServiceButton({super.key, required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        IconButton(
-          icon: Icon(icon, size: 32),
-          onPressed: () {},
-        ),
-        Text(label),
-      ],
-    );
-  }
-}
-
-class WorkerList extends StatelessWidget {
-  const WorkerList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        WorkerCard(
-          name: 'Teerasil Dangda',
-          rating: '8.7',
-          distance: '2.4 km',
-          price: '420 THB/hr',
-        ),
-        WorkerCard(
-          name: 'Aritwara Kongmalai',
-          rating: '8.0',
-          distance: '3.6 km',
-          price: '400 THB/hr',
-        ),
-        // Add more WorkerCards as needed
-      ],
-    );
-  }
-}
-
-class WorkerCard extends StatelessWidget {
-  final String name;
-  final String rating;
-  final String distance;
-  final String price;
-
-  const WorkerCard({super.key, 
-    required this.name,
-    required this.rating,
-    required this.distance,
-    required this.price,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.symmetric(vertical: 8.0),
-      child: ListTile(
-        leading: const CircleAvatar(
-          backgroundImage:
-              AssetImage('assets/worker.jpg'), // Replace with your image
-        ),
-        title: Text(name),
-        subtitle: Text('$distance | $price'),
-        trailing: Text('Total ⭐ $rating'),
-      ),
-    );
-  }
 }
