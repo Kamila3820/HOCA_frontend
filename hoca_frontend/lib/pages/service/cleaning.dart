@@ -33,7 +33,7 @@ class CleanPage extends StatelessWidget {
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, true);
                       },
                     ),
                   ),
