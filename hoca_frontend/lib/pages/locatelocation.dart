@@ -42,14 +42,23 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          _selectedAddress =
-              "${place.name}, ${place.locality}, ${place.country}";
+          // Construct the address string with the required format
+          _selectedAddress = "${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''} ${place.postalCode ?? ''}".trim();
+          // If the address is still empty, use a default message
+          if (_selectedAddress!.isEmpty) {
+            _selectedAddress = "Address not found";
+          }
+        });
+      } else {
+        // Fallback if no placemarks found
+        setState(() {
+          _selectedAddress = "Address not found";
         });
       }
     } catch (e) {
       print("Error fetching address: $e");
       setState(() {
-        _selectedAddress = "Unknown location";
+        _selectedAddress = "Address not found"; // Fallback on error
       });
     }
   }
@@ -62,22 +71,21 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
           'Location Details',
           style: TextStyle(
             color: Colors.black,
-            fontSize: 16, // Adjust font size
-            fontWeight: FontWeight.w600, // Use a bolder weight to match Figma
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
           ),
         ),
-        backgroundColor: Colors.white, // Match Figma background
-        iconTheme:
-            const IconThemeData(color: Colors.black), // Set icon color to black
-        elevation: 0, // Remove app bar shadow
-        centerTitle: true, // Center the title
+        backgroundColor: Colors.white,
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 0,
+        centerTitle: true,
       ),
       body: Column(
         children: [
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation!, // Use the selected location
+                target: _selectedLocation!,
                 zoom: 14.0,
               ),
               markers: _selectedLocation != null
@@ -90,9 +98,8 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
                   : {},
               onTap: (LatLng tappedLocation) {
                 setState(() {
-                  _selectedLocation = tappedLocation; // Update on map tap
-                  _getAddress(
-                      tappedLocation); // Fetch address for the new location
+                  _selectedLocation = tappedLocation;
+                  _getAddress(tappedLocation);
                 });
               },
             ),
@@ -106,27 +113,23 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
                     'latitude': _selectedLocation!.latitude,
                     'longitude': _selectedLocation!.longitude,
                     'address': _selectedAddress,
-                  }); // Confirm with all necessary details
+                  });
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    Color(0xFF87C4FF), // Use light blue as in Figma
-                minimumSize: const Size(
-                    double.infinity, 48), // Adjust button height slightly
+                backgroundColor: Color(0xFF87C4FF),
+                minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      8), // Match border radius from Figma
+                  borderRadius: BorderRadius.circular(8),
                 ),
               ),
               child: const Text(
                 'Confirm',
                 style: TextStyle(
-                  fontFamily: 'Poppins', // Set font to Poppins
-                  fontSize: 25, // Adjust text size
-                  fontWeight: FontWeight.bold, // Set text to bold
-                  color: Color.fromARGB(
-                      255, 255, 255, 255), // Set desired text color
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 255, 255, 255),
                 ),
               ),
             ),
