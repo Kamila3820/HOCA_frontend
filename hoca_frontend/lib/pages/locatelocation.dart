@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:geocoding/geocoding.dart'; // Add geocoding package for reverse geocoding
+import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocateLocationPage extends StatefulWidget {
-  final LatLng? location; // Accept location as a parameter
+  final LatLng? location;
 
   const LocateLocationPage({super.key, this.location});
 
@@ -15,14 +15,14 @@ class LocateLocationPage extends StatefulWidget {
 class _LocateLocationPageState extends State<LocateLocationPage> {
   LatLng? _selectedLocation;
   String? _selectedAddress;
+  GoogleMapController? _mapController; // เพิ่มตัวแปรสำหรับ GoogleMapController
 
   @override
   void initState() {
     super.initState();
-    // Set the initial location to Bangkok if no location is provided
     _selectedLocation = widget.location ?? LatLng(13.7563, 100.5018);
-    _getAddress(_selectedLocation!); // Get address for the initial location
-    _checkPermissions(); // Check for location permissions
+    _getAddress(_selectedLocation!);
+    _checkPermissions();
   }
 
   Future<void> _checkPermissions() async {
@@ -32,7 +32,6 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
     }
   }
 
-  // Reverse geocode the location to get the address
   Future<void> _getAddress(LatLng location) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(
@@ -42,15 +41,12 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          // Construct the address string with the required format
           _selectedAddress = "${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''} ${place.postalCode ?? ''}".trim();
-          // If the address is still empty, use a default message
           if (_selectedAddress!.isEmpty) {
             _selectedAddress = "Address not found";
           }
         });
       } else {
-        // Fallback if no placemarks found
         setState(() {
           _selectedAddress = "Address not found";
         });
@@ -58,9 +54,14 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
     } catch (e) {
       print("Error fetching address: $e");
       setState(() {
-        _selectedAddress = "Address not found"; // Fallback on error
+        _selectedAddress = "Address not found";
       });
     }
+  }
+
+  // เพิ่มเมธอดนี้เพื่อให้สามารถเก็บ GoogleMapController ได้
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
   }
 
   @override
@@ -84,6 +85,7 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
         children: [
           Expanded(
             child: GoogleMap(
+              onMapCreated: _onMapCreated, // ตั้งค่า controller
               initialCameraPosition: CameraPosition(
                 target: _selectedLocation!,
                 zoom: 14.0,
@@ -101,6 +103,11 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
                   _selectedLocation = tappedLocation;
                   _getAddress(tappedLocation);
                 });
+
+                // ใช้ animateCamera เพื่อเลื่อนกล้องไปที่ตำแหน่งใหม่
+                _mapController?.animateCamera(
+                  CameraUpdate.newLatLng(tappedLocation),
+                );
               },
             ),
           ),
