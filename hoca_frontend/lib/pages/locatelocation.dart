@@ -74,28 +74,6 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
       ),
       body: Column(
         children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-                horizontal: 16.0, vertical: 8.0), // Padding to match the Figma
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search for your location',
-                hintStyle: TextStyle(
-                    color: Colors.black
-                        .withOpacity(0.5)), // Adjust hint text color
-                prefixIcon: const Icon(Icons.search, color: Colors.black54),
-                filled: true,
-                fillColor: Colors
-                    .grey[200], // Match Figma background for the search bar
-                contentPadding: const EdgeInsets.symmetric(
-                    vertical: 12), // Add padding inside text field
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
@@ -158,4 +136,3 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
     );
   }
 }
-
