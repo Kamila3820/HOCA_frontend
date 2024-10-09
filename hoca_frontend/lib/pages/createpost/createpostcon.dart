@@ -150,17 +150,17 @@ class _CreatePostConState extends State<CreatePostCon> {
             ),
           ),
           CreatePostButton(
-            formKey: _formKey,
-            selectedBoxIndices: _selectedBoxIndices,
-            onPressed: () {
-              if (_formKey.currentState!.validate() && _selectedBoxIndices.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const HomePage(),
-                  ),
-                );
-              } else if (_selectedBoxIndices.isEmpty) {
+  formKey: _formKey,
+  selectedBoxIndices: _selectedBoxIndices,
+  onPressed: () {
+    if (_formKey.currentState!.validate() && _selectedBoxIndices.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomePage(),
+        ),
+      );
+    } else if (_selectedBoxIndices.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(
                     content: Text('Please select at least one type of place to work'),

@@ -14,7 +14,7 @@ import 'package:hoca_frontend/pages/service/pets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, });
 
   @override
   State<HomePage> createState() => _HomePageState();

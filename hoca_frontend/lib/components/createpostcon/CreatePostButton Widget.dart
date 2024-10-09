@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/main.dart';
 
 class CreatePostButton extends StatelessWidget {
   final GlobalKey<FormState> formKey;
@@ -59,8 +60,11 @@ class CreatePostButton extends StatelessWidget {
             // Show success notification at the top
             _showTopNotification(context, 'Post created successfully!', Colors.green);
             
-            // Call the original onPressed function
-            onPressed();
+            // Navigate back to MainScreen
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (context) => MainScreen()),
+              (Route<dynamic> route) => false,
+            );
           } else if (selectedBoxIndices.isEmpty) {
             // Show error notification at the top
             _showTopNotification(
