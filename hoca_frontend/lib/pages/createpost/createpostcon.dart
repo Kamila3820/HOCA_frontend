@@ -22,6 +22,7 @@ class _CreatePostConState extends State<CreatePostCon> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _selectedFamilyAmount;
   LatLng? _currentLocation;
+  String _locationName = "Choose Your Location"; // Default location text
 
   @override
   void initState() {
@@ -72,16 +73,22 @@ class _CreatePostConState extends State<CreatePostCon> {
       }
     }
 
-    
     if (_currentLocation != null) {
-      Navigator.push(
+      // Navigate to PostLocation page and wait for result
+      final result = await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => PostLocation(initialLocation: _currentLocation!),
         ),
       );
+
+      // Check if result is not null and update _locationName
+      if (result != null) {
+        setState(() {
+          _locationName = result['address']; // Update the location name with the selected address
+        });
+      }
     } else {
-      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Unable to get current location'),
@@ -103,10 +110,10 @@ class _CreatePostConState extends State<CreatePostCon> {
                   Navigator.pop(context); // Go back to the previous page
                 },
               ),
-
             ],
           ),
-          LocationBox(),
+          // Show the selected location name in the LocationBox widget
+          LocationBox(locationName: _locationName),
           WorkTypeSelector(
             selectedBoxIndices: _selectedBoxIndices,
             onBoxTapped: _onBoxTapped,
