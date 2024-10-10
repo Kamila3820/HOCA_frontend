@@ -18,7 +18,7 @@ class HistoryCard extends StatelessWidget {
   final String price; // Price field
 
   const HistoryCard({
-    super.key,
+    Key? key,
     required this.id,
     required this.name,
     required this.date,
@@ -30,6 +30,7 @@ class HistoryCard extends StatelessWidget {
     this.showRating = false,
     this.isRated = false,
     this.reason,
+    required this.price, // Initialize price
   }) : super(key: key);
 
   @override
