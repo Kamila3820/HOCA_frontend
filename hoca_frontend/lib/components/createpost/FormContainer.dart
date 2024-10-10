@@ -12,10 +12,10 @@ class FormContainer extends StatelessWidget {
   final Function(String) toggleCategory;
 
   const FormContainer({
-    Key? key,
+    super.key,
     required this.selectedCategories,
     required this.toggleCategory,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

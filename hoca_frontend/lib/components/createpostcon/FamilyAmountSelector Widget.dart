@@ -6,7 +6,7 @@ class FamilyAmountSelector extends StatelessWidget {
   final String? selectedFamilyAmount;
   final Function(String?) onFamilyAmountChanged;
 
-  const FamilyAmountSelector({
+  const FamilyAmountSelector({super.key, 
     required this.formKey,
     required this.selectedFamilyAmount,
     required this.onFamilyAmountChanged,

@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class GenderDropdown extends StatefulWidget {
+  const GenderDropdown({super.key});
+
   @override
   _GenderDropdownState createState() => _GenderDropdownState();
 }

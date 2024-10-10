@@ -8,12 +8,13 @@ part of 'userrating.dart';
 
 UserRating _$UserRatingFromJson(Map<String, dynamic> json) => UserRating(
       ratingID: (json['id'] as num).toInt(),
-      userID: json['user_id'] as String,
-      username: json['username'] as String,
-      avatarUrl: json['avatar'] as String,
-      workScore: (json['work_score'] as num).toInt(),
-      securityScore: (json['security_score'] as num).toInt(),
+      userID: json['user_id'] as String?,
+      username: json['username'] as String?,
+      avatarUrl: json['avatar'] as String?,
+      workScore: (json['work_score'] as num?)?.toInt(),
+      securityScore: (json['security_score'] as num?)?.toInt(),
       comment: json['comment'] as String?,
+      createdAt: json['created_at'] as String?,
     );
 
 Map<String, dynamic> _$UserRatingToJson(UserRating instance) =>
@@ -25,4 +26,5 @@ Map<String, dynamic> _$UserRatingToJson(UserRating instance) =>
       'work_score': instance.workScore,
       'security_score': instance.securityScore,
       'comment': instance.comment,
+      'created_at': instance.createdAt,
     };

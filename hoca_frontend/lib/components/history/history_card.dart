@@ -17,7 +17,7 @@ class HistoryCard extends StatelessWidget {
   final String? reason;
 
   const HistoryCard({
-    Key? key,
+    super.key,
     required this.id,
     required this.name,
     required this.date,
@@ -29,7 +29,7 @@ class HistoryCard extends StatelessWidget {
     this.showRating = false,
     this.isRated = false,
     this.reason,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

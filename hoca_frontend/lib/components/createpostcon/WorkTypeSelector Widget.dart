@@ -5,7 +5,7 @@ class WorkTypeSelector extends StatelessWidget {
   final List<int> selectedBoxIndices;
   final Function(int) onBoxTapped;
 
-  const WorkTypeSelector({
+  const WorkTypeSelector({super.key, 
     required this.selectedBoxIndices,
     required this.onBoxTapped,
   });

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/pages/home.dart';
+import 'package:hoca_frontend/pages/progress.dart';
 
 class PaymentDialog extends StatefulWidget {
   const PaymentDialog({super.key});
@@ -12,6 +13,9 @@ class PaymentDialog extends StatefulWidget {
 }
 
 class _PaymentDialogState extends State<PaymentDialog> {
+  String? location;
+  String? contactName;
+  String? contactPhone;
   String? _selectedPaymentMethod;
   String? _placeType;
   String? _noteToWorker;
@@ -44,7 +48,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
     Timer(Duration(seconds: 2), () {
       Navigator.of(context).pop(); // Dismiss the alert dialog
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => HomePage()),
+        MaterialPageRoute(builder: (context) => ProgressPage()),
         (Route<dynamic> route) => false,
       );
     });

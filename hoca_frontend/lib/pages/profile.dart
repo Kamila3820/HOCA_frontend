@@ -22,7 +22,7 @@ class _ProfilePageState extends State<ProfilePage> {
   };
 
   // Controllers for each info field
-  Map<String, TextEditingController> _controllers = {};
+  final Map<String, TextEditingController> _controllers = {};
 
   @override
   void initState() {
@@ -38,9 +38,9 @@ class _ProfilePageState extends State<ProfilePage> {
 
   @override
   void dispose() {
-    _controllers.values.forEach((controller) {
+    for (var controller in _controllers.values) {
       controller.dispose();
-    });
+    }
     super.dispose();
   }
 

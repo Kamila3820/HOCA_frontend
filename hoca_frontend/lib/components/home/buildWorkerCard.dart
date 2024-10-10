@@ -29,8 +29,8 @@ class _WorkerPostState extends State<WorkerPost> {
   }
 
   String getPlaceTypeNames(List<PlaceType> placeTypes) {
-  return placeTypes.map((placeType) => placeType.name ?? "Unknown").join(" / ");
-}
+    return placeTypes.map((placeType) => placeType.name ?? "Unknown").join(" / ");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,8 +73,8 @@ class _WorkerPostState extends State<WorkerPost> {
     onTap: () {
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ReservePage()),
-      );
+        MaterialPageRoute(builder: (context) => ReservePage(postID: widget.post.postID.toString(),),
+      ));
     },
     child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -275,7 +275,7 @@ class _WorkerPostState extends State<WorkerPost> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          widget.post.distance! + " km",
+                          "${widget.post.distance!} km",
                           style: GoogleFonts.poppins(
                             textStyle: const TextStyle(
                               fontSize: 10,
@@ -306,7 +306,7 @@ class _WorkerPostState extends State<WorkerPost> {
               bottom: 10,
               right: 12,
               child: Text(
-                "฿ "+ widget.post.price.toString(),
+                "฿ ${widget.post.price}",
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 10,

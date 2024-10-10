@@ -11,7 +11,7 @@ class ProfilePic extends StatelessWidget {
         Stack(
           alignment: Alignment.center,
           children: [
-            Container(
+            SizedBox(
               width: 200,
               height: 200,
               child: const CircleAvatar(
@@ -22,7 +22,7 @@ class ProfilePic extends StatelessWidget {
             Positioned(
               bottom: 20,
               left: 140,
-              child: Container(
+              child: SizedBox(
                 width: 60,
                 height: 25,
                

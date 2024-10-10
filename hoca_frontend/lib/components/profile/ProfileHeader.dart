@@ -7,10 +7,10 @@ class ProfileHeader extends StatelessWidget {
   final VoidCallback onPickImage;
 
   const ProfileHeader({
-    Key? key,
+    super.key,
     required this.isLoading,
     required this.onPickImage,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

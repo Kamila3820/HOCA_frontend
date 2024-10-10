@@ -5,7 +5,7 @@ import 'package:geocoding/geocoding.dart';
 class LocateLocationPage extends StatefulWidget {
   final LatLng? location;
 
-  const LocateLocationPage({Key? key, this.location}) : super(key: key);
+  const LocateLocationPage({super.key, this.location});
 
   @override
   LocateLocationPageState createState() => LocateLocationPageState();

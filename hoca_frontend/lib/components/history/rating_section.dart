@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class RatingSection extends StatefulWidget {
   final String title;
 
-  const RatingSection({Key? key, required this.title}) : super(key: key);
+  const RatingSection({super.key, required this.title});
 
   @override
   _RatingSectionState createState() => _RatingSectionState();

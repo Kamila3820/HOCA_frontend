@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PortraitLine extends StatelessWidget {
+  const PortraitLine({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Divider(

@@ -2,8 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/pages/reserve/reservepayment.dart';
 
-class ReserveButton extends StatelessWidget {
-  const ReserveButton({super.key});
+class ReserveButton extends StatefulWidget {
+  final String postID;
+
+  const ReserveButton({super.key, required this.postID});
+
+  @override
+  _ReserveButtonState createState() => _ReserveButtonState();
+}
+
+class _ReserveButtonState extends State<ReserveButton> {
 
   @override
   Widget build(BuildContext context) {

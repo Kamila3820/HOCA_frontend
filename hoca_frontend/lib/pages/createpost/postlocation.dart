@@ -5,7 +5,7 @@ import 'package:geocoding/geocoding.dart';
 class PostLocation extends StatefulWidget {
   final LatLng initialLocation;  // ใช้ LatLng จาก google_maps_flutter
 
-  const PostLocation({Key? key, required this.initialLocation}) : super(key: key);
+  const PostLocation({super.key, required this.initialLocation});
 
   @override
   _PostLocationState createState() => _PostLocationState();

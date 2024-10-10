@@ -5,9 +5,9 @@ class CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
 
   const CustomFloatingActionButton({
-    Key? key,
+    super.key,
     this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

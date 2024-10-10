@@ -12,7 +12,7 @@ class HistoryItemBox extends StatelessWidget {
   final VoidCallback? onRate;
 
   const HistoryItemBox({
-    Key? key,
+    super.key,
     required this.orderID,
     required this.name,
     required this.date,
@@ -21,7 +21,7 @@ class HistoryItemBox extends StatelessWidget {
     required this.price, // New price parameter
     required this.ratingStatus, // Updated to boolean
     this.onRate,
-  }) : super(key: key);
+  });
 
   Color getStatusColor(String status) {
     if (status == 'Completed') {

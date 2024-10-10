@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class SecurityRating extends StatelessWidget {
+  final int? score;
+
+  const SecurityRating({super.key, required this.score});
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -20,7 +24,7 @@ class SecurityRating extends StatelessWidget {
         ),
         const SizedBox(width: 5),
         Text(
-          "9/10",
+          "$score/10",
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w500,

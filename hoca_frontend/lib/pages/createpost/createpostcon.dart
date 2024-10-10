@@ -31,25 +31,25 @@ class _CreatePostConState extends State<CreatePostCon> {
 
   Future<void> _getCurrentLocation() async {
     Location location = Location();
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
+    bool serviceEnabled;
+    PermissionStatus permissionGranted;
+    LocationData locationData;
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) return;
+    serviceEnabled = await location.serviceEnabled();
+    if (!serviceEnabled) {
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) return;
     }
 
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) return;
+    permissionGranted = await location.hasPermission();
+    if (permissionGranted == PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != PermissionStatus.granted) return;
     }
 
-    _locationData = await location.getLocation();
+    locationData = await location.getLocation();
     setState(() {
-      _currentLocation = LatLng(_locationData.latitude!, _locationData.longitude!);
+      _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
     });
   }
 
@@ -58,9 +58,9 @@ class _CreatePostConState extends State<CreatePostCon> {
       // ตรวจสอบและขอตำแหน่งอีกครั้ง หาก _currentLocation เป็น null
       try {
         Location location = Location();
-        LocationData _locationData = await location.getLocation();
+        LocationData locationData = await location.getLocation();
         setState(() {
-          _currentLocation = LatLng(_locationData.latitude!, _locationData.longitude!);
+          _currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
         });
       } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(

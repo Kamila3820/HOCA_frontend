@@ -9,12 +9,12 @@ class CustomScaffold extends StatelessWidget {
   final Function(int) onItemTapped;
 
   const CustomScaffold({
-    Key? key,
+    super.key,
     required this.body,
     required this.title,
     required this.currentIndex,
     required this.onItemTapped,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

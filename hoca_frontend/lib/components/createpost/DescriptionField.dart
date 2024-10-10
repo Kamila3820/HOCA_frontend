@@ -3,6 +3,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/String.dart';
 
 class DescriptionField extends StatelessWidget {
+  const DescriptionField({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(

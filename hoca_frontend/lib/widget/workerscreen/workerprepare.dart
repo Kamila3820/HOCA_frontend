@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class WorkerPreparingScreen extends StatelessWidget {
-  const WorkerPreparingScreen({Key? key}) : super(key: key);
+  const WorkerPreparingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

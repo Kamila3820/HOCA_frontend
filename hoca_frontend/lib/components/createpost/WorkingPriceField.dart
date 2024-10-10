@@ -4,6 +4,8 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class WorkingPriceField extends StatelessWidget {
+  const WorkingPriceField({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(

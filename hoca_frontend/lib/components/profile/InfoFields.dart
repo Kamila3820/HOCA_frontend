@@ -8,11 +8,11 @@ class InfoFields extends StatefulWidget {
   final VoidCallback onSaveChanges;
 
   const InfoFields({
-    Key? key,
+    super.key,
     required this.originalInfo,
     required this.controllers,
     required this.onSaveChanges,
-  }) : super(key: key);
+  });
 
   @override
   _InfoFieldsState createState() => _InfoFieldsState();

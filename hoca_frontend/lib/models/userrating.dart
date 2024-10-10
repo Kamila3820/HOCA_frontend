@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 
 part 'userrating.g.dart';
@@ -9,22 +8,25 @@ class UserRating {
   final int ratingID;
 
   @JsonKey(name: 'user_id')
-  final String userID;
+  final String? userID;
 
   @JsonKey(name: 'username')
-  final String username;
+  final String? username;
 
   @JsonKey(name: 'avatar')
-  final String avatarUrl;
+  final String? avatarUrl;
 
   @JsonKey(name: 'work_score')
-  final int workScore;
+  final int? workScore;
 
   @JsonKey(name: 'security_score')
-  final int securityScore;
+  final int? securityScore;
 
   @JsonKey(name: 'comment')
   final String? comment;
+
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
 
 
   UserRating(
@@ -34,7 +36,8 @@ class UserRating {
       required this.avatarUrl,
       required this.workScore,
       required this.securityScore,
-      required this.comment
+      required this.comment,
+      required this.createdAt
       });
 
   factory UserRating.fromJson(Map<String, dynamic> json) => _$UserRatingFromJson(json);

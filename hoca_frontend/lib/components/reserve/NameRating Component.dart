@@ -1,25 +1,28 @@
 import 'package:flutter/material.dart';
 
 class NameRating extends StatelessWidget {
-  const NameRating({super.key});
+  final String? name;
+  final int? taskCount;
+
+  const NameRating({super.key, required this.name, required this.taskCount});
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: const [
+      children: [
         Text(
-          'Artiwara Kongmalai',
-          style: TextStyle(
+          name!, // Use dynamic name
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
-        SizedBox(width: 8),
+        const SizedBox(width: 8),
         Text(
-          '(5 times)',
-          style: TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+          '($taskCount times)', // Display dynamic task count
+          style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
         ),
       ],
     );

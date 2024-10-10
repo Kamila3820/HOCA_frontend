@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 class SubserviceWidget extends StatelessWidget {
   final String text;
 
-  const SubserviceWidget({Key? key, required this.text}) : super(key: key);
+  const SubserviceWidget({super.key, required this.text});
 
   @override
   Widget build(BuildContext context) {

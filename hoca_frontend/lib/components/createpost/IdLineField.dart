@@ -4,6 +4,8 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class IdLineField extends StatelessWidget {
+  const IdLineField({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Column(

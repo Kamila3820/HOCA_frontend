@@ -8,10 +8,10 @@ class CategoriesSection extends StatelessWidget {
   final Function(String) toggleCategory;
 
   const CategoriesSection({
-    Key? key,
+    super.key,
     required this.selectedCategories,
     required this.toggleCategory,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

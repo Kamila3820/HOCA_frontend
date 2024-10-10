@@ -6,7 +6,7 @@ class CreatePostButton extends StatelessWidget {
   final List<int> selectedBoxIndices;
   final VoidCallback onPressed;
 
-  const CreatePostButton({
+  const CreatePostButton({super.key, 
     required this.formKey,
     required this.selectedBoxIndices,
     required this.onPressed,

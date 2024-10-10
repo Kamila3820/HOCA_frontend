@@ -9,7 +9,7 @@ import 'package:hoca_frontend/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Splash extends StatelessWidget {
-  const Splash({Key? key}) : super(key: key);
+  const Splash({super.key});
 
   Future navigate() async {
     // Get user token from shared preferences

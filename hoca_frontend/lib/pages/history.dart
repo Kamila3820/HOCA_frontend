@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/history/history_card.dart';
 
 class HistoryPage extends StatelessWidget {
-  HistoryPage({super.key});
+  const HistoryPage({super.key});
 
   @override
   Widget build(BuildContext context) {
