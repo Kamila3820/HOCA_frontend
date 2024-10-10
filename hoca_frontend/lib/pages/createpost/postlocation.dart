@@ -42,7 +42,7 @@ class _PostLocationState extends State<PostLocation> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          _selectedAddress = "${place.name}, ${place.locality}, ${place.country}";
+          _selectedAddress = "${place.subLocality} ${place.locality}, ${place.administrativeArea} ${place.postalCode}";
         });
       }
     } catch (e) {
@@ -55,7 +55,6 @@ class _PostLocationState extends State<PostLocation> {
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    // Force the camera to move to Bangkok
     controller.animateCamera(CameraUpdate.newLatLngZoom(_bangkokLocation, 14.0));
   }
 
@@ -121,11 +120,10 @@ class _PostLocationState extends State<PostLocation> {
               child: const Text(
                 'Confirm',
                 style: TextStyle(
-                  fontFamily: 'Poppins', // Set font to Poppins
-                  fontSize: 25, // Adjust text size
-                  fontWeight: FontWeight.bold, // Set text to bold
-                  color: Color.fromARGB(
-                      255, 255, 255, 255), // Set desired text color
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
