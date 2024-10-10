@@ -3,8 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hoca_frontend/components/register/register_components.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../components/register/register_components.dart';
+
+
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -18,6 +21,7 @@ class _SignUpPageState extends State<SignUpPage> {
   final ImagePicker _picker = ImagePicker();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _imageSelected = false;
+  bool _termsAccepted = false;
 
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
@@ -142,18 +146,18 @@ class _SignUpPageState extends State<SignUpPage> {
               ),
               const SizedBox(height: 16),
               Padding(
-  padding: const EdgeInsets.only(left: 25.0),
-  child: Text(
-    "ID Card",
-    style: GoogleFonts.poppins(
-      textStyle: const TextStyle(
-        fontSize: 16,
-        color: Color(0xFF7A7777),
-      ),
-    ),
-  ),
-),
-const SizedBox(height: 8),
+                padding: const EdgeInsets.only(left: 25.0),
+                child: Text(
+                  "ID Card",
+                  style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color(0xFF7A7777),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
               ImagePickerSection(
                 image: _image,
                 onTap: () {
@@ -226,25 +230,77 @@ const SizedBox(height: 8),
                   );
                 },
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _termsAccepted,
+                          onChanged: (bool? value) {
+                            setState(() {
+                              _termsAccepted = value!;
+                            });
+                          },
+                          activeColor: const Color(0xFF87C4FF),
+                        ),
+                        Expanded(
+                          child: Text(
+                            "I agree to the terms and conditions",
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF7A7777),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 50.0),
+                      child: GestureDetector(
+                        onTap: () => showDialog(
+                          context: context,
+                          builder: (BuildContext context) => const TermsAndConditionsDialog(),
+                        ),
+                        child: Text(
+                          "Read more",
+                          style: GoogleFonts.poppins(
+                            textStyle: const TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF87C4FF),
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               Center(
                 child: SizedBox(
                   width: 345,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF87C4FF),
+                      backgroundColor: _termsAccepted ? const Color(0xFF87C4FF) : Colors.grey,
                       padding: const EdgeInsets.symmetric(vertical: 15),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
                     ),
-                    onPressed: _validateForm,
+                    onPressed: _termsAccepted ? _validateForm : null,
                     child: Text(
                       'Sign Up',
                       style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
+                        textStyle: TextStyle(
                           fontSize: 18,
-                          color: Colors.white,
+                          color: _termsAccepted ? Colors.white : Colors.black54,
                         ),
                       ),
                     ),
@@ -258,4 +314,3 @@ const SizedBox(height: 8),
     );
   }
 }
- 

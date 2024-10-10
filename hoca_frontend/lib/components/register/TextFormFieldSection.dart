@@ -8,53 +8,56 @@ class TextFormFieldSection extends StatelessWidget {
   final bool obscureText;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
-  final String? Function(String?) validator;
+  final String? Function(String?)? validator;
 
   const TextFormFieldSection({
-    super.key,
+    Key? key,
     required this.label,
     required this.hintText,
     this.obscureText = false,
     this.keyboardType,
     this.inputFormatters,
-    required this.validator,
-  });
+    this.validator,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+      padding: const EdgeInsets.symmetric(horizontal: 25.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 5.0),
-            child: Text(
-              label,
-              style: GoogleFonts.poppins(
-                textStyle: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF7A7777),
-                ),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              textStyle: const TextStyle(
+                fontSize: 16,
+                color: Color(0xFF7A7777),
               ),
             ),
           ),
           const SizedBox(height: 8),
           TextFormField(
+            obscureText: obscureText,
+            keyboardType: keyboardType,
+            inputFormatters: inputFormatters,
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: GoogleFonts.poppins(
                 textStyle: const TextStyle(
-                  color: Color(0xFFA9A8A8),
+                  fontSize: 14,
+                  color: Color(0xFFB3B1B1),
                 ),
               ),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(5),
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFFB3B1B1)),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: const BorderSide(color: Color(0xFF87C4FF)),
               ),
             ),
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            inputFormatters: inputFormatters,
             validator: validator,
           ),
         ],
