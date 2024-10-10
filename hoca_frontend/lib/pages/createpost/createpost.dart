@@ -20,7 +20,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       if (selectedCategories.contains(category)) {
         selectedCategories.remove(category);
       } else {
-        if (selectedCategories.length < 3) {
+        if (selectedCategories.isEmpty) {
           selectedCategories.add(category);
         }
       }
@@ -66,7 +66,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                           backgroundColor: Color.fromARGB(255, 221, 78,
                               78), // Set the background color of the dialog
                           content: Text(
-                            'Please select at least one category.',
+                            'Please select a category.',
                             style: GoogleFonts.poppins(
                               // Use GoogleFonts.poppins for the text style
                               textStyle: TextStyle(

@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LocationBox extends StatelessWidget {
-  const LocationBox({super.key});
-
   @override
   Widget build(BuildContext context) {
     return Positioned(
@@ -38,7 +36,7 @@ class LocationBox extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              '679/210 Prachauthit 45 Thung Khru, Bangkok',
+              locationName, // Display the selected location name
               style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
                   fontSize: 12,

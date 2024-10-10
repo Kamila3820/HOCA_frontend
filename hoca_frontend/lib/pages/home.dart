@@ -1,12 +1,14 @@
-import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
-// Make sure to import the navbar
+import 'package:hoca_frontend/components/navbar/creatpostbutton.dart';
+import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
+import 'package:hoca_frontend/models/homepost.dart';
 import 'package:hoca_frontend/models/post.dart';
-import 'package:hoca_frontend/pages/location.dart';
+import 'package:hoca_frontend/pages/locatelocation.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 import 'package:hoca_frontend/pages/service/cleaning.dart';
 import 'package:hoca_frontend/pages/service/clothes.dart';
@@ -15,7 +17,7 @@ import 'package:hoca_frontend/pages/service/pets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, });
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -23,8 +25,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   List<Post> posts = [];
-  String? selectedLatitude = "";  
-  String? selectedLongitude = ""; 
+  String? selectedLatitude = "";
+  String? selectedLongitude = "";
+  String _locationName = "Choose Your Location"; // Default location text
+
+  String get shortenedLocation {
+    if (_locationName.length > 20) {
+      return _locationName.substring(0, 20) + '...';
+    }
+    return _locationName;
+  }
 
   @override
   void initState() {
@@ -37,24 +47,23 @@ class _HomePageState extends State<HomePage> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 
-
     print("Making request to URL: $url");
     print("Using token: $token");
     Caller.dio.get(
       url,
       options: Options(
-      headers: {
-        'x-auth-token': '$token',  // Add token to header
-      },
-    ),
-      ).then((response) {
-        print(response.data);
-          if (mounted) {
-            setState(() {
-              // Directly map the response data to List<Post>
-              posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
-            });
-          }
+        headers: {
+          'x-auth-token': '$token',  // Add token to header
+        },
+      ),
+    ).then((response) {
+      print(response.data);
+      if (mounted) {
+        setState(() {
+          // Directly map the response data to List<Post>
+          posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
+        });
+      }
     }).onError((DioException error, _) {
       Caller.handle(context, error);
     });
@@ -62,9 +71,9 @@ class _HomePageState extends State<HomePage> {
 
   reload() {
     if (selectedLatitude == null || selectedLongitude == null) {
-      _showLocationAlert(); 
+      _showLocationAlert();
     } else {
-      load(selectedLatitude!, selectedLongitude!); 
+      load(selectedLatitude!, selectedLongitude!);
     }
   }
 
@@ -79,7 +88,7 @@ class _HomePageState extends State<HomePage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context); // Dismiss the dialog
-                _navigateToLocationPage();  // Navigate to the location selection page
+                navigateToLocateLocation();  // Navigate to the location selection page
               },
               child: const Text('Choose Location'),
             ),
@@ -89,104 +98,112 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  _navigateToLocationPage() async {
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const LocationPage(),
-      ),
-    );
-
-    if (result != null) {
-      setState(() {
-        selectedLatitude = result['latitude'].toString();
-        selectedLongitude = result['longitude'].toString();
-      });
-
-      load(selectedLatitude!, selectedLongitude!);  // Reload data with new location
-    }
+  void updateLocation(String newLocation) {
+    setState(() {
+      _locationName = newLocation;
+    });
   }
 
-  void navigateBasedOnCategory(Post post) async {
-  if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
-    List<Post> filteredPosts = posts.where((post) =>
-    post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CleanPage(posts: filteredPosts),  // Navigate to CleanPage
-      ),
-    );
-    if (result == true) {
-      setState(() {
-          filteredPosts = posts;  // Reset the filteredPosts list to all posts
-      });
-      reload();
-    }
-  } else if (post.categoryID == 4 || post.categoryID == 5) {
-    List<Post> filteredPosts = posts.where((post) =>
-    post.categoryID == 4 || post.categoryID == 5).toList();
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => ClothesPage(posts: filteredPosts),  // Navigate to ClothesPage
-      ),
-    );
-    if (result == true) {
-      setState(() {
-          filteredPosts = posts;  // Reset the filteredPosts list to all posts
-      });
-      reload();
-    }
-  } else if (post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8) {
-    List<Post> filteredPosts = posts.where((post) =>
-    post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => GardeningPage(posts: filteredPosts,),  // Navigate to GardeningPage
-      ),
-    );
-    if (result == true) {
-      setState(() {
-          filteredPosts = posts;  // Reset the filteredPosts list to all posts
-      });
-      reload();
-    }
-  } else if (post.categoryID == 9) {
-    List<Post> filteredPosts = posts.where((post) =>
-    post.categoryID == 9).toList();
-    var result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => PetsPage(posts: filteredPosts,),  // Navigate to PetsPage
-      ),
-    );
-    if (result == true) {
-      setState(() {
-          filteredPosts = posts;  // Reset the filteredPosts list to all posts
-        });
-      reload();
-    }
+  void navigateToLocateLocation() async {
+  final result = await Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const LocateLocationPage(),
+    ),
+  );
+
+  // Check if the result is a Map and contains 'address'
+  if (result is Map<String, dynamic> && result.containsKey('address')) {
+    updateLocation(result['address']);
+    setState(() {
+      selectedLatitude = result['latitude'].toString();
+      selectedLongitude = result['longitude'].toString();
+    });
+    load(selectedLatitude!, selectedLongitude!);
+  } else {
+    // Handle the case where result is not as expected
+    print('Unexpected result: $result');
   }
 }
 
 
+  void navigateBasedOnCategory(Post post) async {
+    if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
+      List<Post> filteredPosts = posts.where((post) =>
+      post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
+      var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => CleanPage(posts: filteredPosts),
+        ),
+      );
+      if (result == true) {
+        setState(() {
+          filteredPosts = posts;
+        });
+        reload();
+      }
+    } else if (post.categoryID == 4 || post.categoryID == 5) {
+      List<Post> filteredPosts = posts.where((post) =>
+      post.categoryID == 4 || post.categoryID == 5).toList();
+      var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ClothesPage(posts: filteredPosts),
+        ),
+      );
+      if (result == true) {
+        setState(() {
+          filteredPosts = posts;
+        });
+        reload();
+      }
+    } else if (post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8) {
+      List<Post> filteredPosts = posts.where((post) =>
+      post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
+      var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GardeningPage(posts: filteredPosts,),
+        ),
+      );
+      if (result == true) {
+        setState(() {
+          filteredPosts = posts;
+        });
+        reload();
+      }
+    } else if (post.categoryID == 9) {
+      List<Post> filteredPosts = posts.where((post) =>
+      post.categoryID == 9).toList();
+      var result = await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PetsPage(posts: filteredPosts,),
+        ),
+      );
+      if (result == true) {
+        setState(() {
+          filteredPosts = posts;
+        });
+        reload();
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
         children: [
-          // Background half box decoration
           Container(
             height: 335.0,
             decoration: BoxDecoration(
-              color: const Color(0xFF87C4FF).withOpacity(0.6), // 70% opacity
+              color: const Color(0xFF87C4FF).withOpacity(0.6),
               borderRadius: const BorderRadius.only(
                 bottomLeft: Radius.circular(90),
                 bottomRight: Radius.circular(90),
-              ), // Rounded only top corners
+              ),
             ),
           ),
           Padding(
@@ -243,8 +260,8 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  const NotiPage()), // Navigate to NotiPage
+                            builder: (context) => const NotiPage(),
+                          ),
                         );
                       },
                     ),
@@ -252,27 +269,11 @@ class _HomePageState extends State<HomePage> {
                 ),
                 const SizedBox(height: 10),
                 GestureDetector(
-                  onTap: () async {
-                    var result = await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const LocationPage(),
-                      ),
-                    );
-
-                    if (result != null) {
-                      selectedLatitude = result['latitude'].toString();
-                      selectedLongitude = result['longitude'].toString();
-
-                      // Use the latitude and longitude
-                      load(selectedLatitude!, selectedLongitude!);
-                    }
-                  },
+                  onTap: navigateToLocateLocation,
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
@@ -285,16 +286,18 @@ class _HomePageState extends State<HomePage> {
                             size: 26,
                           ),
                           const SizedBox(width: 10),
-                          Text(
-                            'Choose Your Location',
-                            style: GoogleFonts.poppins(
-                              textStyle: TextStyle(
-                                fontSize: 18,
-                                color: Colors.black.withOpacity(0.4),
+                          Expanded(
+                            child: Text(
+                              shortenedLocation,
+                              style: GoogleFonts.poppins(
+                                textStyle: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black.withOpacity(0.4),
+                                ),
                               ),
+                              overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const Spacer(),
                           const Icon(Icons.arrow_forward_ios, size: 18),
                         ],
                       ),
@@ -319,54 +322,49 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
-                        onTap: () {
-                          // Filter the posts for cleaning categories (1, 2, 3)
-                          List<Post> filteredPosts = posts.where((post) => post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
-                          setState(() {
-                            posts = filteredPosts; // Update the posts list with filtered posts
-                          });
-                          if (filteredPosts.isNotEmpty) {
-                            navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
-                          }
-                        },
-                        child: buildServiceOption('Cleaning', FontAwesomeIcons.broom),
-                      ),
-
-                    GestureDetector(
                       onTap: () {
-                        // Filter the posts for clothes categories (4, 5)
-                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 4 || post.categoryID == 5).toList();
+                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
                         setState(() {
-                          posts = filteredPosts; // Update the posts list with filtered posts
+                          posts = filteredPosts;
                         });
                         if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                          navigateBasedOnCategory(filteredPosts.first);
+                        }
+                      },
+                      child: buildServiceOption('Cleaning', FontAwesomeIcons.broom),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 4 || post.categoryID == 5).toList();
+                        setState(() {
+                          posts = filteredPosts;
+                        });
+                        if (filteredPosts.isNotEmpty) {
+                          navigateBasedOnCategory(filteredPosts.first);
                         }
                       },
                       child: buildServiceOption('Clothes', FontAwesomeIcons.shirt),
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Filter the posts for gardening categories (6, 7, 8)
                         List<Post> filteredPosts = posts.where((post) => post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
                         setState(() {
-                          posts = filteredPosts; // Update the posts list with filtered posts
+                          posts = filteredPosts;
                         });
                         if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                          navigateBasedOnCategory(filteredPosts.first);
                         }
                       },
                       child: buildServiceOption('Gardening', FontAwesomeIcons.seedling),
                     ),
                     GestureDetector(
                       onTap: () {
-                        // Filter the posts for pets categories (9)
                         List<Post> filteredPosts = posts.where((post) => post.categoryID == 9).toList();
                         setState(() {
-                          posts = filteredPosts; // Update the posts list with filtered posts
+                          posts = filteredPosts;
                         });
                         if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first); // Navigate based on the first post's category
+                          navigateBasedOnCategory(filteredPosts.first);
                         }
                       },
                       child: buildServiceOption('Pets', Icons.pets),
@@ -387,7 +385,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                     Text(
-                      'Total Found: ${posts.length} in your area', // Use posts.length for the count
+                      'Total Found: ${posts.length} in your area',
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 14,
@@ -406,11 +404,11 @@ class _HomePageState extends State<HomePage> {
                       crossAxisSpacing: 10,
                       childAspectRatio: 0.58,
                     ),
-                    itemCount: posts.length, // Use posts.length directly
+                    itemCount: posts.length,
                     itemBuilder: (context, index) {
                       return WorkerPost(
-                        post: posts[index],  // Directly pass the post
-                        reload: reload,      // Pass the reload function
+                        post: posts[index],
+                        reload: reload,
                       );
                     },
                   ),

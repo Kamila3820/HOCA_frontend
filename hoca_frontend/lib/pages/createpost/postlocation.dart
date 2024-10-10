@@ -1,26 +1,36 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class PostLocation extends StatefulWidget {
-  final LatLng initialLocation;  // ใช้ LatLng จาก google_maps_flutter
+  final LatLng? initialLocation;
 
-  const PostLocation({super.key, required this.initialLocation});
+  const PostLocation({Key? key, this.initialLocation}) : super(key: key);
 
   @override
   _PostLocationState createState() => _PostLocationState();
 }
 
 class _PostLocationState extends State<PostLocation> {
-  LatLng? _selectedLocation;
+  static const LatLng _bangkokLocation = LatLng(13.7563, 100.5018);
+  late LatLng _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;
 
   @override
   void initState() {
     super.initState();
-    _selectedLocation = widget.initialLocation;
-    _getAddressFromLatLng(_selectedLocation!);
+    _selectedLocation = widget.initialLocation ?? _bangkokLocation;
+    _getAddressFromLatLng(_selectedLocation);
+    _checkPermissions();
+  }
+
+  Future<void> _checkPermissions() async {
+    var status = await Permission.location.status;
+    if (!status.isGranted) {
+      await Permission.location.request();
+    }
   }
 
   Future<void> _getAddressFromLatLng(LatLng position) async {
@@ -32,13 +42,20 @@ class _PostLocationState extends State<PostLocation> {
       if (placemarks.isNotEmpty) {
         Placemark place = placemarks[0];
         setState(() {
-          _selectedAddress =
-              "${place.street}, ${place.subLocality}, ${place.locality}, ${place.country}";
+          _selectedAddress = "${place.subLocality} ${place.locality}, ${place.administrativeArea} ${place.postalCode}";
         });
       }
     } catch (e) {
       print("Error: $e");
+      setState(() {
+        _selectedAddress = "Unknown location";
+      });
     }
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    _mapController = controller;
+    controller.animateCamera(CameraUpdate.newLatLngZoom(_bangkokLocation, 14.0));
   }
 
   @override
@@ -63,48 +80,52 @@ class _PostLocationState extends State<PostLocation> {
           Expanded(
             child: GoogleMap(
               initialCameraPosition: CameraPosition(
-                target: _selectedLocation ?? const LatLng(13.7563, 100.5018), // ตำแหน่งเริ่มต้นที่กรุงเทพฯ
+                target: _selectedLocation,
                 zoom: 14.0,
               ),
-              markers: _selectedLocation != null
-                  ? {
-                      Marker(
-                        markerId: const MarkerId('selected-location'),
-                        position: _selectedLocation!,
-                        draggable: true,  // สามารถลากหมุดได้
-                        onDragEnd: (LatLng newPosition) {
-                          setState(() {
-                            _selectedLocation = newPosition;
-                          });
-                          _getAddressFromLatLng(newPosition);
-                        },
-                      ),
-                    }
-                  : {},
-              onMapCreated: (GoogleMapController controller) {
-                _mapController = controller;
+              markers: {
+                Marker(
+                  markerId: const MarkerId('selected-location'),
+                  position: _selectedLocation,
+                ),
               },
+              onTap: (LatLng tappedLocation) {
+                setState(() {
+                  _selectedLocation = tappedLocation;
+                });
+                _getAddressFromLatLng(tappedLocation);
+              },
+              onMapCreated: _onMapCreated,
             ),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                if (_selectedLocation != null && _selectedAddress != null) {
+                if (_selectedAddress != null) {
                   Navigator.of(context).pop({
-                    'location': _selectedLocation,
+                    'latitude': _selectedLocation.latitude,
+                    'longitude': _selectedLocation.longitude,
                     'address': _selectedAddress,
                   });
                 }
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue,
+                backgroundColor: const Color(0xFF87C4FF),
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              child: const Text('Confirm', style: TextStyle(fontSize: 16)),
+              child: const Text(
+                'Confirm',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 25,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ),
         ],

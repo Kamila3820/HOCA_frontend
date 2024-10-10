@@ -15,6 +15,7 @@ class HistoryCard extends StatelessWidget {
   final bool showRating;
   final bool isRated;
   final String? reason;
+  final String price; // Price field
 
   const HistoryCard({
     super.key,
@@ -29,7 +30,7 @@ class HistoryCard extends StatelessWidget {
     this.showRating = false,
     this.isRated = false,
     this.reason,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -122,7 +123,7 @@ class HistoryCard extends StatelessWidget {
               children: [
                 if (status == 'Canceled') ...[
                   Text(
-                    status,
+                    status, // Display "Canceled"
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         fontSize: 14,
@@ -131,10 +132,22 @@ class HistoryCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 8),
+                ],
+                if (status != 'Canceled') ...[ // Do not show price for canceled jobs
+                  Text(
+                    '฿$price', // Show price for non-canceled jobs
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                 ],
                 if (showRating) ...[
-                  const SizedBox(height: 8),
-                  // Check if isRated to conditionally render a GestureDetector or a Container
                   isRated
                       ? Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -144,7 +157,7 @@ class HistoryCard extends StatelessWidget {
                           ),
                           child: SizedBox(
                             width: 50,
-                            height: 60,
+                            height: 30,
                             child: Center(
                               child: Text(
                                 'Rated',
@@ -159,33 +172,37 @@ class HistoryCard extends StatelessWidget {
                             ),
                           ),
                         )
-                      : GestureDetector(
-                          onTap: () {
-                            showRatingDialog(context);
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFFFE15D),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: SizedBox(
-                              width: 50,
-                              height: 60,
-                              child: Center(
-                                child: Text(
-                                  'Rating',
-                                  style: GoogleFonts.poppins(
-                                    textStyle: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.black,
+                      : Column(
+                          children: [                         
+                            GestureDetector(
+                              onTap: () {
+                                showRatingDialog(context);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFFE15D),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: SizedBox(
+                                  width: 50,
+                                  height: 40,
+                                  child: Center(
+                                    child: Text(
+                                      'Rating',
+                                      style: GoogleFonts.poppins(
+                                        textStyle: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
+                          ],
                         ),
                 ],
               ],
