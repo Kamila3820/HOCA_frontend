@@ -17,16 +17,20 @@ import 'package:hoca_frontend/pages/service/pets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, });
+  final String? latitude;
+  final String? longitude;
+
+  const HomePage({super.key, this.latitude, this.longitude});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
+
 class _HomePageState extends State<HomePage> {
   List<Post> posts = [];
-  String? selectedLatitude = "";
-  String? selectedLongitude = "";
+  String selectedLatitude = "";
+  String selectedLongitude = "";
   String _locationName = "Choose Your Location"; // Default location text
 
   String get shortenedLocation {
@@ -39,7 +43,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    load("", "");
+    // Load posts using the latitude and longitude passed from the previous screen
+    load(widget.latitude!, widget.longitude!);
   }
 
   load(String latitude, String longitude) async {

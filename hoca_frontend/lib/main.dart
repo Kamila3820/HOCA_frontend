@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:hoca_frontend/models/login.dart';
 import 'package:hoca_frontend/pages/history.dart';
 import 'package:hoca_frontend/pages/home.dart';
+import 'package:hoca_frontend/pages/login.dart';
 import 'package:hoca_frontend/pages/profile.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:hoca_frontend/widget/CustomScaffold.dart';
@@ -23,7 +25,7 @@ class HOCAApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const MainScreen(),
+      home: const LoginPage(),
     );
   }
 }

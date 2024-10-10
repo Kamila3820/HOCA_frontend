@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/models/login.dart';
 import 'package:hoca_frontend/pages/home.dart';
+import 'package:hoca_frontend/pages/locatelocation.dart';
 import 'package:hoca_frontend/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,7 +23,7 @@ class Splash extends StatelessWidget {
 
     // Set caller token value
     Caller.setToken(token);
-    return const HomePage();
+    return const LocateLocationPage();
   }
 
   @override

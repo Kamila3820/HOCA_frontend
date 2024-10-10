@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hoca_frontend/pages/home.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocateLocationPage extends StatefulWidget {
@@ -112,35 +113,40 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              onPressed: () {
-                if (_selectedLocation != null && _selectedAddress != null) {
-                  Navigator.of(context).pop({
-                    'latitude': _selectedLocation!.latitude,
-                    'longitude': _selectedLocation!.longitude,
-                    'address': _selectedAddress,
-                  });
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF87C4FF),
-                minimumSize: const Size(double.infinity, 48),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+              padding: const EdgeInsets.all(16.0),
+              child: ElevatedButton(
+                onPressed: () {
+                  if (_selectedLocation != null && _selectedAddress != null) {
+                    // Navigate to HomePage with latitude and longitude
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => HomePage(
+                          latitude: _selectedLocation!.latitude.toString(),
+                          longitude: _selectedLocation!.longitude.toString(),
+                        ),
+                      ),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF87C4FF),
+                  minimumSize: const Size(double.infinity, 48),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
                 ),
-              ),
-              child: const Text(
-                'Confirm',
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 25,
-                  fontWeight: FontWeight.bold,
-                  color: Color.fromARGB(255, 255, 255, 255),
+                child: const Text(
+                  'Confirm',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 25,
+                    fontWeight: FontWeight.bold,
+                    color: Color.fromARGB(255, 255, 255, 255),
+                  ),
                 ),
               ),
             ),
-          ),
+
         ],
       ),
     );

@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LocationBox extends StatelessWidget {
+  final String locationName; // Added to receive location name
+
+  const LocationBox({Key? key, required this.locationName}) : super(key: key);
+  
   @override
   Widget build(BuildContext context) {
     return Positioned(
