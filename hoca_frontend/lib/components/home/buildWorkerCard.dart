@@ -221,7 +221,8 @@ class _WorkerPostState extends State<WorkerPost> {
                           textAlign: TextAlign.center,
                           style: GoogleFonts.poppins(
                             textStyle: const TextStyle(
-                              fontSize: 6,
+                              fontSize: 9,
+                               fontWeight: FontWeight.bold,
                               color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
                             ),
                           ),

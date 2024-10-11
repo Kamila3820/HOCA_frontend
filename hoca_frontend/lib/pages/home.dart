@@ -4,9 +4,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
-import 'package:hoca_frontend/components/navbar/creatpostbutton.dart';
-import 'package:hoca_frontend/components/navbar/customnavbar.dart'; // Make sure to import the navbar
-import 'package:hoca_frontend/models/homepost.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/locatelocation.dart';
 import 'package:hoca_frontend/pages/notification.dart';
@@ -19,8 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class HomePage extends StatefulWidget {
   final String? latitude;
   final String? longitude;
+  final String? address;
 
-  const HomePage({super.key, this.latitude, this.longitude});
+  const HomePage({super.key, this.latitude, this.longitude, this.address});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -43,8 +41,14 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    // Load posts using the latitude and longitude passed from the previous screen
-    load(widget.latitude!, widget.longitude!);
+    if (widget.latitude != null && widget.longitude != null) {
+      selectedLatitude = widget.latitude!;
+      selectedLongitude = widget.longitude!;
+      _locationName = widget.address ?? "Choose Your Location";
+      load(selectedLatitude, selectedLongitude);
+    } else {
+      _showLocationAlert();  // Ask the user to select location if none is provided.
+    }
   }
 
   load(String latitude, String longitude) async {
@@ -126,7 +130,6 @@ class _HomePageState extends State<HomePage> {
     });
     load(selectedLatitude!, selectedLongitude!);
   } else {
-    // Handle the case where result is not as expected
     print('Unexpected result: $result');
   }
 }

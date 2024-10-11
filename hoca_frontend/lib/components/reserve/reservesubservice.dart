@@ -28,7 +28,7 @@ class ReSubserviceWidget extends StatelessWidget {
           textAlign: TextAlign.center,
           style: GoogleFonts.poppins(
             textStyle: const TextStyle(
-              fontSize: 10,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Color.fromARGB(228, 0, 0, 0),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-
-import 'buildIcon.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -41,35 +40,62 @@ class CustomBottomNavigationBar extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                buildIconWithLabelWithColor(
+                _buildIconWithLabel(
                   icon: FontAwesomeIcons.home,
                   label: "Home",
-                  isSelected: currentIndex == 0,
-                  onTap: () => onItemTapped(0),
+                  index: 0,
                 ),
-                buildIconWithLabelWithColor(
+                _buildIconWithLabel(
                   icon: Icons.history,
                   label: "History",
-                  isSelected: currentIndex == 1,
-                  onTap: () => onItemTapped(1),
+                  index: 1,
                 ),
                 const SizedBox(width: 40),
-                buildIconWithLabelWithColor(
+                _buildIconWithLabel(
                   icon: FontAwesomeIcons.fileAlt,
                   label: "Progress",
-                  isSelected: currentIndex == 2,
-                  onTap: () => onItemTapped(2),
+                  index: 2,
                 ),
-                buildIconWithLabelWithColor(
+                _buildIconWithLabel(
                   icon: FontAwesomeIcons.userCircle,
                   label: "Profile",
-                  isSelected: currentIndex == 3,
-                  onTap: () => onItemTapped(3),
+                  index: 3,
                 ),
               ],
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildIconWithLabel({
+    required IconData icon,
+    required String label,
+    required int index,
+  }) {
+    final isSelected = currentIndex == index;
+    return GestureDetector(
+      onTap: () => onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? const Color(0xFF87C4FF) : Colors.grey,
+            size: 27,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: GoogleFonts.poppins(
+              textStyle: TextStyle(
+                color: isSelected ? const Color(0xFF87C4FF) : Colors.grey,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

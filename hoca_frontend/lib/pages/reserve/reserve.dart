@@ -127,7 +127,7 @@ class _ReservePageState extends State<ReservePage> {
                                     const SizedBox(height: 20),
                                     Description(description: post.description),
                                     const SizedBox(height: 20),
-                                    BuildReviews(rating: post.userRatings,),
+                                    BuildReviews(rating: post.userRatings, name: post.name,),
                                     const SizedBox(height: 20),
                                   ],
                                 ),

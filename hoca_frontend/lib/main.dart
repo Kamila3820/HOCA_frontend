@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:hoca_frontend/models/login.dart';
+import 'package:hoca_frontend/components/navbar/creatpostbutton.dart';
+import 'package:hoca_frontend/components/navbar/customnavbar.dart';
 import 'package:hoca_frontend/pages/history.dart';
 import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/login.dart';
 import 'package:hoca_frontend/pages/profile.dart';
 import 'package:hoca_frontend/pages/progress.dart';
-import 'package:hoca_frontend/widget/CustomScaffold.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,55 +26,62 @@ class HOCAApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const LoginPage(),
+      routes: {
+        '/home': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, String?>?;
+          return MainScreen(
+            latitude: args?['latitude'],
+            longitude: args?['longitude'],
+          );
+        },
+      },
     );
   }
 }
 
 class MainScreen extends StatefulWidget {
-  final int initialIndex;
-  const MainScreen({Key? key, this.initialIndex = 0}) : super(key: key);
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const MainScreen({Key? key, this.latitude, this.longitude, this.address}) : super(key: key);
 
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  late int _currentIndex;
+  int _selectedIndex = 0;
+
+  late final List<Widget> _pages;
 
   @override
   void initState() {
     super.initState();
-    _currentIndex = widget.initialIndex;
+    _pages = [
+      HomePage(latitude: widget.latitude, longitude: widget.longitude, address: widget.address,),
+      const HistoryPage(),
+      const ProgressPage(),
+      const ProfilePage(),
+    ];
   }
-
-
-  final List<Widget> _pages = [
-    const HomePage(),
-    HistoryPage(),
-    const ProgressPage(),
-    const ProfilePage(),
-  ];
-
-  final List<String> _titles = [
-    'Home',
-    'History',
-    'Progress',
-    'Profile',
-  ];
 
   void _onItemTapped(int index) {
     setState(() {
-      _currentIndex = index;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomScaffold(
-      title: _titles[_currentIndex],
-      body: _pages[_currentIndex],
-      currentIndex: _currentIndex,
-      onItemTapped: _onItemTapped,
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: CustomBottomNavigationBar(
+        currentIndex: _selectedIndex,
+        onItemTapped: _onItemTapped,
+      ),
+      floatingActionButton: const CustomFloatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

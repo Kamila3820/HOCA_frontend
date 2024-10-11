@@ -137,7 +137,7 @@ class HistoryCard extends StatelessWidget {
                 ],
                 if (status != 'Canceled') ...[ // Do not show price for canceled jobs
                   Text(
-                    'à¸¿$price', // Show price for non-canceled jobs
+                    '฿ $price', // Show price for non-canceled jobs
                     style: GoogleFonts.poppins(
                       textStyle: const TextStyle(
                         fontSize: 16,

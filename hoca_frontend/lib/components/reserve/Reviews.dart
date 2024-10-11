@@ -8,18 +8,21 @@ import 'package:hoca_frontend/components/reserve/WorkRating.dart';
 import 'package:hoca_frontend/models/userrating.dart';
 
 class BuildReviews extends StatelessWidget {
-  final List<UserRating>? rating; // Changed to final since it's passed in constructor
+  final List<UserRating>? rating; // List of user ratings
+  final String? name; // Name to be passed to ReviewHeader
 
-  const BuildReviews({super.key, required this.rating});
+  const BuildReviews({super.key, required this.rating, required this.name});
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ReviewHeader(), // Static review header
+        // Pass the name to ReviewHeader
+        ReviewHeader(name: name ?? 'No Name Provided'), 
         const SizedBox(height: 10),
 
+        // Check if rating is available and non-empty
         rating != null && rating!.isNotEmpty
             ? SizedBox(
                 height: 150,
@@ -30,15 +33,15 @@ class BuildReviews extends StatelessWidget {
                     return Column(
                       children: [
                         ReviewTile(
-                          name: userRating.username!, // Dynamic name from the rating data
-                          date: userRating.createdAt!, // Dynamic date from the rating data
+                          name: userRating.username!, // Dynamic name from user rating
+                          date: userRating.createdAt!, // Dynamic date from user rating
                         ),
                         const SizedBox(height: 10),
                         WorkRating(score: userRating.workScore,), // Dynamic work rating
                         const SizedBox(height: 5),
                         SecurityRating(score: userRating.securityScore,), // Dynamic security rating
                         const SizedBox(height: 10),
-                        ReviewDescription(comment: userRating.comment,), // Dynamic description
+                        ReviewDescription(comment: userRating.comment,), // Dynamic review description
                         const SizedBox(height: 10),
                         PortraitLine(), // Static portrait line
                         const SizedBox(height: 10),
@@ -49,8 +52,9 @@ class BuildReviews extends StatelessWidget {
               )
             : const Center(
                 child: Text('No reviews available'),
-              ), // Show if no reviews
+              ), // Fallback if no reviews are present
       ],
     );
   }
 }
+

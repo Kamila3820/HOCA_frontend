@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 
 class PaymentDialog extends StatefulWidget {
