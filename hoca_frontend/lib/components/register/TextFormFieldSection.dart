@@ -9,6 +9,7 @@ class TextFormFieldSection extends StatelessWidget {
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
+  final TextEditingController? controller; // Added controller
 
   const TextFormFieldSection({
     Key? key,
@@ -18,6 +19,7 @@ class TextFormFieldSection extends StatelessWidget {
     this.keyboardType,
     this.inputFormatters,
     this.validator,
+    this.controller, // Accept the controller as a parameter
   }) : super(key: key);
 
   @override
@@ -38,6 +40,7 @@ class TextFormFieldSection extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           TextFormField(
+            controller: controller, // Set the controller for the TextFormField
             obscureText: obscureText,
             keyboardType: keyboardType,
             inputFormatters: inputFormatters,
