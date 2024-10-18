@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 
@@ -12,7 +13,6 @@ class PaymentDialog extends StatefulWidget {
 }
 
 class _PaymentDialogState extends State<PaymentDialog> {
-  String? location;
   String? contactName;
   String? contactPhone;
   String? _selectedPaymentMethod;
@@ -63,91 +63,171 @@ class _PaymentDialogState extends State<PaymentDialog> {
           const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       content: Form(
         key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Select a payment method',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Topic text for the new fields
+              Align(
+  alignment: Alignment.centerLeft,
+  child: Text(
+    'Location',
+    style: GoogleFonts.poppins(
+      fontSize: 18,
+      fontWeight: FontWeight.bold,
+    ),
+  ),
+),
+
+              const SizedBox(height: 16.0),
+              // Location text with icon and line underneath
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        color: Color(0xFF87C4FF),
+                      ),
+                      const SizedBox(width: 8.0),
+                      Expanded(
+                        child: Text(
+                          '679/210 Prachauthit 45 Thung Khru, Bangkok',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 3,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4.0),
+                  Container(
+                    height: 1.0,
+                    color: const Color.fromARGB(115, 0, 0, 0),
+                  ),
+                ],
               ),
-            ),
-            const SizedBox(height: 16.0),
-            ListTile(
-              leading: Radio(
-                value: 'cash',
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value;
-                  });
+              const SizedBox(height: 16.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  labelText: 'Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                onSaved: (value) {
+                  contactName = value;
                 },
               ),
-              title: Text(
-                'Cash',
-                style: GoogleFonts.poppins(),
+              const SizedBox(height: 16.0),
+              TextFormField(
+  decoration: InputDecoration(
+    labelText: 'Phone Number',
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(10.0),
+    ),
+  ),
+  keyboardType: TextInputType.phone,
+  inputFormatters: [
+    FilteringTextInputFormatter.digitsOnly, // Allow only digits
+    LengthLimitingTextInputFormatter(10), // Limit to 10 digits
+  ],
+  validator: (value) {
+    if (value == null || value.length != 10) {
+      return 'Phone number must be exactly 10 digits';
+    }
+    return null;
+  },
+  onSaved: (value) {
+    contactPhone = value;
+  },
+),
+              const SizedBox(height: 16.0),
+              Text(
+                'Select a payment method',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
-            ListTile(
-              leading: Radio(
-                value: 'qrcode',
-                groupValue: _selectedPaymentMethod,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedPaymentMethod = value;
-                  });
+              const SizedBox(height: 16.0),
+              ListTile(
+                leading: Radio(
+                  value: 'cash',
+                  groupValue: _selectedPaymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedPaymentMethod = value;
+                    });
+                  },
+                ),
+                title: Text(
+                  'Cash',
+                  style: GoogleFonts.poppins(),
+                ),
+              ),
+              ListTile(
+                leading: Radio(
+                  value: 'qrcode',
+                  groupValue: _selectedPaymentMethod,
+                  onChanged: (value) {
+                    setState(() {
+                      _selectedPaymentMethod = value;
+                    });
+                  },
+                ),
+                title: Text(
+                  'QR code Payment',
+                  style: GoogleFonts.poppins(),
+                ),
+              ),
+              const SizedBox(height: 16.0),
+              Text(
+                'Specify a type of your place',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                ),
+              ),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
+                ),
+                onSaved: (value) {
+                  _placeType = value;
                 },
               ),
-              title: Text(
-                'QR code Payment',
-                style: GoogleFonts.poppins(),
-              ),
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'Specify a type of your place',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            TextFormField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+              const SizedBox(height: 16.0),
+              Text(
+                'Note to a worker (if any)',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
                 ),
               ),
-              
-              onSaved: (value) {
-                _placeType = value;
-              },
-            ),
-            const SizedBox(height: 16.0),
-            Text(
-              'Note to a worker (if any)',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 8.0),
-            TextFormField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10.0),
+              const SizedBox(height: 8.0),
+              TextFormField(
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10.0),
+                  ),
                 ),
+                validator: (value) {
+                  if (value != null && value.length > 500) {
+                    return 'Note should not exceed 500 characters';
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _noteToWorker = value;
+                },
               ),
-              validator: (value) {
-                if (value != null && value.length > 500) {
-                  return 'Note should not exceed 500 characters';
-                }
-                return null;
-              },
-              onSaved: (value) {
-                _noteToWorker = value;
-              },
-            ),
-          ],
+            ],
+          ),
         ),
       ),
       actions: [
@@ -167,6 +247,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
               ? () {
                   if (_formKey.currentState!.validate()) {
                     _formKey.currentState!.save();
+                    print('Contact Name: $contactName');
+                    print('Contact Phone: $contactPhone');
                     print('Selected Payment Method: $_selectedPaymentMethod');
                     print('Place Type: $_placeType');
                     print('Note to Worker: $_noteToWorker');
