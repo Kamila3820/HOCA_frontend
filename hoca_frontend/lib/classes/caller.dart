@@ -17,12 +17,18 @@ class Caller {
 
   static handle(BuildContext context, DioError error) {
     print("Error: ${error.message}");
+
     if (error.response == null) {
       FlutterPlatformAlert.showAlert(
-          windowTitle: 'Something went wrong',
-          text: error.message ?? "Unknown error");
+        windowTitle: 'Something went wrong',
+        text: error.message ?? "Unknown error",
+      );
       return;
     }
+
+    // Safely handle null values in error messages
+    String message = error.response!.data?["message"] ?? "An error occurred";
+    String? errorDetails = error.response!.data?["error"]; // Can be null
 
     SnackBar snackBar = SnackBar(
       behavior: SnackBarBehavior.floating,
@@ -32,16 +38,15 @@ class Caller {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(error.response!.data["message"]),
-          error.response!.data["error"] == null
-              ? Container()
-              : Padding(
-                  padding: const EdgeInsets.only(top: 4.0),
-                  child: Text(
-                    error.response!.data["error"],
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                ),
+          Text(message), // Ensure message is always non-null
+          if (errorDetails != null) // Only show error details if present
+            Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                errorDetails,
+                style: const TextStyle(color: Colors.white70),
+              ),
+            ),
         ],
       ),
     );

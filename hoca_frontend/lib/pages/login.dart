@@ -20,49 +20,72 @@ class _LoginPageState extends State<LoginPage> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
-  void callLogin() async {
-    Caller.dio.post("/v1/account/login", data: {
+void callLogin() async {
+  try {
+    // Make POST request for login
+    Response response = await Caller.dio.post("/v1/account/login", data: {
       "email": emailController.text,
       "password": passwordController.text,
-    }).then((response) async {
-      // * Parse response
-      final Map<String, dynamic> responseData = jsonDecode(response.toString());
-
-    // Retrieve the token from the response
-    final token = responseData["token"];
-    print(token);
-
-      // * Load shared preferences
-      final prefs = await SharedPreferences
-          .getInstance(); //shared_preferences same as cookies
-      prefs.setString('token', token);
-
-      // * Set caller token value
-      Caller.setToken(token);
-
-      Navigator.pushReplacement(
-        context,
-        PageTransition(
-          type: PageTransitionType.rightToLeft,
-          child: const LocateLocationPage(),
-          duration: const Duration(milliseconds: 550),
-          curve: Curves.easeInOut,
-        ),
-      );
-    }).onError((DioException error, _) {
-      // * Apply default error handling
-      Caller.handle(context, error);
     });
+
+    // * Parse response
+    final Map<String, dynamic> responseData = jsonDecode(response.toString());
+
+    // Retrieve token from response
+    final token = responseData["token"];
+
+    if (token == null || token.isEmpty) {
+      // Handle missing token case
+      Caller.error(context, 'Failed to retrieve token. Please try again.');
+      return;
+    }
+
+    print('Token received: $token'); // Log the received token
+
+    // * Load shared preferences
+    final prefs = await SharedPreferences.getInstance();
+    prefs.setString('token', token);
+
+    // * Set caller token value
+    Caller.setToken(token);
+
+    // Navigate to LocateLocationPage after successful login
+    Navigator.pushReplacement(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: const LocateLocationPage(),
+        duration: const Duration(milliseconds: 550),
+        curve: Curves.easeInOut,
+      ),
+    );
+  } on DioException catch (error) {
+    // Custom handling for 401 Unauthorized
+    if (error.response?.statusCode == 401) {
+      Caller.error(context, 'Invalid email or password.');
+      print('Login failed with status code 401: Invalid email or password.');
+    } else {
+      // Default error handling
+      Caller.handle(context, error);
+      print('Login failed with status code ${error.response?.statusCode}: ${error.message}');
+    }
+  } catch (e) {
+    // Handle any other unexpected errors
+    Caller.error(context, 'An unexpected error occurred.');
+    print('Unexpected error: $e'); // Log unexpected errors
   }
+}
 
   @override
   Widget build(BuildContext context) {
     final formKey = GlobalKey<FormState>();
 
     void validateAndLogin() {
+      // Validate form and trigger login
       if (formKey.currentState?.validate() ?? false) {
-        // Call the login function
         callLogin();
+      } else{
+        print('Error: Form validation failed');
       }
     }
 
@@ -77,10 +100,11 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const SizedBox(height: 50),
-                const LogoSection(),
+                const LogoSection(), // Custom logo widget
                 const SizedBox(height: 30),
-                const WelcomeText(),
+                const WelcomeText(), // Welcome text widget
                 const SizedBox(height: 10),
+                // Email input field
                 EmailTextField(
                   controller: emailController,
                   validator: (value) {
@@ -93,6 +117,7 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 20),
+                // Password input field
                 PasswordTextField(
                   controller: passwordController,
                   validator: (value) {
@@ -106,9 +131,10 @@ class _LoginPageState extends State<LoginPage> {
                   },
                 ),
                 const SizedBox(height: 30),
+                // Login button
                 LoginButton(onPressed: validateAndLogin),
                 const SizedBox(height: 20),
-                const RegisterText(),
+                const RegisterText(), // Register link widget
               ],
             ),
           ),
