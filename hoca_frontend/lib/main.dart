@@ -44,7 +44,7 @@ class MainScreen extends StatefulWidget {
   final String? longitude;
   final String? address;
 
-  const MainScreen({Key? key, this.latitude, this.longitude, this.address}) : super(key: key);
+  const MainScreen({super.key, this.latitude, this.longitude, this.address});
 
   @override
   _MainScreenState createState() => _MainScreenState();

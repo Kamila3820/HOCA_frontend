@@ -12,7 +12,7 @@ class TextFormFieldSection extends StatelessWidget {
   final TextEditingController? controller; // Added controller
 
   const TextFormFieldSection({
-    Key? key,
+    super.key,
     required this.label,
     required this.hintText,
     this.obscureText = false,
@@ -20,7 +20,7 @@ class TextFormFieldSection extends StatelessWidget {
     this.inputFormatters,
     this.validator,
     this.controller, // Accept the controller as a parameter
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class RatingSection extends StatefulWidget {
   final String title;
@@ -22,15 +21,7 @@ class _RatingSectionState extends State<RatingSection> {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            widget.title,
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+        
           // First row of stars
           Row(
             mainAxisAlignment: MainAxisAlignment.center,

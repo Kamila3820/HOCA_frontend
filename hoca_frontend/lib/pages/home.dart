@@ -24,7 +24,6 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-
 class _HomePageState extends State<HomePage> {
   List<Post> posts = [];
   String selectedLatitude = "";
@@ -33,7 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   String get shortenedLocation {
     if (_locationName.length > 20) {
-      return _locationName.substring(0, 20) + '...';
+      return '${_locationName.substring(0, 20)}...';
     }
     return _locationName;
   }
@@ -79,10 +78,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   reload() {
-    if (selectedLatitude == null || selectedLongitude == null) {
+    if (selectedLongitude == null) {
       _showLocationAlert();
     } else {
-      load(selectedLatitude!, selectedLongitude!);
+      load(selectedLatitude, selectedLongitude);
     }
   }
 
@@ -114,26 +113,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToLocateLocation() async {
-  final result = await Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const LocateLocationPage(),
-    ),
-  );
+    final result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const LocateLocationPage(),
+      ),
+    );
 
-  // Check if the result is a Map and contains 'address'
-  if (result is Map<String, dynamic> && result.containsKey('address')) {
-    updateLocation(result['address']);
-    setState(() {
-      selectedLatitude = result['latitude'].toString();
-      selectedLongitude = result['longitude'].toString();
-    });
-    load(selectedLatitude!, selectedLongitude!);
-  } else {
-    print('Unexpected result: $result');
+    // Check if the result is a Map and contains 'address'
+    if (result is Map<String, dynamic> && result.containsKey('address')) {
+      updateLocation(result['address']);
+      setState(() {
+        selectedLatitude = result['latitude'].toString();
+        selectedLongitude = result['longitude'].toString();
+      });
+      load(selectedLatitude, selectedLongitude);
+    } else {
+      print('Unexpected result: $result');
+    }
   }
-}
-
 
   void navigateBasedOnCategory(Post post) async {
     if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
