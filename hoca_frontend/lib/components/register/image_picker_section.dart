@@ -5,11 +5,13 @@ import 'package:google_fonts/google_fonts.dart';
 
 class ImagePickerSection extends StatelessWidget {
   final File? image;
+  final String? imageUrl;
   final VoidCallback onTap;
 
   const ImagePickerSection({
     super.key,
     required this.image,
+    this.imageUrl,
     required this.onTap,
   });
 
@@ -36,6 +38,22 @@ class ImagePickerSection extends StatelessWidget {
                   child: Image.file(
                     image!,
                     fit: BoxFit.cover,
+                  ),
+                ),
+              if (image == null && imageUrl != null)
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(10),
+                  child: Image.network(
+                    imageUrl!,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, progress) {
+                      return progress == null 
+                        ? child 
+                        : const Center(child: CircularProgressIndicator());
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const Center(child: Icon(Icons.broken_image, size: 80, color: Colors.grey));
+                    },
                   ),
                 ),
               Center(

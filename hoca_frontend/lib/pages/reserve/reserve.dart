@@ -125,7 +125,7 @@ class _ReservePageState extends State<ReservePage> {
                                     const SizedBox(height: 20),
                                     InfoList(location: post.location, phoneNumber: post.phoneNumber, placeTypes: post.placeTypeID, amountPeople: post.amountFamily, price: post.price,),
                                     const SizedBox(height: 20),
-                                    Description(description: post.description),
+                                    Description(description: post.description, create: post.createdAt, update: post.updatedAt,),
                                     const SizedBox(height: 20),
                                     BuildReviews(rating: post.userRatings, name: post.name,),
                                     const SizedBox(height: 20),

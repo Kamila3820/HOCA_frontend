@@ -36,8 +36,11 @@ class Post {
   @JsonKey(name: 'price')
   final double? price;
 
+  @JsonKey(name: 'prompt_pay')
+  final String? promptPay;
+
   @JsonKey(name: 'distance')
-  final String? distance;  // Nullable
+  final String? distance;  
 
   @JsonKey(name: 'phone_number')
   final String? phoneNumber;
@@ -60,6 +63,12 @@ class Post {
   @JsonKey(name: 'user_ratings')
   final List<UserRating>? userRatings;  // Nullable List of UserRating
 
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  @JsonKey(name: 'updated_at')
+  final String? updatedAt;
+
   Post({
     required this.postID,
     required this.ownerID,
@@ -71,6 +80,7 @@ class Post {
     required this.locationLat,
     required this.locationLong,
     required this.price,
+    required this.promptPay,
     this.distance,  // Nullable
     required this.phoneNumber,
     required this.gender,
@@ -78,6 +88,8 @@ class Post {
     this.totalScore,  // Nullable
     required this.activeStatus,
     required this.placeTypeID,  // Nullable
+    required this.createdAt,
+    required this.updatedAt,
     this.userRatings,  // Nullable
   });
 

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hoca_frontend/pages/createpost/createpost.dart';
+import 'package:hoca_frontend/pages/mngPost.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -23,7 +24,7 @@ class CustomFloatingActionButton extends StatelessWidget {
           onPressed: onPressed ?? () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => CreatePostPage()),
+              MaterialPageRoute(builder: (context) => ManagePostPage()),
             );
           },
           backgroundColor: const Color(0xFF7E869E).withOpacity(0.5),

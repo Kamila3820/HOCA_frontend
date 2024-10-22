@@ -3,7 +3,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/String.dart';
 
 class DescriptionField extends StatelessWidget {
-  const DescriptionField({super.key});
+  final TextEditingController controller; // Add controller parameter
+
+  const DescriptionField({
+    super.key,
+    required this.controller, // Make controller required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,6 +29,7 @@ class DescriptionField extends StatelessWidget {
           child: SizedBox(
             width: 320,
             child: TextFormField(
+              controller: controller, // Use the controller
               onSaved: (value) => description = value,
               decoration: InputDecoration(
                 hintStyle: GoogleFonts.poppins(

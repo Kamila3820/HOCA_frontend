@@ -4,12 +4,12 @@ import 'package:hoca_frontend/components/createpost/buildCategoryChip.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class CategoriesSection extends StatelessWidget {
-  final List<String> selectedCategories;
-  final Function(String) toggleCategory;
+  final int? selectedCategory; // Now stores the selected category as an integer
+  final Function(int) toggleCategory; // Expects an integer for category selection
 
   const CategoriesSection({
     super.key,
-    required this.selectedCategories,
+    required this.selectedCategory,
     required this.toggleCategory,
   });
 
@@ -25,23 +25,23 @@ class CategoriesSection extends StatelessWidget {
           runSpacing: 4.0,
           children: [
             buildCategoryChip(
-                selectedCategories, 'Deep cleaning', FontAwesomeIcons.broom, toggleCategory),
+                selectedCategory, 'Deep cleaning', FontAwesomeIcons.broom, 1, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Floor care', FontAwesomeIcons.broom, toggleCategory),
+                selectedCategory, 'Floor care', FontAwesomeIcons.broom, 2, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Window care', FontAwesomeIcons.broom, toggleCategory),
+                selectedCategory, 'Window care', FontAwesomeIcons.broom, 3, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Laundry', FontAwesomeIcons.shirt, toggleCategory),
+                selectedCategory, 'Laundry', FontAwesomeIcons.shirt, 4, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Sewing', FontAwesomeIcons.shirt, toggleCategory),
+                selectedCategory, 'Sewing', FontAwesomeIcons.shirt, 5, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Lawn Mowing', FontAwesomeIcons.seedling, toggleCategory),
+                selectedCategory, 'Lawn Mowing', FontAwesomeIcons.seedling, 6, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Watering', FontAwesomeIcons.seedling, toggleCategory),
+                selectedCategory, 'Watering', FontAwesomeIcons.seedling,  7, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Yard cleanup', FontAwesomeIcons.seedling, toggleCategory),
+                selectedCategory, 'Yard cleanup', FontAwesomeIcons.seedling, 8, toggleCategory),
             buildCategoryChip(
-                selectedCategories, 'Pet sitting', FontAwesomeIcons.paw, toggleCategory),
+                selectedCategory, 'Pet sitting', FontAwesomeIcons.paw, 9, toggleCategory),
           ],
         ),
       ],

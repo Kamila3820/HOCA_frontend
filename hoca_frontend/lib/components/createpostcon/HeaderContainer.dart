@@ -3,8 +3,9 @@ import 'package:google_fonts/google_fonts.dart';
 
 class HeaderContainer extends StatelessWidget {
   final VoidCallback onBackPressed;
+  final String title;
 
-  const HeaderContainer({super.key, required this.onBackPressed});
+  const HeaderContainer({super.key, required this.onBackPressed, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class HeaderContainer extends StatelessWidget {
             ),
             Center(
               child: Text(
-                'Create Worker',
+                title,
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 30,

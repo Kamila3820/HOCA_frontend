@@ -4,7 +4,12 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class WorkingPriceField extends StatelessWidget {
-  const WorkingPriceField({super.key});
+  final TextEditingController controller; // Add the controller
+
+  const WorkingPriceField({
+    super.key,
+    required this.controller, // Make it required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +22,7 @@ class WorkingPriceField extends StatelessWidget {
           child: SizedBox(
             width: 150,
             child: TextFormField(
-              onSaved: (value) => workingPrice = value,
+              controller: controller, // Use the controller
               keyboardType: TextInputType.number,
               inputFormatters: [
                 FilteringTextInputFormatter.digitsOnly,

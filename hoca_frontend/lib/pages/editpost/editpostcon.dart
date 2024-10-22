@@ -12,6 +12,7 @@ import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
 import 'package:hoca_frontend/components/register/image_picker_section.dart';
+import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/pages/createpost/postlocation.dart'; // Import the new screen
 import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/mngPost.dart';
@@ -20,19 +21,26 @@ import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CreatePostCon extends StatefulWidget {
+class EditPostCon extends StatefulWidget {
   final Map<String, dynamic>? formData;
+  final String postID;
+  final String? location;
+  final String? latitude;
+  final String? longtitude;
+  final List<PlaceType>? placeTypes; // Add placeTypes field
+  final String? amountFamily;
+  final String? imageUrl;
 
-  const CreatePostCon({super.key, this.formData});
+  const EditPostCon({super.key, this.formData, required this.postID, required this.location, required this.latitude, required this.longtitude, required this.placeTypes, required this.imageUrl, required this.amountFamily});
 
   @override
-  _CreatePostConState createState() => _CreatePostConState();
+  _EditPostConState createState() => _EditPostConState();
 }
 
-class _CreatePostConState extends State<CreatePostCon> {
+class _EditPostConState extends State<EditPostCon> {
   File? _image;
   final ImagePicker _picker = ImagePicker();
-  bool _imageSelected = false;
+  bool _imageSelected = true;
   final List<int> _selectedBoxIndices = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _selectedFamilyAmount;
@@ -47,6 +55,28 @@ class _CreatePostConState extends State<CreatePostCon> {
   @override
   void initState() {
     super.initState();
+
+    if (widget.location != null) {
+      _locationName = widget.location!;
+    }
+
+    if (widget.latitude != null && widget.longtitude != null) {
+      _currentLocation = LatLng(double.parse(widget.latitude!), double.parse(widget.longtitude!));
+    }
+
+    if (widget.imageUrl != null) {
+      _image = null;
+    }
+
+    if (widget.placeTypes != null) {
+      _selectedBoxIndices.addAll(
+        widget.placeTypes!.map((placeType) => placeType.id - 1).toList(),
+      );
+    }
+
+    if (widget.amountFamily != null) {
+      _selectedFamilyAmount = widget.amountFamily;
+    }
 
      WidgetsBinding.instance.addPostFrameCallback((_) async {
       _getCurrentLocation();
@@ -140,13 +170,6 @@ class _CreatePostConState extends State<CreatePostCon> {
           backgroundColor: Colors.red,
         ),
       );
-    } else if (!_imageSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please upload or take a photo.'),
-          backgroundColor: Colors.red,
-        ),
-      );
     } else {
       callCreatePost();
     }
@@ -180,9 +203,10 @@ class _CreatePostConState extends State<CreatePostCon> {
         "amount_family": _selectedFamilyAmount,
       });
 
+      String wpostID = widget.postID;
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
-      await Caller.dio.post("/v1/post/create", data: formData, options: Options(
+      await Caller.dio.patch("/v1/post/edit/$wpostID", data: formData, options: Options(
         headers: {
           'x-auth-token': '$token', 
         },
@@ -207,7 +231,7 @@ class _CreatePostConState extends State<CreatePostCon> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             HeaderContainer(
-              title: "Create Worker",
+               title: "Edit Worker Post",
               onBackPressed: () {
                 Navigator.pop(context); // Go back to the previous page
               },
@@ -261,7 +285,7 @@ class _CreatePostConState extends State<CreatePostCon> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Text(
-                  "Upload worker avatar",
+                  "Upload worker avatar here",
                   style: GoogleFonts.poppins(
                     textStyle: const TextStyle(
                       fontSize: 16,
@@ -275,6 +299,7 @@ class _CreatePostConState extends State<CreatePostCon> {
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ImagePickerSection(
                   image: _image,
+                  imageUrl: widget.imageUrl,
                   onTap: () {
                     showDialog(
                       context: context,
@@ -361,7 +386,7 @@ class _CreatePostConState extends State<CreatePostCon> {
                       ),
                     ),
                     child: Text(
-                      "Create Post",
+                      "Apply Changes",
                       style: GoogleFonts.poppins(
                         textStyle: const TextStyle(
                           fontSize: 16,

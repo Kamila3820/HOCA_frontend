@@ -4,7 +4,12 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class PhoneNumberField extends StatelessWidget {
-  const PhoneNumberField({super.key});
+  final TextEditingController controller; // Add controller parameter
+
+  const PhoneNumberField({
+    super.key,
+    required this.controller, // Make controller required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,6 +22,7 @@ class PhoneNumberField extends StatelessWidget {
           child: SizedBox(
             width: 150,
             child: TextFormField(
+              controller: controller, // Use the controller
               onSaved: (value) => phoneNumber = value,
               keyboardType: TextInputType.number,
               inputFormatters: [

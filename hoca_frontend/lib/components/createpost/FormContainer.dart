@@ -8,65 +8,66 @@ import 'package:hoca_frontend/components/createpost/WorkerNameField.dart';
 import 'package:hoca_frontend/components/createpost/WorkingPriceField.dart';
 
 class FormContainer extends StatelessWidget {
-  final List<String> selectedCategories;
-  final Function(String) toggleCategory;
+  final TextEditingController workerNameController;
+  final TextEditingController workingPriceController;
+  final TextEditingController idLineController;
+  final TextEditingController phoneNumberController;
+  final TextEditingController descriptionController;
+  final String selectedGender;
+  final Function(String?) onGenderChanged;
+  final int? selectedCategories;
+  final Function(int) toggleCategory;
 
   const FormContainer({
-    super.key,
+    Key? key,
+    required this.workerNameController,
+    required this.workingPriceController,
+    required this.idLineController,
+    required this.phoneNumberController,
+    required this.descriptionController,
+    required this.selectedGender,
+    required this.onGenderChanged,
     required this.selectedCategories,
     required this.toggleCategory,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 360,
-      height: 720,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            spreadRadius: 5,
-            blurRadius: 10,
-            offset: const Offset(0, 3),
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          WorkerNameField(controller: workerNameController),
+          const SizedBox(height: 10.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              WorkingPriceField(controller: workingPriceController),
+              const SizedBox(width: 20.0),
+              IdLineField(controller: idLineController),
+            ],
           ),
+          const SizedBox(height: 10.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GenderDropdown(
+                gender: selectedGender,
+                onChanged: onGenderChanged,
+              ),
+              const SizedBox(width: 20.0),
+              PhoneNumberField(controller: phoneNumberController),
+            ],
+          ),
+          const SizedBox(height: 15.0),
+          CategoriesSection(
+            selectedCategory: selectedCategories,
+            toggleCategory: toggleCategory,
+          ),
+          const SizedBox(height: 5.0),
+          DescriptionField(controller: descriptionController),
         ],
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            WorkerNameField(),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                WorkingPriceField(),
-                const SizedBox(width: 20.0),
-                IdLineField(),
-              ],
-            ),
-            const SizedBox(height: 10.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                GenderDropdown(),
-                const SizedBox(width: 20.0),
-                PhoneNumberField(),
-              ],
-            ),
-            const SizedBox(height: 15.0),
-            CategoriesSection(
-              selectedCategories: selectedCategories,
-              toggleCategory: toggleCategory,
-            ),
-            const SizedBox(height: 5.0),
-            DescriptionField(),
-          ],
-        ),
       ),
     );
   }

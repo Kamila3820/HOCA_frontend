@@ -17,6 +17,7 @@ Post _$PostFromJson(Map<String, dynamic> json) => Post(
       locationLat: json['latitude'] as String?,
       locationLong: json['longtitude'] as String?,
       price: (json['price'] as num?)?.toDouble(),
+      promptPay: json['prompt_pay'] as String?,
       distance: json['distance'] as String?,
       phoneNumber: json['phone_number'] as String?,
       gender: json['gender'] as String?,
@@ -26,6 +27,8 @@ Post _$PostFromJson(Map<String, dynamic> json) => Post(
       placeTypeID: (json['place_types'] as List<dynamic>?)
           ?.map((e) => PlaceType.fromJson(e as Map<String, dynamic>))
           .toList(),
+      createdAt: json['created_at'] as String?,
+      updatedAt: json['updated_at'] as String?,
       userRatings: (json['user_ratings'] as List<dynamic>?)
           ?.map((e) => UserRating.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -42,6 +45,7 @@ Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
       'latitude': instance.locationLat,
       'longtitude': instance.locationLong,
       'price': instance.price,
+      'prompt_pay': instance.promptPay,
       'distance': instance.distance,
       'phone_number': instance.phoneNumber,
       'gender': instance.gender,
@@ -50,4 +54,6 @@ Map<String, dynamic> _$PostToJson(Post instance) => <String, dynamic>{
       'active_status': instance.activeStatus,
       'place_types': instance.placeTypeID,
       'user_ratings': instance.userRatings,
+      'created_at': instance.createdAt,
+      'updated_at': instance.updatedAt,
     };

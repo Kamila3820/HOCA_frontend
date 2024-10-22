@@ -12,19 +12,69 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  final _formKey = GlobalKey<FormState>();
-  List<String> selectedCategories = [];
+  // Define controllers for the form fields in FormContainer
+  final TextEditingController _workerNameController = TextEditingController();
+  final TextEditingController _workingPriceController = TextEditingController();
+  final TextEditingController _idLineController = TextEditingController();
+  final TextEditingController _phoneNumberController = TextEditingController();
+  final TextEditingController _descriptionController = TextEditingController();
+  String _selectedGender = "Male";
+  int? selectedCategory; 
 
-  void toggleCategory(String category) {
+  // Function to toggle category selection
+  void toggleCategory(int category) {
     setState(() {
-      if (selectedCategories.contains(category)) {
-        selectedCategories.remove(category);
-      } else {
-        if (selectedCategories.isEmpty) {
-          selectedCategories.add(category);
-        }
-      }
+      selectedCategory = selectedCategory == category ? null : category;
     });
+  }
+
+  // Method to handle form submission
+  void _submitForm() {
+    // Check if a category is selected
+    if (selectedCategory == null) {
+      // Show an error if the category is not selected
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: const Color.fromARGB(255, 221, 78, 78),
+          content: Text(
+            'Please select a category.',
+            style: GoogleFonts.poppins(
+              textStyle: const TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ),
+      );
+      Future.delayed(const Duration(seconds: 2), () {
+        Navigator.of(context).pop();
+      });
+      return;
+    }
+
+    // Create a formData map to pass the collected form data
+    Map<String, dynamic> formData = {
+      "name": _workerNameController.text,
+      "price": _workingPriceController.text,
+      "idLine": _idLineController.text,
+      "phoneNumber": _phoneNumberController.text,
+      "description": _descriptionController.text,
+      "gender": _selectedGender,
+      "categories": selectedCategory,
+    };
+
+    // If form is valid, navigate to CreatePostCon and pass form data
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CreatePostCon(
+          formData: formData,
+        ),
+      ),
+    );
   }
 
   @override
@@ -32,71 +82,40 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return Scaffold(
       body: Stack(
         children: [
-          HeaderSection(),
+          HeaderSection(title: "Create Worker",), // Your existing header section
           Center(
-            child: Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const SizedBox(height: 80),
-                  FormContainer(
-                    selectedCategories: selectedCategories,
-                    toggleCategory: toggleCategory,
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 80),
+                FormContainer(
+                  workerNameController: _workerNameController,
+                  workingPriceController: _workingPriceController,
+                  idLineController: _idLineController,
+                  phoneNumberController: _phoneNumberController,
+                  descriptionController: _descriptionController,
+                  selectedGender: _selectedGender,
+                  onGenderChanged: (value) {
+                    setState(() {
+                      _selectedGender = value!;
+                    });
+                  },
+                  selectedCategories: selectedCategory,
+                  toggleCategory: toggleCategory,
+                ),
+                const SizedBox(height: 10),
+              ],
             ),
           ),
           Positioned(
-            bottom: 10, // Adjust as needed to overlap with the container
+            bottom: 10,
             left: 0,
             right: 0,
             child: Center(
               child: ElevatedButton(
-                onPressed: () {
-                  if (_formKey.currentState?.validate() ?? false) {
-                    // Check if at least one category is selected
-                    if (selectedCategories.isEmpty) {
-                      // Show a dialog indicating the user should select at least one category
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          backgroundColor: Color.fromARGB(255, 221, 78,
-                              78), // Set the background color of the dialog
-                          content: Text(
-                            'Please select a category.',
-                            style: GoogleFonts.poppins(
-                              // Use GoogleFonts.poppins for the text style
-                              textStyle: TextStyle(
-                                fontSize: 18, // Set the font size
-                                color: Colors.white, // Set the text color
-                                fontWeight: FontWeight
-                                    .w600, // Optional: Set the font weight
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                      Future.delayed(const Duration(seconds: 2), () {
-                        Navigator.of(context)
-                            .pop(); // Close the dialog after 2 seconds
-                      });
-                      return; // Exit the method if no category is selected
-                    }
-                    _formKey.currentState?.save();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CreatePostCon(),
-                      ),
-                    );
-                  }
-                },
+                onPressed: _submitForm, // Directly call _submitForm
                 style: ElevatedButton.styleFrom(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
+                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
                   backgroundColor: const Color(0xFF87C4FF),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),

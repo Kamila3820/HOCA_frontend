@@ -4,20 +4,25 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class IdLineField extends StatelessWidget {
-  const IdLineField({super.key});
+  final TextEditingController controller; // Add the controller
+
+  const IdLineField({
+    super.key,
+    required this.controller, // Make it required
+  });
 
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildRequiredLabel('ID Line'),
+        buildRequiredLabel('PromptPay Number'),
         const SizedBox(height: 8.0),
         Center(
           child: SizedBox(
             width: 150,
             child: TextFormField(
-              onSaved: (value) => idLine = value,
+              controller: controller, // Use the controller
               decoration: InputDecoration(
                 hintStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(
@@ -34,7 +39,7 @@ class IdLineField extends StatelessWidget {
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
-                  return 'Enter a IDLine';
+                  return 'Enter a PromptPay Number';
                 }
                 return null;
               },

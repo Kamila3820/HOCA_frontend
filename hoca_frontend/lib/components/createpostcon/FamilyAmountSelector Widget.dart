@@ -15,7 +15,7 @@ class FamilyAmountSelector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Positioned(
-      top: 520,
+      top: 470,
       left: 20,
       right: 20,
       child: Form(

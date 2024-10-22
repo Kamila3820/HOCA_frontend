@@ -4,7 +4,12 @@ import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class WorkerNameField extends StatelessWidget {
-  const WorkerNameField({super.key});
+  final TextEditingController controller; // Add the controller
+
+  const WorkerNameField({
+    super.key,
+    required this.controller, // Make it required
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -17,8 +22,9 @@ class WorkerNameField extends StatelessWidget {
           child: SizedBox(
             width: 340,
             child: TextFormField(
-              onSaved: (value) => workerName = value,
+              controller: controller, // Use the passed controller
               decoration: InputDecoration(
+                hintText: 'Enter worker name',
                 hintStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(
                     color: Colors.black.withOpacity(0.2),

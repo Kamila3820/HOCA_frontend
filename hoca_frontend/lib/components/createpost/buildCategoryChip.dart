@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 Widget buildCategoryChip(
-    List<String> selectedCategories, String label, IconData icon, Function toggleCategory) {
+    int? selectedCategory, String label, IconData icon, int value, Function(int) toggleCategory) {
   // Check if the category is selected
-  bool isSelected = selectedCategories.contains(label);
+  bool isSelected = selectedCategory == value;
+  
   return GestureDetector(
-    onTap: () => toggleCategory(label), // Toggle category selection
+    onTap: () => toggleCategory(value), // Pass the integer value
     child: Chip(
       avatar: Icon(
         icon,
@@ -19,7 +20,7 @@ Widget buildCategoryChip(
           textStyle: const TextStyle(
             fontSize: 10,
             color: Colors.black87,
-            fontWeight: FontWeight.w500, // Added fontWeight
+            fontWeight: FontWeight.w500,
           ),
         ),
       ),

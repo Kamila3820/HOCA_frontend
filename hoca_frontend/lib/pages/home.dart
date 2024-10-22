@@ -41,7 +41,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    if (widget.latitude != null && widget.longitude != null) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if (widget.latitude != null && widget.longitude != null) {
       selectedLatitude = widget.latitude!;
       selectedLongitude = widget.longitude!;
       _locationName = widget.address ?? "Choose Your Location";
@@ -49,6 +50,7 @@ class _HomePageState extends State<HomePage> {
     } else {
       _showLocationAlert();  // Ask the user to select location if none is provided.
     }
+    });
   }
 
   load(String latitude, String longitude) async {

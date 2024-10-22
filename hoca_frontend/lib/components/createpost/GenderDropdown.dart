@@ -3,15 +3,20 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class GenderDropdown extends StatefulWidget {
-  const GenderDropdown({super.key});
+  final String? gender; // Add gender parameter
+  final Function(String?) onChanged; // Add onChanged callback
+
+  const GenderDropdown({
+    super.key,
+    required this.gender, // Make it required
+    required this.onChanged, // Make it required
+  });
 
   @override
   _GenderDropdownState createState() => _GenderDropdownState();
 }
 
 class _GenderDropdownState extends State<GenderDropdown> {
-  String? gender;
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -23,7 +28,7 @@ class _GenderDropdownState extends State<GenderDropdown> {
           child: SizedBox(
             width: 150,
             child: DropdownButtonFormField<String>(
-              value: gender,
+              value: widget.gender, // Use the gender from the parent
               items: [
                 DropdownMenuItem(
                   value: 'Male',
@@ -53,11 +58,7 @@ class _GenderDropdownState extends State<GenderDropdown> {
                   ),
                 ),
               ],
-              onChanged: (value) {
-                setState(() {
-                  gender = value;
-                });
-              },
+              onChanged: widget.onChanged, // Use the onChanged callback
               decoration: InputDecoration(
                 hintStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(

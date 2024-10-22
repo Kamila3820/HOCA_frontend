@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HeaderSection extends StatelessWidget {
-  const HeaderSection({super.key});
+  final String title;
+
+  const HeaderSection({super.key, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +37,7 @@ class HeaderSection extends StatelessWidget {
                 ),
                 Center(
                   child: Text(
-                    'Create Worker',
+                    title,
                     style: GoogleFonts.poppins(
                       textStyle: const TextStyle(
                         fontSize: 30,
