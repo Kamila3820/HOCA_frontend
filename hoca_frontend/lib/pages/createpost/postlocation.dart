@@ -6,7 +6,7 @@ import 'package:permission_handler/permission_handler.dart';
 class PostLocation extends StatefulWidget {
   final LatLng? initialLocation;
 
-  const PostLocation({Key? key, this.initialLocation}) : super(key: key);
+  const PostLocation({super.key, this.initialLocation});
 
   @override
   _PostLocationState createState() => _PostLocationState();
