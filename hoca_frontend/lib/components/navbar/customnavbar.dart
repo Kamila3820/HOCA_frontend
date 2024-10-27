@@ -14,6 +14,13 @@ class CustomBottomNavigationBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Only show navigation bar when keyboard is not visible
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    
+    if (isKeyboardVisible) {
+      return const SizedBox.shrink(); // Hide when keyboard is visible
+    }
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: const BorderRadius.only(

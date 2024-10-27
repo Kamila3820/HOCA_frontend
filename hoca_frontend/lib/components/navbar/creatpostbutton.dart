@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hoca_frontend/pages/createpost/createpost.dart';
 import 'package:hoca_frontend/pages/mngPost.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
@@ -12,6 +11,13 @@ class CustomFloatingActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Only show FAB when keyboard is not visible
+    final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
+    
+    if (isKeyboardVisible) {
+      return const SizedBox.shrink(); // Hide when keyboard is visible
+    }
+
     return Padding(
       padding: const EdgeInsets.only(top: 20),
       child: Container(
