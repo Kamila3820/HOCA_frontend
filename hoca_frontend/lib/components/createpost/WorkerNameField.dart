@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class WorkerNameField extends StatelessWidget {

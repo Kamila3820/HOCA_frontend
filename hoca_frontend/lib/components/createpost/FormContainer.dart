@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:hoca_frontend/components/createpost/CategoriesSection.dart';
 import 'package:hoca_frontend/components/createpost/DescriptionField.dart';
 import 'package:hoca_frontend/components/createpost/GenderDropdown.dart';
-import 'package:hoca_frontend/components/createpost/IdLineField.dart';
 import 'package:hoca_frontend/components/createpost/PhoneNumberField.dart';
+import 'package:hoca_frontend/components/createpost/PromptPayField.dart';
 import 'package:hoca_frontend/components/createpost/WorkerNameField.dart';
 import 'package:hoca_frontend/components/createpost/WorkingPriceField.dart';
 
@@ -45,7 +45,7 @@ class FormContainer extends StatelessWidget {
             children: [
               WorkingPriceField(controller: workingPriceController),
               const SizedBox(width: 20.0),
-              IdLineField(controller: idLineController),
+              PromptPayField(controller: idLineController),
             ],
           ),
           const SizedBox(height: 10.0),

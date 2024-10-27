@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:hoca_frontend/components/createpost/String.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
-class IdLineField extends StatelessWidget {
+class PromptPayField extends StatelessWidget {
   final TextEditingController controller; // Add the controller
 
-  const IdLineField({
+  const PromptPayField({
     super.key,
     required this.controller, // Make it required
   });

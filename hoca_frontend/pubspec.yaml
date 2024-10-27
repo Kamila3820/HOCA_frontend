@@ -79,6 +79,11 @@ flutter:
     - assets/images/Domi.png
     - assets/images/House.png
     - assets/images/Room.png
+    - assets/images/promptpay.png
+    - assets/images/runman.png
+    - assets/images/workload.png
+    - assets/images/userload.png
+    - assets/images/qrcode.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

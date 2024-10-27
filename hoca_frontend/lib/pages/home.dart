@@ -87,26 +87,61 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  _showLocationAlert() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Location Required'),
-          content: const Text('Please choose a location to see available services.'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Dismiss the dialog
-                navigateToLocateLocation();  // Navigate to the location selection page
-              },
-              child: const Text('Choose Location'),
+ _showLocationAlert() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.location_on, color: Colors.blue),
+            SizedBox(width: 8.0),
+            Text(
+              'Location Required',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18.0,
+                color: Colors.black87,
+              ),
             ),
           ],
-        );
-      },
-    );
-  }
+        ),
+        content: Text(
+          'Please choose a location to see available services.',
+          style: TextStyle(
+            fontSize: 16.0,
+            color: Colors.black54,
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.white,
+              backgroundColor: Color(0xFF87C4FF),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+            ),
+            onPressed: () {
+              Navigator.pop(context); // Dismiss the dialog
+              navigateToLocateLocation(); // Navigate to the location selection page
+            },
+            child: Text(
+              'Choose Location',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   void updateLocation(String newLocation) {
     setState(() {

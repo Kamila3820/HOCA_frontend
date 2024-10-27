@@ -88,20 +88,37 @@ class _CreatePostPageState extends State<CreatePostPage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 80),
-                FormContainer(
-                  workerNameController: _workerNameController,
-                  workingPriceController: _workingPriceController,
-                  idLineController: _idLineController,
-                  phoneNumberController: _phoneNumberController,
-                  descriptionController: _descriptionController,
-                  selectedGender: _selectedGender,
-                  onGenderChanged: (value) {
-                    setState(() {
-                      _selectedGender = value!;
-                    });
-                  },
-                  selectedCategories: selectedCategory,
-                  toggleCategory: toggleCategory,
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 10,
+                        offset: const Offset(0, 5),
+                      ),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20),
+                    child: FormContainer(
+                      workerNameController: _workerNameController,
+                      workingPriceController: _workingPriceController,
+                      idLineController: _idLineController,
+                      phoneNumberController: _phoneNumberController,
+                      descriptionController: _descriptionController,
+                      selectedGender: _selectedGender,
+                      onGenderChanged: (value) {
+                        setState(() {
+                          _selectedGender = value!;
+                        });
+                      },
+                      selectedCategories: selectedCategory,
+                      toggleCategory: toggleCategory,
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 10),
               ],
