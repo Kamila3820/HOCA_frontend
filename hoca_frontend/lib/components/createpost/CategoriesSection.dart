@@ -21,7 +21,7 @@ class CategoriesSection extends StatelessWidget {
         buildRequiredLabel('Categories'),
         const SizedBox(height: 8.0),
         Wrap(
-          spacing: 5.0,
+          spacing: 4.0,
           runSpacing: 4.0,
           children: [
             buildCategoryChip(

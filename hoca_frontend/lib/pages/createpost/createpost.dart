@@ -12,67 +12,58 @@ class CreatePostPage extends StatefulWidget {
 }
 
 class _CreatePostPageState extends State<CreatePostPage> {
-  // Define controllers for the form fields in FormContainer
-  final TextEditingController _workerNameController = TextEditingController();
-  final TextEditingController _workingPriceController = TextEditingController();
-  final TextEditingController _idLineController = TextEditingController();
-  final TextEditingController _phoneNumberController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  String _selectedGender = "Male";
-  int? selectedCategory; 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  
+  // Controllers
+  late final Map<String, TextEditingController> _controllers;
+  
+  // Form state
+  String _selectedGender = '';
+  int? _selectedCategory;
 
-  // Function to toggle category selection
-  void toggleCategory(int category) {
+  @override
+  void initState() {
+    super.initState();
+    _controllers = {
+      'workerName': TextEditingController(),
+      'workingPrice': TextEditingController(),
+      'idLine': TextEditingController(),
+      'phoneNumber': TextEditingController(),
+      'description': TextEditingController(),
+    };
+  }
+
+  @override
+  void dispose() {
+    _controllers.values.forEach((controller) => controller.dispose());
+    super.dispose();
+  }
+
+  void _toggleCategory(int category) {
     setState(() {
-      selectedCategory = selectedCategory == category ? null : category;
+      _selectedCategory = _selectedCategory == category ? null : category;
     });
   }
 
-  // Method to handle form submission
   void _submitForm() {
-    // Check if a category is selected
-    if (selectedCategory == null) {
-      // Show an error if the category is not selected
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: const Color.fromARGB(255, 221, 78, 78),
-          content: Text(
-            'Please select a category.',
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 18,
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      );
-      Future.delayed(const Duration(seconds: 2), () {
-        Navigator.of(context).pop();
-      });
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    // Create a formData map to pass the collected form data
-    Map<String, dynamic> formData = {
-      "name": _workerNameController.text,
-      "price": _workingPriceController.text,
-      "idLine": _idLineController.text,
-      "phoneNumber": _phoneNumberController.text,
-      "description": _descriptionController.text,
+    final formData = {
+      "name": _controllers['workerName']!.text,
+      "price": _controllers['workingPrice']!.text,
+      "idLine": _controllers['idLine']!.text,
+      "phoneNumber": _controllers['phoneNumber']!.text,
+      "description": _controllers['description']!.text,
       "gender": _selectedGender,
-      "categories": selectedCategory,
+      "categories": _selectedCategory,
     };
 
-    // If form is valid, navigate to CreatePostCon and pass form data
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => CreatePostCon(
-          formData: formData,
-        ),
+        builder: (context) => CreatePostCon(formData: formData),
       ),
     );
   }
@@ -80,78 +71,91 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          HeaderSection(title: "Create Worker",), // Your existing header section
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 80),
-                Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 20),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 10,
-                        offset: const Offset(0, 5),
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20),
-                    child: FormContainer(
-                      workerNameController: _workerNameController,
-                      workingPriceController: _workingPriceController,
-                      idLineController: _idLineController,
-                      phoneNumberController: _phoneNumberController,
-                      descriptionController: _descriptionController,
-                      selectedGender: _selectedGender,
-                      onGenderChanged: (value) {
-                        setState(() {
-                          _selectedGender = value!;
-                        });
-                      },
-                      selectedCategories: selectedCategory,
-                      toggleCategory: toggleCategory,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: _submitForm, // Directly call _submitForm
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                  backgroundColor: const Color(0xFF87C4FF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Next',
-                  style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+      body: SafeArea(
+        child: Stack(
+          children: [
+            const HeaderSection(title: "Create Worker"),
+            
+            Padding(
+              padding: const EdgeInsets.only(top: 100.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    _buildFormContainer(),
+                    const SizedBox(height: 1),
+                    _buildSubmitButton(),
+                    const SizedBox(height: 24),
+                  ],
                 ),
               ),
             ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFormContainer() {
+    return Container(
+      // height: 690,
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
+      ),
+      child: Form(
+        key: _formKey,
+        child: FormContainer(
+          workerNameController: _controllers['workerName']!,
+          workingPriceController: _controllers['workingPrice']!,
+          idLineController: _controllers['idLine']!,
+          phoneNumberController: _controllers['phoneNumber']!,
+          descriptionController: _controllers['description']!,
+          selectedGender: _selectedGender,
+          onGenderChanged: (value) {
+            if (value != null) {
+              setState(() => _selectedGender = value);
+            }
+          },
+          selectedCategories: _selectedCategory,
+          toggleCategory: _toggleCategory,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    final bool isButtonEnabled = _selectedCategory != null;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ElevatedButton(
+        onPressed: isButtonEnabled ? _submitForm : null, // Button is null (disabled) when no category is selected
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          backgroundColor: isButtonEnabled 
+            ? const Color(0xFF87C4FF)  // Original color when enabled
+            : Colors.grey.shade300,    // Grey color when disabled
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          minimumSize: const Size(200, 50),
+        ),
+        child: Text(
+          'Next',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            color: isButtonEnabled ? Colors.white : Colors.grey.shade500, // Different text color when disabled
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

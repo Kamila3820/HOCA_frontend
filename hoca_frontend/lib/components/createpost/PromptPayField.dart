@@ -15,7 +15,7 @@ class PromptPayField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        buildRequiredLabel('PromptPay Number'),
+        buildRequiredLabel('PromptPay'),
         const SizedBox(height: 8.0),
         Center(
           child: SizedBox(
@@ -39,6 +39,9 @@ class PromptPayField extends StatelessWidget {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Enter a PromptPay Number';
+                   }
+                if (value.length < 10) {
+                  return 'Enter 10 digits';
                 }
                 return null;
               },

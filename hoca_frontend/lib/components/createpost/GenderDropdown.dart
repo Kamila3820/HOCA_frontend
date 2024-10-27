@@ -3,20 +3,28 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class GenderDropdown extends StatefulWidget {
-  final String? gender; // Add gender parameter
-  final Function(String?) onChanged; // Add onChanged callback
+  final String? gender;
+  final Function(String?) onChanged;
 
   const GenderDropdown({
     super.key,
-    required this.gender, // Make it required
-    required this.onChanged, // Make it required
+    required this.gender,
+    required this.onChanged,
   });
 
   @override
-  _GenderDropdownState createState() => _GenderDropdownState();
+  State<GenderDropdown> createState() => _GenderDropdownState();
 }
 
 class _GenderDropdownState extends State<GenderDropdown> {
+  String? _selectedGender;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedGender = widget.gender;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -28,8 +36,19 @@ class _GenderDropdownState extends State<GenderDropdown> {
           child: SizedBox(
             width: 150,
             child: DropdownButtonFormField<String>(
-              value: widget.gender, // Use the gender from the parent
+              value: _selectedGender?.isNotEmpty == true ? _selectedGender : null,
               items: [
+                DropdownMenuItem(
+                  value: '',
+                  child: Text(
+                    '',
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        color: Colors.black.withOpacity(0.5),
+                      ),
+                    ),
+                  ),
+                ),
                 DropdownMenuItem(
                   value: 'Male',
                   child: Text(
@@ -48,17 +67,13 @@ class _GenderDropdownState extends State<GenderDropdown> {
                     ),
                   ),
                 ),
-                DropdownMenuItem(
-                  value: 'Other',
-                  child: Text(
-                    'Other',
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(color: Colors.black54),
-                    ),
-                  ),
-                ),
               ],
-              onChanged: widget.onChanged, // Use the onChanged callback
+              onChanged: (value) {
+                setState(() {
+                  _selectedGender = value;
+                });
+                widget.onChanged(value);
+              },
               decoration: InputDecoration(
                 hintStyle: GoogleFonts.poppins(
                   textStyle: TextStyle(

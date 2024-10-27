@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class WorkerNameField extends StatelessWidget {
@@ -23,12 +22,6 @@ class WorkerNameField extends StatelessWidget {
             child: TextFormField(
               controller: controller, // Use the passed controller
               decoration: InputDecoration(
-                hintText: 'Enter worker name',
-                hintStyle: GoogleFonts.poppins(
-                  textStyle: TextStyle(
-                    color: Colors.black.withOpacity(0.2),
-                  ),
-                ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(5),
                 ),

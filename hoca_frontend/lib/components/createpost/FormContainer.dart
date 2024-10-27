@@ -33,41 +33,58 @@ class FormContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          WorkerNameField(controller: workerNameController),
-          const SizedBox(height: 10.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              WorkingPriceField(controller: workingPriceController),
-              const SizedBox(width: 20.0),
-              PromptPayField(controller: idLineController),
-            ],
-          ),
-          const SizedBox(height: 10.0),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              GenderDropdown(
-                gender: selectedGender,
-                onChanged: onGenderChanged,
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 10.0),
+            WorkerNameField(controller: workerNameController),
+            const SizedBox(height: 16.0),
+            // First row with Working Price and ID Line
+            Row(
+              children: [
+                Expanded(
+                  child: WorkingPriceField(controller: workingPriceController),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: PromptPayField(controller: idLineController),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16.0),
+            // Second row with Gender and Phone Number
+            Row(
+              children: [
+                Expanded(
+                  child: GenderDropdown(
+                    gender: selectedGender,
+                    onChanged: onGenderChanged,
+                  ),
+                ),
+                const SizedBox(width: 16.0),
+                Expanded(
+                  child: PhoneNumberField(controller: phoneNumberController),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16.0),
+            // Categories section with proper spacing
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: CategoriesSection(
+                selectedCategory: selectedCategories,
+                toggleCategory: toggleCategory,
               ),
-              const SizedBox(width: 20.0),
-              PhoneNumberField(controller: phoneNumberController),
-            ],
-          ),
-          const SizedBox(height: 15.0),
-          CategoriesSection(
-            selectedCategory: selectedCategories,
-            toggleCategory: toggleCategory,
-          ),
-          const SizedBox(height: 5.0),
-          DescriptionField(controller: descriptionController),
-        ],
+            ),
+            const SizedBox(height: 16.0),
+            // Description field at the bottom
+            DescriptionField(controller: descriptionController),
+            const SizedBox(height: 10.0),
+          ],
+        ),
       ),
     );
   }
