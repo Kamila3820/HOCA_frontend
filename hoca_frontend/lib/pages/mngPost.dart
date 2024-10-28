@@ -5,10 +5,10 @@ import 'package:hoca_frontend/components/reserve/Description%20Component.dart';
 import 'package:hoca_frontend/components/reserve/InfoList%20Component.dart';
 import 'package:hoca_frontend/components/reserve/NameRating%20Component.dart';
 import 'package:hoca_frontend/components/reserve/ProfilePicture%20Component.dart';
-import 'package:hoca_frontend/components/reserve/ReserveButton%20Component.dart';
 import 'package:hoca_frontend/components/reserve/Reviews.dart';
 import 'package:hoca_frontend/components/reserve/TaskButtons%20Component.dart';
 import 'package:hoca_frontend/components/reserve/VerifiedBadge%20Component.dart';
+import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/createpost/createpost.dart';
 import 'package:hoca_frontend/pages/editpost/editpost.dart';
@@ -247,16 +247,22 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    IconButton(
-                                      icon: const Icon(
-                                        Icons.arrow_back,
-                                        color: Color.fromARGB(255, 0, 0, 0),
-                                        size: 40.0,
-                                      ),
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                    ),
+                                   IconButton(
+  icon: const Icon(
+    Icons.arrow_back,
+    color: Color.fromARGB(255, 0, 0, 0),
+    size: 40.0,
+  ),
+  onPressed: () {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const MainScreen()),
+      (route) => false, // This removes all previous routes.
+    );
+  },
+),
+
+
                                     PopupMenuButton<String>(
                                       onSelected: (value) {
                                         _handleMenuItemClick(value, post.postID.toString()); // Pass the postID here

@@ -71,8 +71,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
+      body: 
+        Stack(
           children: [
             const HeaderSection(title: "Create Worker"),
             
@@ -91,8 +91,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
           ],
         ),
-      ),
-    );
+      );
+    
   }
 
   Widget _buildFormContainer() {

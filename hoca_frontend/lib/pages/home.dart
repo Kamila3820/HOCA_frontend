@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
       _locationName = widget.address ?? "Choose Your Location";
       load(selectedLatitude, selectedLongitude);
     } else {
-      _showLocationAlert();  // Ask the user to select location if none is provided.
+      showLocationAlert();  // Ask the user to select location if none is provided.
     }
     });
   }
@@ -81,13 +81,13 @@ class _HomePageState extends State<HomePage> {
 
   reload() {
     if (selectedLongitude == null) {
-      _showLocationAlert();
+      showLocationAlert();
     } else {
       load(selectedLatitude, selectedLongitude);
     }
   }
 
- _showLocationAlert() {
+ showLocationAlert() {
   showDialog(
     context: context,
     builder: (BuildContext context) {
@@ -366,37 +366,63 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     GestureDetector(
                       onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
+                        List<Post> filteredPosts = posts.where((post) => 
+                          post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
                         setState(() {
                           posts = filteredPosts;
                         });
-                        if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first);
-                        }
+                        // Removed the isEmpty check, directly navigate to CleanPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CleanPage(posts: filteredPosts),
+                          ),
+                        ).then((result) {
+                          if (result == true) {
+                            reload();
+                          }
+                        });
                       },
                       child: buildServiceOption('Cleaning', FontAwesomeIcons.broom),
                     ),
-                    GestureDetector(
+                     GestureDetector(
                       onTap: () {
                         List<Post> filteredPosts = posts.where((post) => post.categoryID == 4 || post.categoryID == 5).toList();
                         setState(() {
                           posts = filteredPosts;
                         });
-                        if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first);
-                        }
+                        // Removed the isEmpty check, directly navigate to CleanPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClothesPage(posts: filteredPosts),
+                          ),
+                        ).then((result) {
+                          if (result == true) {
+                            reload();
+                          }
+                        });
                       },
                       child: buildServiceOption('Clothes', FontAwesomeIcons.shirt),
                     ),
-                    GestureDetector(
+                     GestureDetector(
                       onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
+                        List<Post> filteredPosts = posts.where((post) => 
+                          post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
                         setState(() {
                           posts = filteredPosts;
                         });
-                        if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first);
-                        }
+                        // Removed the isEmpty check, always navigate
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GardeningPage(posts: filteredPosts),
+                          ),
+                        ).then((result) {
+                          if (result == true) {
+                            reload();
+                          }
+                        });
                       },
                       child: buildServiceOption('Gardening', FontAwesomeIcons.seedling),
                     ),
@@ -406,12 +432,21 @@ class _HomePageState extends State<HomePage> {
                         setState(() {
                           posts = filteredPosts;
                         });
-                        if (filteredPosts.isNotEmpty) {
-                          navigateBasedOnCategory(filteredPosts.first);
-                        }
+                        // Removed the isEmpty check, directly navigate to CleanPage
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PetsPage(posts: filteredPosts),
+                          ),
+                        ).then((result) {
+                          if (result == true) {
+                            reload();
+                          }
+                        });
                       },
                       child: buildServiceOption('Pets', Icons.pets),
                     ),
+
                   ],
                 ),
                 const SizedBox(height: 65),

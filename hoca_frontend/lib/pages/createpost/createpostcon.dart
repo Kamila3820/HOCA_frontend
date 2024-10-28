@@ -6,16 +6,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/classes/caller.dart';
-import 'package:hoca_frontend/components/createpostcon/CreatePostButton%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
 import 'package:hoca_frontend/components/register/image_picker_section.dart';
 import 'package:hoca_frontend/pages/createpost/postlocation.dart'; // Import the new screen
-import 'package:hoca_frontend/pages/home.dart';
 import 'package:hoca_frontend/pages/mngPost.dart';
-import 'package:hoca_frontend/pages/profile.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -233,7 +230,7 @@ class _CreatePostConState extends State<CreatePostCon> {
           top: 170,
           right: 30,
           child: GestureDetector(
-            // onTap: _onLocationButtonPressed, // Navigate to PostLocation page
+            onTap: _onLocationButtonPressed, // Navigate to PostLocation page
             child: Container(
               width: 45,
               height: 45,
