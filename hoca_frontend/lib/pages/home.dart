@@ -46,6 +46,9 @@ class _HomePageState extends State<HomePage> {
       selectedLongitude = widget.longitude!;
       _locationName = widget.address ?? "Choose Your Location";
       load(selectedLatitude, selectedLongitude);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('latitude', selectedLatitude);
+      await prefs.setString('longitude', selectedLongitude);
     } else {
       showLocationAlert();  // Ask the user to select location if none is provided.
     }

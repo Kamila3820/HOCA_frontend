@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentDialog extends StatefulWidget {
   const PaymentDialog({super.key});
@@ -26,15 +27,36 @@ class _PaymentDialogState extends State<PaymentDialog> {
   final _formKey = GlobalKey<FormState>();
   final Completer<GoogleMapController> _controller = Completer();
 
-  static const LatLng _initialPosition = LatLng(13.736717, 100.523186); // Default to Bangkok
-  LatLng _currentPosition = _initialPosition;
+  // static const LatLng _initialPosition = LatLng(13.736717, 100.523186); // Default to Bangkok
+  LatLng _currentPosition = LatLng(13.736717, 100.523186);
 
-  @override
+@override
   void initState() {
     super.initState();
-    _selectedLocation = _initialPosition;
-    _getAddress(_initialPosition);
+    _initializePosition(); // Call an async function from here
   }
+
+  Future<void> _initializePosition() async {
+    LatLng initialPosition = await _loadPosition();
+    setState(() {
+      _currentPosition = initialPosition;
+    });
+    _getAddress(initialPosition); // Any additional logic after setting the position
+  }
+
+  Future<LatLng> _loadPosition() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? lat = prefs.getString('latitude');
+    String? long = prefs.getString('longitude');
+
+    if (lat != null && long != null) {
+      return LatLng(double.parse(lat), double.parse(long));
+    } else {
+      // Return a default location if no stored values are found
+      return LatLng(13.736717, 100.523186);
+    }
+  }
+
 
   Future<void> _getAddress(LatLng location) async {
     try {
@@ -52,7 +74,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
           place.country,
         ].where((element) => element != null && element.isNotEmpty).join(", ");
         setState(() {
-          _selectedAddress = fullAddress.isNotEmpty ? fullAddress : "Address not found";
+          _selectedAddress =
+              fullAddress.isNotEmpty ? fullAddress : "Address not found";
         });
       } else {
         setState(() => _selectedAddress = "Address not found");
@@ -136,7 +159,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
       ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+      contentPadding:
+          const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
       content: Form(
         key: _formKey,
         child: SingleChildScrollView(
@@ -156,7 +180,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
                         const SizedBox(width: 8.0),
                         Expanded(
                           child: Text(
-                            _selectedAddress ?? 'Selected location: $_currentPosition',
+                            _selectedAddress ??
+                                'Selected location: $_currentPosition',
                             style: GoogleFonts.poppins(fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
@@ -269,7 +294,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
       leading: Radio<String>(
         value: value,
         groupValue: _selectedPaymentMethod,
-        onChanged: (newValue) => setState(() => _selectedPaymentMethod = newValue),
+        onChanged: (newValue) =>
+            setState(() => _selectedPaymentMethod = newValue),
       ),
       title: Text(title, style: GoogleFonts.poppins()),
     );
