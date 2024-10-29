@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/profile/ProfilePic.dart';
 
 class ProfileHeader extends StatelessWidget {
   final bool isLoading;
   final VoidCallback onPickImage;
+  final String? imageUrl;
 
   const ProfileHeader({
     super.key,
     required this.isLoading,
     required this.onPickImage,
+    this.imageUrl,
   });
 
   @override
@@ -34,30 +35,10 @@ class ProfileHeader extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 30),
-                  const ProfilePic(),
-                  ElevatedButton(
-                    onPressed: isLoading ? null : onPickImage,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF292B5C),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      minimumSize: const Size(70, 50),
-                    ),
-                    child: isLoading
-                        ? const CircularProgressIndicator(
-                            color: Colors.white,
-                          )
-                        : Text(
-                            'Change Picture',
-                            style: GoogleFonts.poppins(
-                              textStyle: const TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
+                  ProfilePic(
+                    isLoading: isLoading,
+                    onPickImage: onPickImage,
+                    imageUrl: imageUrl,
                   ),
                 ],
               ),
