@@ -1,14 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkerCompletionPage extends StatelessWidget {
   final String customerName;
+  final String? latitude;
+  final String? longitude;
+  final String? address;
   
   const WorkerCompletionPage({
     super.key, 
     this.customerName = "Jintara Maliwan",
+    this.latitude,
+    this.longitude,
+    this.address,
   });
+
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -169,31 +185,41 @@ Container(
 
       // Done button
       Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 120),
-        child: ElevatedButton(
-          onPressed: () {
-            showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF87C4FF),
-            minimumSize: const Size(double.infinity, 50),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(25),
+      padding: const EdgeInsets.symmetric(horizontal: 120),
+      child: ElevatedButton(
+        onPressed: () async {
+          // Get saved location data
+          final locationData = await _getSavedLocation();
+          
+          // Navigate to MainScreen with location data
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                latitude: locationData['latitude'],
+                longitude: locationData['longitude'],
+                address: locationData['address'],
+              ),
             ),
+          );
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: const Color(0xFF87C4FF),
+          minimumSize: const Size(double.infinity, 50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(25),
           ),
-          child: Text(
-            'DONE',
-            style: GoogleFonts.poppins( 
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+        ),
+        child: Text(
+          'DONE',
+          style: GoogleFonts.poppins( 
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
           ),
         ),
       ),
+    ),
     ],
   ),
 ),

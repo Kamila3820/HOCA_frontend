@@ -28,127 +28,42 @@ class _HomePageState extends State<HomePage> {
   List<Post> posts = [];
   String selectedLatitude = "";
   String selectedLongitude = "";
-  String _locationName = "Choose Your Location"; // Default location text
-
-  String get shortenedLocation {
-    if (_locationName.length > 20) {
-      return '${_locationName.substring(0, 20)}...';
-    }
-    return _locationName;
-  }
+  String _locationName = "Choose Your Location";
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if (widget.latitude != null && widget.longitude != null) {
-      selectedLatitude = widget.latitude!;
-      selectedLongitude = widget.longitude!;
-      _locationName = widget.address ?? "Choose Your Location";
-      load(selectedLatitude, selectedLongitude);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('latitude', selectedLatitude);
-      await prefs.setString('longitude', selectedLongitude);
-    } else {
-      showLocationAlert();  // Ask the user to select location if none is provided.
-    }
-    });
-  }
 
-  load(String latitude, String longitude) async {
-    String url = "/v1/post/list?lat=$latitude&long=$longitude";
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    print("Making request to URL: $url");
-    print("Using token: $token");
-    Caller.dio.get(
-      url,
-      options: Options(
-        headers: {
-          'x-auth-token': '$token',  // Add token to header
-        },
-      ),
-    ).then((response) {
-      print(response.data);
-      if (mounted) {
+      if (widget.latitude != null && widget.longitude != null) {
         setState(() {
-          // Directly map the response data to List<Post>
-          posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
+          selectedLatitude = widget.latitude!;
+          selectedLongitude = widget.longitude!;
+          _locationName = widget.address ?? prefs.getString('address') ?? "Choose Your Location";
         });
+
+        await prefs.setString('latitude', selectedLatitude);
+        await prefs.setString('longitude', selectedLongitude);
+        await prefs.setString('address', _locationName);
+
+        load(selectedLatitude, selectedLongitude);
+      } else {
+        String? savedLat = prefs.getString('latitude');
+        String? savedLong = prefs.getString('longitude');
+        String? savedAddress = prefs.getString('address');
+
+        if (savedLat != null && savedLong != null) {
+          setState(() {
+            selectedLatitude = savedLat;
+            selectedLongitude = savedLong;
+            _locationName = savedAddress ?? "Choose Your Location";
+          });
+          load(selectedLatitude, selectedLongitude);
+        } else {
+          showLocationAlert();
+        }
       }
-    }).onError((DioException error, _) {
-      Caller.handle(context, error);
-    });
-  }
-
-  reload() {
-    if (selectedLongitude == null) {
-      showLocationAlert();
-    } else {
-      load(selectedLatitude, selectedLongitude);
-    }
-  }
-
- showLocationAlert() {
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        title: Row(
-          children: [
-            Icon(Icons.location_on, color: Colors.blue),
-            SizedBox(width: 8.0),
-            Text(
-              'Location Required',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18.0,
-                color: Colors.black87,
-              ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Please choose a location to see available services.',
-          style: TextStyle(
-            fontSize: 16.0,
-            color: Colors.black54,
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor: Color(0xFF87C4FF),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
-            onPressed: () {
-              Navigator.pop(context); // Dismiss the dialog
-              navigateToLocateLocation(); // Navigate to the location selection page
-            },
-            child: Text(
-              'Choose Location',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
-      );
-    },
-  );
-}
-
-
-  void updateLocation(String newLocation) {
-    setState(() {
-      _locationName = newLocation;
     });
   }
 
@@ -160,81 +75,86 @@ class _HomePageState extends State<HomePage> {
       ),
     );
 
-    // Check if the result is a Map and contains 'address'
-    if (result is Map<String, dynamic> && result.containsKey('address')) {
-      updateLocation(result['address']);
+    if (result is Map && result.containsKey('address')) {
       setState(() {
+        _locationName = result['address'];
         selectedLatitude = result['latitude'].toString();
         selectedLongitude = result['longitude'].toString();
       });
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('latitude', selectedLatitude);
+      await prefs.setString('longitude', selectedLongitude);
+      await prefs.setString('address', _locationName);
+
       load(selectedLatitude, selectedLongitude);
-    } else {
-      print('Unexpected result: $result');
     }
   }
 
-  void navigateBasedOnCategory(Post post) async {
-    if (post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3) {
-      List<Post> filteredPosts = posts.where((post) =>
-      post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
-      var result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => CleanPage(posts: filteredPosts),
-        ),
-      );
-      if (result == true) {
-        setState(() {
-          filteredPosts = posts;
-        });
-        reload();
-      }
-    } else if (post.categoryID == 4 || post.categoryID == 5) {
-      List<Post> filteredPosts = posts.where((post) =>
-      post.categoryID == 4 || post.categoryID == 5).toList();
-      var result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ClothesPage(posts: filteredPosts),
-        ),
-      );
-      if (result == true) {
-        setState(() {
-          filteredPosts = posts;
-        });
-        reload();
-      }
-    } else if (post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8) {
-      List<Post> filteredPosts = posts.where((post) =>
-      post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
-      var result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => GardeningPage(posts: filteredPosts,),
-        ),
-      );
-      if (result == true) {
-        setState(() {
-          filteredPosts = posts;
-        });
-        reload();
-      }
-    } else if (post.categoryID == 9) {
-      List<Post> filteredPosts = posts.where((post) =>
-      post.categoryID == 9).toList();
-      var result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PetsPage(posts: filteredPosts,),
-        ),
-      );
-      if (result == true) {
-        setState(() {
-          filteredPosts = posts;
-        });
-        reload();
-      }
+  reload() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedLat = prefs.getString('latitude');
+    String? savedLong = prefs.getString('longitude');
+
+    if (savedLat != null && savedLong != null) {
+      load(savedLat, savedLong);
+    } else {
+      showLocationAlert();
     }
+  }
+
+  load(String latitude, String longitude) async {
+    String url = "/v1/post/list?lat=$latitude&long=$longitude";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    Caller.dio.get(
+      url,
+      options: Options(
+        headers: {'x-auth-token': '$token'},
+      ),
+    ).then((response) {
+      if (mounted) {
+        setState(() {
+          posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
+        });
+      }
+    }).onError((DioException error, _) {
+      Caller.handle(context, error);
+    });
+  }
+
+  showLocationAlert() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          title: Row(
+            children: [
+              Icon(Icons.location_on, color: Colors.blue),
+              SizedBox(width: 8.0),
+              Text('Location Required', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
+            ],
+          ),
+          content: Text(
+            'Please choose a location to see available services.',
+            style: TextStyle(fontSize: 16.0, color: Colors.black54),
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                navigateToLocateLocation();
+              },
+              child: Text('Choose Location', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -270,20 +190,14 @@ class _HomePageState extends State<HomePage> {
                           child: RichText(
                             text: TextSpan(
                               style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                  fontFamily: 'Poppins',
-                                ),
+                                textStyle: const TextStyle(fontSize: 18, color: Colors.white),
                               ),
                               children: [
                                 const TextSpan(text: 'Welcome!, '),
                                 TextSpan(
                                   text: 'Thanadol',
                                   style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
+                                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -293,14 +207,10 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     IconButton(
-                      icon: const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: FaIcon(
-                          FontAwesomeIcons.bell,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                          size: 35,
-                        ),
+                      icon: const FaIcon(
+                        FontAwesomeIcons.bell,
+                        color: Colors.black,
+                        size: 35,
                       ),
                       onPressed: () {
                         Navigator.push(
@@ -334,7 +244,7 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                              shortenedLocation,
+                              _locationName,
                               style: GoogleFonts.poppins(
                                 textStyle: TextStyle(
                                   fontSize: 18,
@@ -356,10 +266,7 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     'Service',
                     style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),

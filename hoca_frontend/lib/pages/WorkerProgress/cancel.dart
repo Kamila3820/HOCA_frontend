@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-// Replace the existing CancelOrderDialog with this version
 class WorkerCancelOrderDialog extends StatefulWidget {
-  const WorkerCancelOrderDialog({super.key});
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const WorkerCancelOrderDialog({
+    super.key,
+    this.latitude,
+    this.longitude,
+    this.address,
+  });
 
   @override
   State<WorkerCancelOrderDialog> createState() => _CancelOrderDialogState();
@@ -12,6 +21,15 @@ class WorkerCancelOrderDialog extends StatefulWidget {
 
 class _CancelOrderDialogState extends State<WorkerCancelOrderDialog> {
   String? selectedReason;
+
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,12 +80,20 @@ class _CancelOrderDialogState extends State<WorkerCancelOrderDialog> {
               child: ElevatedButton(
                 onPressed: selectedReason == null 
                     ? null  // Button is disabled when no reason is selected
-                    : () {
-                        // Handle send action
+                    : () async {
+                        // Get saved location data
+                        final locationData = await _getSavedLocation();
                         print('Selected reason: $selectedReason');
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
+                        // Navigate to MainScreen with location data
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MainScreen(
+                              latitude: locationData['latitude'],
+                              longitude: locationData['longitude'],
+                              address: locationData['address'],
+                            ),
+                          ),
                         );
                       },
                 style: ElevatedButton.styleFrom(

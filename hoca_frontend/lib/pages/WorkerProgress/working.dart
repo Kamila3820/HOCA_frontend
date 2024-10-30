@@ -2,16 +2,34 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/complete.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkerdonePage extends StatelessWidget {
-  const WorkerdonePage({super.key});
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+  const WorkerdonePage({
+    super.key,
+    this.latitude,
+    this.longitude,
+    this.address,
+    });
+
+    Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
+      body: 
+         Column(
           children: [
             Container(
   height: 120.0,
@@ -27,12 +45,22 @@ class WorkerdonePage extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () {
-              showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-            },
+            onPressed: () async {
+          // Get saved location data
+          final locationData = await _getSavedLocation();
+          
+          // Navigate to MainScreen with location data
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MainScreen(
+                latitude: locationData['latitude'],
+                longitude: locationData['longitude'],
+                address: locationData['address'],
+              ),
+            ),
+          );
+        },
           ),
         ),
         Center(
@@ -252,30 +280,121 @@ Row(
                   const SizedBox(height: 40), // Optional: Add some space before the button
 ElevatedButton(
   onPressed: () {
+    bool isChecked = false; // Initial checkbox state
+
     showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const WorkerCompletionPage(),
-                        );
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.check_circle_outline,
+                        color: const Color(0xFF87C4FF),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Confirm Arrival',
+                        style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      Icons.close,
+                      color: Colors.grey[600],
+                    ),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+              content: Row(
+                children: [
+                  Checkbox(
+                    value: isChecked,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        isChecked = value ?? false;
+                      });
+                    },
+                    shape: CircleBorder(), // Circular shape for checkbox
+                    activeColor: const Color(0xFF87C4FF), // Checkbox color
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      "I am honored to have never taken anything that isn't mine.",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isChecked
+                      ? () {
+                          // Navigate to the next page if the checkbox is checked
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const WorkerCompletionPage()),
+                          );
+                        }
+                      : null, // Disable button if unchecked
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: isChecked
+                        ? const Color(0xFF87C4FF) // Enabled color
+                        : Colors.white, // Disabled color
+                  ),
+                  child: Text(
+                    'Confirm',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   },
   style: ElevatedButton.styleFrom(
-    foregroundColor: Colors.white, backgroundColor: Color(0xFF90D26D), // Text color of the button
-    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12), // Button padding
+    foregroundColor: Colors.white,
+    backgroundColor: Color(0xFF90D26D),
+    padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 12),
     shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8), // Rounded corners
+      borderRadius: BorderRadius.circular(8),
     ),
   ),
   child: Text(
     'Complete',
     style: GoogleFonts.poppins(
-      fontSize: 20, // Font size of the button text
+      fontSize: 20,
       fontWeight: FontWeight.w600,
     ),
   ),
 ),
+
           ],
         ),
-      ),
-    );
+      );
+    
   }
 
   Widget _buildCircleCheckbox({

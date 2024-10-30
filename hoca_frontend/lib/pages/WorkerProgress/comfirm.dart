@@ -5,9 +5,19 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/cancel.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkerProgressPage extends StatefulWidget {
-  const WorkerProgressPage({super.key});
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const WorkerProgressPage({
+    super.key,
+    this.latitude,
+    this.longitude,
+    this.address,
+  });
 
   @override
   State<WorkerProgressPage> createState() => _WorkerProgressPageState();
@@ -16,6 +26,15 @@ class WorkerProgressPage extends StatefulWidget {
 class _WorkerProgressPageState extends State<WorkerProgressPage> {
   Timer? _timer;
   int _remainingSeconds = 7 * 60; // 7 minutes in seconds
+
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   void initState() {
@@ -51,48 +70,57 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Column(
+      body: 
+         Column(
           children: [
-           Container(
-  height: 120.0,
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: const Color(0xFF87C4FF).withOpacity(0.6),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
-    child: Stack(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () {
-              showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-            },
-          ),
-        ),
-        Center(
-          child: Text(
-            'Progress',
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            Container(
+              height: 120.0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF87C4FF).withOpacity(0.6),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+                        onPressed: () async {
+                          // Get saved location data
+                          final locationData = await _getSavedLocation();
+
+                          // Navigate to MainScreen with location data
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainScreen(
+                                latitude: locationData['latitude'],
+                                longitude: locationData['longitude'],
+                                address: locationData['address'],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        'Progress',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    ),
-  ),
-),
-
             // Progress steps at the top
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -107,7 +135,6 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                 ],
               ),
             ),
-
             // Worker Card
             Container(
               margin: const EdgeInsets.all(16),
@@ -127,7 +154,6 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Worker Profile Section
                   Row(
                     children: [
                       const CircleAvatar(
@@ -162,7 +188,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                                       '098-765-4321',
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
-                                        color: Color.fromARGB(255, 0, 0, 0),
+                                        color: Colors.black,
                                       ),
                                     ),
                                   ],
@@ -171,7 +197,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                                   'Time: 7 MAR 2024 19.03',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
-                                    color: Color.fromARGB(255, 0, 0, 0),
+                                    color: Colors.black,
                                   ),
                                 ),
                               ],
@@ -193,7 +219,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                           ),
                         ),
                         TextSpan(
-                          text: 'need your help',
+                          text: 'needs your help',
                           style: GoogleFonts.poppins(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -237,7 +263,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Look like someone need your help...',
+                        'Look like someone needs your help...',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -277,7 +303,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                   const SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     'Location :',
                     style: GoogleFonts.poppins(
@@ -307,8 +333,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                       color: Colors.black87,
                     ),
                   ),
-                 
-                 const SizedBox(height: 12),
+                  const SizedBox(height: 12),
                   Text(
                     'Note from a customer :',
                     style: GoogleFonts.poppins(
@@ -362,13 +387,80 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                   SizedBox(
                     width: 150,
                     child: ElevatedButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const WorkerArrivalPage(),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
+  onPressed: () {
+    showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return AlertDialog(
+      title: Row(
+        children: [
+          Icon(
+            Icons.check_circle_outline, // Choose an appropriate icon
+            color: const Color(0xFF87C4FF), // Icon color
+          ),
+          const SizedBox(width: 8), // Add some spacing between icon and text
+          Text(
+            'Confirm Arrival',
+            style: GoogleFonts.poppins(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+      content: Text(
+        'Are you sure you want to confirm your arrival?',
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          color: Colors.black54
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () {
+            // Close the dialog
+            Navigator.of(context).pop();
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: const Color(0xFFE12525),
+            backgroundColor: Colors.white, // "No" button color
+          ),
+          child: Text(
+            'No',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        TextButton(
+          onPressed: () {
+            // Navigate to the next page
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WorkerArrivalPage()),
+            );
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: const Color(0xFF87C4FF), // "Yes" button color
+          ),
+          child: Text(
+            'Yes',
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        
+      ],
+    );
+  },
+);
+
+  },
+  style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
                         backgroundColor: const Color(0xFF90D26D),
                         padding: const EdgeInsets.symmetric(vertical: 12),
@@ -407,8 +499,8 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
             ),
           ],
         ),
-      ),
-    );
+      );
+    
   }
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
