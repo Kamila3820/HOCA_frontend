@@ -38,7 +38,7 @@ class Description extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight, // Align to the right
           child: Text(
-            'created on: ${create ?? '-'}',
+            'created on: ${create!.replaceAll("-", "/")}',
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),
@@ -48,7 +48,7 @@ class Description extends StatelessWidget {
         Align(
           alignment: Alignment.centerRight, // Align to the right
           child: Text(
-            'edited at: ${update ?? '-'}',
+            'edited at: ${update!.replaceAll("-", "/")}',
             style: const TextStyle(fontSize: 12, color: Colors.grey),
           ),
         ),

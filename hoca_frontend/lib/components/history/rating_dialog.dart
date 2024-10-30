@@ -1,10 +1,17 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'rating_section.dart';
 
-void showRatingDialog(BuildContext context) {
+void showRatingDialog(BuildContext context, String historyID, Function reloadData) {
+  int? workScore; // For work score rating
+  int? securityScore; // For security score rating
+  final TextEditingController commentController = TextEditingController();
+
   showDialog(
     context: context,
     builder: (context) {
@@ -58,11 +65,17 @@ void showRatingDialog(BuildContext context) {
               Center(child: RatingSectionWithIcon(
                 title: 'Work',
                 tooltipMessage: 'Rate the quality and efficiency of the work performed',
+                onRatingUpdate: (rating) {
+                    workScore = rating; // Update work score
+                },
               )),
               const SizedBox(height: 16),
               Center(child: RatingSectionWithIcon(
                 title: 'Security',
                 tooltipMessage: 'Rate how safe and secure you felt during the service',
+                onRatingUpdate: (rating) {
+                    securityScore = rating; // Update security score
+                },
               )),
               const SizedBox(height: 16),
               Text(
@@ -76,6 +89,7 @@ void showRatingDialog(BuildContext context) {
               ),
               const SizedBox(height: 8),
               TextField(
+                controller: commentController,
                 maxLines: 3,
                 decoration: InputDecoration(
                   hintText: 'Let us know your great experience!',
@@ -91,7 +105,13 @@ void showRatingDialog(BuildContext context) {
               Center(
                 child: ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    if (workScore != null && securityScore != null) {
+                      _submitRating(context, historyID, workScore!, securityScore!, commentController.text, reloadData);
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Please provide ratings for both Work and Security.'))
+                      );
+                    }
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF87C4FF),
@@ -119,14 +139,60 @@ void showRatingDialog(BuildContext context) {
   );
 }
 
+void _submitRating(BuildContext context, String historyID, int workScore, int securityScore, String comment, Function reloadData) async {
+  try {
+    final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      await Caller.dio.post("/v1/rating/create/$historyID", 
+      data: {
+        "work_score": workScore,
+        "security_score": securityScore,
+        "comment": comment
+      }, 
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', 
+        },
+      ),);
+
+      Navigator.of(context).pop();
+      Future.delayed(Duration(seconds: 3));
+      _showSuccessPopup(context);
+      reloadData();
+
+  } on DioException catch (error) {
+      // Handle error
+      Caller.handle(context, error);
+  }
+}
+
+void _showSuccessPopup(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false, // Prevent dismissal by tapping outside
+    builder: (BuildContext context) {
+      Future.delayed(Duration(seconds: 2), () {
+        Navigator.of(context).pop(); // Close the dialog automatically
+      });
+
+      return AlertDialog(
+        title: Text('Success'),
+        content: Text('Your rating has been submitted successfully.'),
+      );
+    },
+  );
+}
+
 class RatingSectionWithIcon extends StatefulWidget {
   final String title;
   final String tooltipMessage;
+  final Function(int) onRatingUpdate; // Add callback to get rating
 
   const RatingSectionWithIcon({
     Key? key, 
     required this.title,
     required this.tooltipMessage,
+    required this.onRatingUpdate
   }) : super(key: key);
 
   @override
@@ -135,10 +201,18 @@ class RatingSectionWithIcon extends StatefulWidget {
 
 class _RatingSectionWithIconState extends State<RatingSectionWithIcon> {
   final GlobalKey _tooltipKey = GlobalKey();
+  int _rating = 0;
   
   void _showTooltip() {
     final dynamic tooltip = _tooltipKey.currentState;
     tooltip?.ensureTooltipVisible();
+  }
+
+  void _updateRating(int rating) {
+    setState(() {
+      _rating = rating;
+    });
+    widget.onRatingUpdate(_rating); // Pass rating to parent via callback
   }
 
   @override
@@ -200,7 +274,7 @@ class _RatingSectionWithIconState extends State<RatingSectionWithIcon> {
                 ),
               ],
             ),
-            RatingSection(title: ''),
+            RatingSection(title: '', onRatingUpdate: _updateRating,),
           ],
         ),
       ],

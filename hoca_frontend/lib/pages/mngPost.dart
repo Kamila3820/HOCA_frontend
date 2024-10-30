@@ -22,7 +22,7 @@ class ManagePostPage extends StatefulWidget {
 }
 
 class _ManagePostPageState extends State<ManagePostPage> {
-  late Future<Post> postFuture;
+  late Future<Post?> postFuture;
 
   @override
   void initState() {
@@ -30,7 +30,7 @@ class _ManagePostPageState extends State<ManagePostPage> {
     postFuture = fetchPostById();
   }
 
-  Future<Post> fetchPostById() async {
+  Future<Post?> fetchPostById() async {
     String url = "/v1/post/me";
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -44,7 +44,16 @@ class _ManagePostPageState extends State<ManagePostPage> {
           },
         ),
       );
-      return Post.fromJson(response.data); 
+      if (response.statusCode == 200) {
+      // Successfully found post, parse the response
+        return Post.fromJson(response.data);
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        // Post not found, return null to indicate no post
+        return null;
+      } else {
+        // Other errors
+        throw Exception('Failed to load post');
+      } 
     } catch (error) {
       Caller.handle(context, error as DioError); 
       rethrow; 
@@ -164,7 +173,6 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
         postFuture = fetchPostById(); // Refetch the post to update the UI
       });
 
-      // Route to CreatePostPage if shouldNavigateg is true (only for delete)
       if (shouldNavigate) {
         Navigator.pushReplacement(
           context,
@@ -173,10 +181,7 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
       }
     }
   } catch (error) {
-    // Close the loading dialog
     Navigator.of(context, rootNavigator: true).pop();
-
-    // Handle error
     print('Error: $error');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Error: ${error.toString()}')),
@@ -187,7 +192,7 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<Post>(
+      body: FutureBuilder<Post?>(
         future: postFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -199,7 +204,7 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
                   MaterialPageRoute(builder: (context) => CreatePostPage()),
                 );
               });
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator()); 
           } else if (!snapshot.hasData) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.pushReplacement(

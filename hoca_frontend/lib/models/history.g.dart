@@ -7,25 +7,27 @@ part of 'history.dart';
 // **************************************************************************
 
 History _$HistoryFromJson(Map<String, dynamic> json) => History(
-      historyID: (json['historyID'] as num).toInt(),
-      userID: json['userID'] as String,
-      orderID: json['orderID'] as String,
-      status: json['status'] as String,
-      isRated: json['isRated'] as bool,
-      cancellationReason: json['cancellationReason'] as String?,
-      cancelledBy: json['cancelledBy'] as String?,
-      name: json['name'] as String,
+      historyID: (json['id'] as num).toInt(),
+      userID: json['user_id'] as String?,
+      orderID: json['order_id'] as String?,
+      status: json['status'] as String?,
+      isRated: json['is_rated'] as bool?,
+      cancellationReason: json['cancellation_reason'] as String?,
+      cancelledBy: json['cancelled_by'] as String?,
+      name: json['name'] as String?,
       price: (json['price'] as num?)?.toDouble(),
+      createdAt: json['created_at'] as String?,
     );
 
 Map<String, dynamic> _$HistoryToJson(History instance) => <String, dynamic>{
-      'historyID': instance.historyID,
-      'userID': instance.userID,
-      'orderID': instance.orderID,
+      'id': instance.historyID,
+      'user_id': instance.userID,
+      'order_id': instance.orderID,
       'status': instance.status,
-      'isRated': instance.isRated,
-      'cancellationReason': instance.cancellationReason,
-      'cancelledBy': instance.cancelledBy,
+      'is_rated': instance.isRated,
+      'cancellation_reason': instance.cancellationReason,
+      'cancelled_by': instance.cancelledBy,
       'name': instance.name,
       'price': instance.price,
+      'created_at': instance.createdAt,
     };

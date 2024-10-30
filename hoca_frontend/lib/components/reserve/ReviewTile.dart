@@ -29,7 +29,7 @@ class ReviewTile extends StatelessWidget {
               ),
             ),
             Text(
-              date,
+              date.replaceAll("-", "/"),
               style: GoogleFonts.poppins(),
             ),
           ],
