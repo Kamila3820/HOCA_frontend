@@ -7,7 +7,9 @@ import 'package:hoca_frontend/pages/WorkerProgress/cancel.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
 
 class WorkerProgressPage extends StatefulWidget {
-  const WorkerProgressPage({super.key});
+  final String orderID;
+
+  const WorkerProgressPage({super.key, required this.orderID});
 
   @override
   State<WorkerProgressPage> createState() => _WorkerProgressPageState();
@@ -338,7 +340,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (BuildContext context) => const WorkerCancelOrderDialog(),
+                          builder: (BuildContext context) => WorkerCancelOrderDialog(orderID: widget.orderID,),
                         );
                       },
                       style: ElevatedButton.styleFrom(

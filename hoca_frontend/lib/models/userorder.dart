@@ -19,6 +19,9 @@ class UserOrder {
   @JsonKey(name: 'worker_phone')
   final String? workerPhone;
 
+  @JsonKey(name: 'worker_avatar')
+  final String? workerAvatar;
+
   @JsonKey(name: 'payment_type')
   final String? payment;
 

@@ -1,53 +1,146 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/prepareorder.dart';
+import 'package:hoca_frontend/models/userorder.dart';
+import 'package:hoca_frontend/pages/UserProgress/payment.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserArrivalPage extends StatelessWidget {
-  const UserArrivalPage({super.key});
+class UserArrivalPage extends StatefulWidget {
+  final String orderID;
+
+  const UserArrivalPage({super.key, required this.orderID});
+
+  @override
+  State<UserArrivalPage> createState() => _UserArrivalPageState();
+}
+
+class _UserArrivalPageState extends State<UserArrivalPage> {
+  late Future<PrepareOrder?> orderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    orderFuture = fetchOrder(widget.orderID);
+  }
+
+  Future<PrepareOrder?> fetchOrder(String orderID) async {
+    String orderID = widget.orderID;
+    String url = "/v1/order/prepare/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return PrepareOrder.fromJson(response.data);
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        return null;
+      } else {
+        throw Exception('Failed to load order');
+      } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+  }
+
+  void handleNavigation(PrepareOrder? order) {
+    if (order == null || order.orderStatus == "complete" || order.orderStatus == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.orderStatus == "working") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserPaymentPage(orderID: widget.orderID)),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body:  Column(
+      body: FutureBuilder<PrepareOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+
+              return  Column(
           children: [
-  Container(
-  height: 120.0,
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: const Color(0xFF87C4FF).withOpacity(0.6),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
-    child: Stack(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () {
-              showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-            },
-          ),
-        ),
-        Center(
-          child: Text(
-            'Progress',
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+              Container(
+              height: 120.0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF87C4FF).withOpacity(0.6),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+                        onPressed: () {
+                          showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) => const MainScreen(),
+                                    );
+                        },
+                      ),
+                    ),
+                    Center(
+                      child: Text(
+                        'Progress',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
-      ],
-    ),
-  ),
-),
             // Progress steps at the top
             Container(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
@@ -98,7 +191,7 @@ class UserArrivalPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Artiwara Kongmalai',
+                              order.workerName,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -142,7 +235,7 @@ class UserArrivalPage extends StatelessWidget {
       text: TextSpan(
         children: [
           TextSpan(
-            text: '800 THB',
+            text: '${order.price} THB',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -150,7 +243,7 @@ class UserArrivalPage extends StatelessWidget {
             ),
           ),
           TextSpan(
-            text: ' - QR Payment',
+            text: ' - ${order.paymentType}',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -219,7 +312,7 @@ Row(
   text: TextSpan(
     children: [
       TextSpan(
-        text: 'Worker: ',
+        text: 'Phone Number: ',
         style: GoogleFonts.poppins(
           fontSize: 13,
           fontWeight: FontWeight.bold, // Make "Worker" text bold
@@ -227,7 +320,7 @@ Row(
         ),
       ),
       TextSpan(
-        text: 'Jintara 0123456789',
+        text: order.workerPhone,
         style: GoogleFonts.poppins(
           fontSize: 13,
           color: Color(0xFF87C4FF), // Color for the rest of the text
@@ -238,7 +331,7 @@ Row(
 ),
 
                       Text(
-                        '15 Mins',
+                        order.distance!.first.legs!.first.duration!.text!,
                         style: GoogleFonts.poppins(
                           fontSize: 13,
                           fontWeight: FontWeight.w500,
@@ -276,10 +369,13 @@ Expanded(
 ),
 
           ],
+              );
+            }
+        },
         ),
       );
-    
   }
+            }
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Column(
@@ -305,4 +401,3 @@ Expanded(
       ],
     );
   }
-}

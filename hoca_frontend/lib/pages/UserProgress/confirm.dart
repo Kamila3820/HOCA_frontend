@@ -1,18 +1,28 @@
 import 'dart:math' as math;
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/order.dart';
+import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/UserProgress/cancel.dart';
+import 'package:hoca_frontend/pages/UserProgress/preparing.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProgressPage extends StatefulWidget {
-  const UserProgressPage({super.key});
+  final String orderID;
+
+  const UserProgressPage({super.key, required this.orderID});
 
   @override
   State<UserProgressPage> createState() => _ProgressPageState();
 }
 
 class _ProgressPageState extends State<UserProgressPage> with SingleTickerProviderStateMixin {
+  late Future<UserOrder?> orderFuture;
   late AnimationController _animationController;
 
   @override
@@ -22,6 +32,49 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
       duration: const Duration(seconds: 2),
       vsync: this,
     )..repeat();
+
+    orderFuture = fetchOrderById(widget.orderID);
+  }
+
+  Future<UserOrder?> fetchOrderById(String orderID) async {
+    String url = "/v1/order/user/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return UserOrder.fromJson(response.data);
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        return null;
+      } else {
+        throw Exception('Failed to load post');
+      } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+  }
+
+  void handleNavigation(UserOrder? order) {
+    if (order == null || order.status == "complete" || order.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.status == "preparing") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserArrivalPage(orderID: widget.orderID)),
+      );
+    }
   }
 
   @override
@@ -33,47 +86,75 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: FutureBuilder<UserOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+              return Column(
         children: [
           // Header container with the title
            Container(
-  height: 120.0,
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: const Color(0xFF87C4FF).withOpacity(0.6),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
-    child: Stack(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () {
-              showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-            },
-          ),
-        ),
-        Center(
-          child: Text(
-            'Progress',
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            height: 120.0,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: const Color(0xFF87C4FF).withOpacity(0.6),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: IconButton(
+                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+                      onPressed: () {
+                        showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) => const MainScreen(),
+                                  );
+                      },
+                    ),
+                  ),
+                  Center(
+                    child: Text(
+                      'Progress',
+                      style: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          fontSize: 30,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
-        ),
-      ],
-    ),
-  ),
-),
 
           // Progress steps
           Container(
@@ -123,7 +204,7 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Artiwara Kongmalai',
+                            order.workerName!,
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -166,7 +247,7 @@ Row(
       text: TextSpan(
         children: [
           TextSpan(
-            text: '800 THB',
+            text: '${order.price!} THB',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -174,7 +255,7 @@ Row(
             ),
           ),
           TextSpan(
-            text: ' - QR Payment',
+            text: ' - '+order.payment!,
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -211,32 +292,6 @@ const SizedBox(height: 30),
     child: Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        // Distance indicator
-        Row(
-          children: [
-            const Icon(Icons.location_on, color: Colors.grey),
-            Expanded(
-              child: Container(
-                height: 2,
-                color: Colors.grey.shade300,
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(
-                '15 km',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
-              ),
-            ),
-          ],
-        ),
         const SizedBox(height: 40),
         // Searching animation
         SizedBox(
@@ -274,7 +329,7 @@ const SizedBox(height: 30),
         ),
         const SizedBox(height: 20),
         Text(
-          'Finding your worker...',
+          'Waiting for the houseworker to confirm...',
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w500,
@@ -282,7 +337,8 @@ const SizedBox(height: 30),
         ),
         const SizedBox(height: 8),
         Text(
-          'On it! We will find as soon as possible',
+          'Please wait while the worker reviews and confirms within 7 minutes,\n'
+          'You will be notified once the confirmation is complete.',
           style: GoogleFonts.poppins(
             fontSize: 14,
             color: Colors.grey,
@@ -291,41 +347,42 @@ const SizedBox(height: 30),
         const SizedBox(height: 60),
         // Cancel button
       Center(
-  child: SizedBox(
-    width: MediaQuery.of(context).size.width * 0.5, // 80% of the screen width
-    child: ElevatedButton(
-      onPressed: () {
-         showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const UserCancelOrderDialog(),
-                        );
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.red,
-        padding: const EdgeInsets.symmetric(vertical: 15),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.5, // 80% of the screen width
+          child: ElevatedButton(
+            onPressed: () {
+              showDialog(
+                                context: context,
+                                builder: (BuildContext context) => UserCancelOrderDialog(orderID: order.id.toString(),),
+                              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.symmetric(vertical: 15),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: Text(
+              'CANCEL',
+              style: GoogleFonts.poppins(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
+            ),
+          ),
         ),
       ),
-      child: Text(
-        'CANCEL',
-        style: GoogleFonts.poppins(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-      ),
-    ),
-  ),
-),
-
       ],
     ),
   ),
 ),
 
-
         ],
+      );
+            }
+        },
       ),
     );
   }

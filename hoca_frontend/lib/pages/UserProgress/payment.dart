@@ -1,23 +1,104 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/userorder.dart';
+import 'package:hoca_frontend/pages/UserProgress/complete.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserPaymentPage extends StatelessWidget {
-  final String customerName;
-  final String orderId;
-  final double amount;
-  
-  const UserPaymentPage({
-    super.key, 
-    this.customerName = "Artiwara Kongmalai",
-    this.orderId = "ID344546",
-    this.amount = 800,
-  });
+class UserPaymentPage extends StatefulWidget {
+  final String orderID;
+
+  const UserPaymentPage({super.key, required this.orderID});
+
+  @override
+  State<UserPaymentPage> createState() => _UserPaymentPageState();
+}
+
+class _UserPaymentPageState extends State<UserPaymentPage> {
+  late Future<UserOrder?> orderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    orderFuture = fetchOrderById(widget.orderID);
+  }
+
+  Future<UserOrder?> fetchOrderById(String orderID) async {
+    String url = "/v1/order/user/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return UserOrder.fromJson(response.data);
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        return null;
+      } else {
+        throw Exception('Failed to load post');
+      } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: FutureBuilder<UserOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              if (order.status == "complete" || order.status == "cancelled") {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProgressPage()), 
+                  );
+                });
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => UserCompletionPage(orderID: widget.orderID,)), 
+                  );
+                });
+                return const Center(child: CircularProgressIndicator()); // Show loading indicator until navigation
+              }
+
+
+              return Column(
         children: [
           // New Header Container
            Container(
@@ -87,7 +168,7 @@ class UserPaymentPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      customerName,
+                      order.workerName!,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -107,7 +188,7 @@ class UserPaymentPage extends StatelessWidget {
                       ],
                     ),
                     Text(
-                      'Order ID: $orderId',
+                      'Order ID: ${order.id}',
                       style: GoogleFonts.poppins(
                         fontSize: 14,
                         color: const Color.fromARGB(255, 0, 0, 0),
@@ -165,7 +246,7 @@ class UserPaymentPage extends StatelessWidget {
           const SizedBox(height: 10),
 
           Text(
-            'Total: ${amount.toStringAsFixed(0)} THB',
+            'Total: ${order.price} THB',
             style: GoogleFonts.poppins(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -190,9 +271,13 @@ class UserPaymentPage extends StatelessWidget {
             ),
           ),
         ],
+              );
+            }
+        },
       ),
     );
   }
+            }
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Column(
@@ -218,4 +303,3 @@ class UserPaymentPage extends StatelessWidget {
       ],
     );
   }
-}

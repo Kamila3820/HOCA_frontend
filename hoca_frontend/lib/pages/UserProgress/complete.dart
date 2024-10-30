@@ -1,19 +1,102 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/userorder.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class UserCompletionPage extends StatelessWidget {
-  final String customerName;
-  
-  const UserCompletionPage({
-    super.key, 
-    this.customerName = "Artiwara Kongmalai",
-  });
+class UserCompletionPage extends StatefulWidget {
+  final String orderID;
+
+  const UserCompletionPage({super.key, required this.orderID});
+
+  @override
+  State<UserCompletionPage> createState() => _UserCompletionPageState();
+}
+
+class _UserCompletionPageState extends State<UserCompletionPage> {
+  late Future<UserOrder?> orderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    orderFuture = fetchOrderById(widget.orderID);
+  }
+
+  Future<UserOrder?> fetchOrderById(String orderID) async {
+  String url = "/v1/order/user/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  try {
+    final response = await Caller.dio.get(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', // Add token to header
+        },
+      ),
+    );
+    if (response.statusCode == 200) {
+      return UserOrder.fromJson(response.data);
+    } else if (response.statusCode == 404 || response.statusCode == 500) {
+      return null;
+    } else {
+      throw Exception('Failed to load post');
+    } 
+  } catch (error) {
+    Caller.handle(context, error as DioError); 
+    rethrow; 
+  }
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      body: FutureBuilder<UserOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              if (order.status == "complete" || order.status == "cancelled") {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProgressPage()), 
+                  );
+                });
+              } else {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => ProgressPage()), 
+                  );
+                });
+                return const Center(child: CircularProgressIndicator()); // Show loading indicator until navigation
+              }
+
+              return Column(
         children: [
           // Header with customer info and completion status
           Container(
@@ -72,7 +155,7 @@ Container(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      customerName,
+                      order.workerName!,
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
@@ -178,9 +261,14 @@ Container(
 
 
         ],
+              );
+            }
+        },
       ),
     );
   }
+            }
+
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Column(
@@ -206,4 +294,3 @@ Container(
       ],
     );
   }
-}
