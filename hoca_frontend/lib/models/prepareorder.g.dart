@@ -15,6 +15,7 @@ PrepareOrder _$PrepareOrderFromJson(Map<String, dynamic> json) => PrepareOrder(
       price: (json['price'] as num?)?.toDouble(),
       workerName: json['worker_name'] as String,
       workerPhone: json['worker_phone'] as String,
+      workerAvatar: json['worker_avatar'] as String?,
     );
 
 Map<String, dynamic> _$PrepareOrderToJson(PrepareOrder instance) =>
@@ -25,6 +26,7 @@ Map<String, dynamic> _$PrepareOrderToJson(PrepareOrder instance) =>
       'price': instance.price,
       'worker_name': instance.workerName,
       'worker_phone': instance.workerPhone,
+      'worker_avatar': instance.workerAvatar,
     };
 
 Route _$RouteFromJson(Map<String, dynamic> json) => Route(

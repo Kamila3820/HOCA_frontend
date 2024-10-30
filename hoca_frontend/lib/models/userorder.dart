@@ -40,6 +40,7 @@ class UserOrder {
     required this.status,
     required this.workerName,
     required this.workerPhone,
+    required this.workerAvatar,
   });
 
   factory UserOrder.fromJson(Map<String, dynamic> json) => _$UserOrderFromJson(json);

@@ -46,6 +46,7 @@ class WorkerOrder {
     required this.status,
     required this.contactName,
     required this.contactPhone,
+    required this.userAvatar,
     required this.note,
     required this.specPlace,
   });

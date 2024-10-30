@@ -22,6 +22,9 @@ class PrepareOrder {
   @JsonKey(name: 'worker_phone')
   final String workerPhone;
 
+  @JsonKey(name: 'worker_avatar')
+  final String? workerAvatar;
+
   PrepareOrder({
     required this.distance,
     required this.orderStatus,
@@ -29,6 +32,7 @@ class PrepareOrder {
     required this.price,
     required this.workerName,
     required this.workerPhone,
+    required this.workerAvatar,
   });
 
   factory PrepareOrder.fromJson(Map<String, dynamic> json) => _$PrepareOrderFromJson(json);
