@@ -6,7 +6,6 @@ import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class UserCompletionPage extends StatefulWidget {
   final String orderID;

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
-import 'package:hoca_frontend/models/order.dart';
 import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/UserProgress/cancel.dart';
 import 'package:hoca_frontend/pages/UserProgress/preparing.dart';
@@ -14,8 +13,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProgressPage extends StatefulWidget {
   final String orderID;
+   final String? latitude;
+  final String? longitude;
+  final String? address;
 
-  const UserProgressPage({super.key, required this.orderID});
+
+  const UserProgressPage({super.key, required this.orderID,
+  this.latitude,
+    this.longitude,
+    this.address,});
 
   @override
   State<UserProgressPage> createState() => _ProgressPageState();
@@ -24,6 +30,15 @@ class UserProgressPage extends StatefulWidget {
 class _ProgressPageState extends State<UserProgressPage> with SingleTickerProviderStateMixin {
   late Future<UserOrder?> orderFuture;
   late AnimationController _animationController;
+
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   void initState() {
@@ -131,12 +146,22 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
                     alignment: Alignment.centerLeft,
                     child: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-                      onPressed: () {
-                        showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) => const MainScreen(),
-                                  );
-                      },
+                      onPressed: () async {
+                          // Get saved location data
+                          final locationData = await _getSavedLocation();
+
+                          // Navigate to MainScreen with location data
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainScreen(
+                                latitude: locationData['latitude'],
+                                longitude: locationData['longitude'],
+                                address: locationData['address'],
+                              ),
+                            ),
+                          );
+                        },
                     ),
                   ),
                   Center(

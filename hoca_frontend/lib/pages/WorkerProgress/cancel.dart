@@ -154,21 +154,25 @@ class _CancelOrderDialogState extends State<WorkerCancelOrderDialog> {
                 onPressed: selectedReason == null 
                     ? null  // Button is disabled when no reason is selected
                     : () async {
-                        // Get saved location data
-                        final locationData = await _getSavedLocation();
-                        print('Selected reason: $selectedReason');
-                        // Navigate to MainScreen with location data
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => MainScreen(
-                              latitude: locationData['latitude'],
-                              longitude: locationData['longitude'],
-                              address: locationData['address'],
-                            ),
-                          ),
-                        );
-                      },
+  // Cancel the order first
+  cancelOrderByUser();
+
+  // Get saved location data
+  final locationData = await _getSavedLocation();
+  print('Selected reason: $selectedReason');
+
+  // Navigate to MainScreen with location data
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MainScreen(
+        latitude: locationData['latitude'],
+        longitude: locationData['longitude'],
+        address: locationData['address'],
+      ),
+    ),
+  );
+},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF87C4FF),
                   disabledBackgroundColor: Colors.grey[300], // Color when button is disabled
