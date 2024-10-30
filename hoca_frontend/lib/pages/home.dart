@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   String selectedLatitude = "";
   String selectedLongitude = "";
   String _locationName = "Choose Your Location"; // Default location text
+  bool? hasNewNoti = false;
 
   String get shortenedLocation {
     if (_locationName.length > 20) {
@@ -41,6 +42,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      checkNewNotifications();
       if (widget.latitude != null && widget.longitude != null) {
       selectedLatitude = widget.latitude!;
       selectedLongitude = widget.longitude!;
@@ -49,6 +51,14 @@ class _HomePageState extends State<HomePage> {
     } else {
       _showLocationAlert();  // Ask the user to select location if none is provided.
     }
+    });
+  }
+
+  void checkNewNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool? storedNewNoti = prefs.getBool('hasNewNoti');
+    setState(() {
+      hasNewNoti = storedNewNoti ?? false;
     });
   }
 
@@ -290,22 +300,43 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     IconButton(
-                      icon: const SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: FaIcon(
-                          FontAwesomeIcons.bell,
-                          color: Color.fromARGB(255, 0, 0, 0),
-                          size: 35,
+                        icon: Stack(
+                          children: [
+                            const SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: FaIcon(
+                                FontAwesomeIcons.bell,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                                size: 35,
+                              ),
+                            ),
+                            if (hasNewNoti!)
+                              Positioned(
+                                right: 0,
+                                top: 0,
+                                child: Container(
+                                  width: 10,
+                                  height: 10,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                              ),
+                          ],
                         ),
-                      ),
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => const NotiPage(),
                           ),
-                        );
+                        ).then((_) async {
+                          final prefs = await SharedPreferences.getInstance();
+                          prefs.setBool('hasNewNoti', false);
+                          checkNewNotifications();
+                        });
                       },
                     ),
                   ],

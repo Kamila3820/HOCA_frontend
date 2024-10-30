@@ -1,12 +1,92 @@
+import 'package:dio/dio.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/noti/buildnotificationcard.dart';
+import 'package:hoca_frontend/models/notification.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class NotiPage extends StatelessWidget {
+class NotiPage extends StatefulWidget {
   const NotiPage({super.key});
 
   @override
+  State<NotiPage> createState() => _NotiPageState();
+}
+
+class _NotiPageState extends State<NotiPage> {
+  List<Notifications> notificationsList = [];
+  bool hasNewNoti = false; // To track unseen notifications
+  Timer? _pollingTimer;
+  String? lastFetchedNotiID;
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+    _startPolling();
+  }
+
+  void init() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    
+    Caller.dio.get("/v1/notification/", 
+    options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),).then((response) {
+      setState(() {
+        print(response.data);
+        notificationsList = (response.data as List)
+            .map((notiJson) => Notifications.fromJson(notiJson))
+            .toList();
+
+         if (notificationsList.isNotEmpty) {
+          String latestNotiID = notificationsList.first.notiID.toString()!;
+
+          // If the latest notiID is different from the last fetched one, mark it as new
+          if (lastFetchedNotiID == null || lastFetchedNotiID != latestNotiID) {
+            hasNewNoti = true; // There's a new notification
+            lastFetchedNotiID = latestNotiID; // Update the last fetched ID
+            prefs.setBool('hasNewNoti', true);
+          } else {
+            hasNewNoti = false; // No new notification
+          }
+        }
+      });
+    }).onError((DioException error, _) {
+      Caller.handle(context, error);
+    });
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+      init(); // Fetch notifications every 30 seconds
+    });
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
+  }
+
+
+  @override
   Widget build(BuildContext context) {
+    const notificationTypes = {
+      "confirmation": "Please confirm a new order within 7 minutes otherwise it will be cancel automatically",
+      "preparing": "Your order has been confirmed and waiting for a houseworker to prepare",
+      "working": "The worker has been arrived and ready to work",
+      "complete": "Your order is complete. Please rate the experience of a worker",
+      "user_cancel": "Your order has been cancel from a customer",
+      "worker_cancel": "Your order has been cancel from a worker",
+      "system_cancel": "The order has been cancel due to no confirmation from the houseworker",
+      "user_rating": "rated your post",
+    };
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -48,35 +128,30 @@ class NotiPage extends StatelessWidget {
           ),
           const SizedBox(height: 20), // Add some spacing
           Expanded(
-  child: ListView(
-    padding: const EdgeInsets.symmetric(horizontal: 20),
-    children: [
-      buildNotificationCard(
-        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
-        title: 'Confirmation',
-        message: "Please confirm a new Karl Anthony's order within 15 minutes otherwise it will cancel automatically",
-      ),
-      const SizedBox(height: 10),
-      buildNotificationCard(
-        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
-        title: 'Rating',
-        message: "You've received a rating score from James588",
-      ),
-      const SizedBox(height: 10),
-      buildNotificationCard(
-        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
-        title: 'Alert',
-        message: "Your account will be locked after 3 failed login attempts.",
-      ),
-      const SizedBox(height: 10),
-      buildNotificationCard(
-        imageUrl: 'https://via.placeholder.com/150', // Replace with actual image URL
-        title: 'Promo Code',
-        message: "Use code 'SAVE20' for 20% off your next purchase.",
-      ),
-    ],
-  ),
-),
+            child: notificationsList.isNotEmpty
+                ? ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    itemCount: notificationsList.length,
+                    itemBuilder: (context, index) {
+                      Notifications notification = notificationsList[index];
+                      String title = notification.type ?? 'Unknown Notification';
+                      String message = notification.order != null
+                          ? 'Order notification'
+                          : notification.rating != null
+                              ? 'Rating notification'
+                              : 'General notification';
+
+                      return buildNotificationCard(
+                        imageUrl: notification.avatar!,
+                        title: notification.type!,
+                        message: message
+                      );
+                    },
+                  )
+                : const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+          ),
 
         ],
       ),

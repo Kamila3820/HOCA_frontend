@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'rating_dialog.dart';
 
 class HistoryCard extends StatelessWidget {
-  final String id;
+  final String historyID;
+  final String orderID;
   final String name;
   final String date;
   final String time;
@@ -16,10 +17,12 @@ class HistoryCard extends StatelessWidget {
   final bool isRated;
   final String? reason;
   final String price; // Price field
+  final Function? reloadData;
 
   const HistoryCard({
     super.key,
-    required this.id,
+    required this.historyID,
+    required this.orderID,
     required this.name,
     required this.date,
     required this.time,
@@ -31,6 +34,7 @@ class HistoryCard extends StatelessWidget {
     this.isRated = false,
     this.reason,
     required this.price, // Initialize price
+    this.reloadData
   });
 
   @override
@@ -56,7 +60,7 @@ class HistoryCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  id,
+                  orderID,
                   style: GoogleFonts.poppins(
                     textStyle: TextStyle(
                       fontSize: 14,
@@ -90,10 +94,10 @@ class HistoryCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  if (status == 'Completed') ...[
+                  if (status == 'complete') ...[
                     const SizedBox(height: 4),
                     Text(
-                      status,
+                      "Completed",
                       style: GoogleFonts.poppins(
                         textStyle: TextStyle(
                           fontSize: 14,
@@ -122,20 +126,20 @@ class HistoryCard extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                if (status == 'Canceled') ...[
+                if (status == 'cancelled') ...[
                   Text(
-                    status, // Display "Canceled"
+                    "Cancelled", // Display "Canceled"
                     style: GoogleFonts.poppins(
                       textStyle: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
-                        color: statusColor,
+                        color: Colors.red,
                       ),
                     ),
                   ),
                   const SizedBox(height: 8),
                 ],
-                if (status != 'Canceled') ...[ // Do not show price for canceled jobs
+                if (status != 'cancelled') ...[ // Do not show price for canceled jobs
                   Text(
                     '฿ $price', // Show price for non-canceled jobs
                     style: GoogleFonts.poppins(
@@ -177,7 +181,7 @@ class HistoryCard extends StatelessWidget {
                           children: [                         
                             GestureDetector(
                               onTap: () {
-                                showRatingDialog(context);
+                                showRatingDialog(context, historyID, reloadData!);
                               },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

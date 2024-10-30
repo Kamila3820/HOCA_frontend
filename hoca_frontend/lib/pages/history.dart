@@ -1,7 +1,13 @@
+import 'dart:convert';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/history/history_card.dart';
+import 'package:hoca_frontend/models/history.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MessageNotificationTab extends StatelessWidget {
   final Function(int) onTabSelected;
@@ -27,8 +33,8 @@ class MessageNotificationTab extends StatelessWidget {
       ),
       child: Row(
         children: [
-          _buildTab('User', 0),
-          _buildTab('Worker', 1),
+          _buildTab('Reserved', 0),
+          _buildTab('Worked', 1),
         ],
       ),
     );
@@ -69,6 +75,89 @@ class HistoryPage extends StatefulWidget {
 
 class _HistoryPageState extends State<HistoryPage> {
   int _selectedTabIndex = 0;
+  List<dynamic> userHistory = [];
+  List<dynamic> workHistory = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (_selectedTabIndex == 0) {
+      _fetchUserHistory();
+      _fetchWorkedHistory();
+    }
+  }
+
+  void _loadData() {
+    _fetchUserHistory();
+  }
+
+  Future<void> _fetchUserHistory() async {
+    String url = "/v1/history/list";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      print(response.data);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        print("1");
+         List<History> historyList = (response.data as List).map((historyJson) => History.fromJson(historyJson)).toList();
+        print("Historyyyyyyyyyyyyyyyyyyyyyy");
+        print(historyList);
+        setState(() {
+          userHistory = historyList; // Update the state with parsed history data
+        });
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        print('Failed to fetch history');
+      } else {
+        throw Exception('Failed to load post');
+      } 
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
+
+  Future<void> _fetchWorkedHistory() async {
+    String url = "/v1/history/work";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      print(response.data);
+      if (response.statusCode == 200) {
+        final List<dynamic> data = response.data;
+        print("1");
+         List<History> historyList = (response.data as List).map((historyJson) => History.fromJson(historyJson)).toList();
+        print("Historyyyyyyyyyyyyyyyyyyyyyy");
+        print(historyList);
+        setState(() {
+          workHistory = historyList; // Update the state with parsed history data
+        });
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        print('Failed to fetch history');
+      } else {
+        throw Exception('Failed to load post');
+      } 
+    } catch (error) {
+      print('Error: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -120,83 +209,74 @@ class _HistoryPageState extends State<HistoryPage> {
   }
 
   Widget _buildUserList() {
-    return ListView(
-      padding: const EdgeInsets.all(16),
-      children: [
-        // HistoryCard for a completed job with a price
-        HistoryCard(
-          id: 'ID344546',
-          name: 'Ratanaporn Yong',
-          date: '28/04/2024',
-          time: '12:30',
-          status: 'Completed',
-          iconColor: Colors.green,
-          icon: FontAwesomeIcons.broom,
-          showRating: true,
-          price: '120.00', // Include price for completed jobs
-        ),
-        // HistoryCard for a canceled job (no price)
-        HistoryCard(
-          id: 'ID588724',
-          name: 'Ploypailin Saethong',
-          date: '26/04/2024',
-          time: '18:45',
-          status: 'Canceled',
-          statusColor: Colors.red,
-          iconColor: Colors.red,
-          icon: Icons.cancel,
-          reason: 'Bad weather',
-          price: '', // No price for canceled jobs
-        ),
-        // HistoryCard for another completed job with a price
-        HistoryCard(
-          id: 'ID448875',
-          name: 'Jinda Saeaum',
-          date: '25/04/2024',
-          time: '10:30',
-          status: 'Completed',
-          iconColor: Colors.green,
-          icon: FontAwesomeIcons.broom,
-          showRating: true,
-          isRated: true,
-          price: '150.00', // Include price for completed jobs
-        ),
-      ],
+    if (userHistory.isEmpty) {
+    return Center(
+      child: Text(
+        'No reserve history available',
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
     );
   }
 
+  return ListView.builder(
+    padding: const EdgeInsets.all(16),
+    itemCount: userHistory.length,
+    itemBuilder: (context, index) {
+      // Access the History object
+      History historyItem = userHistory[index];
+      String formattedDate = historyItem.createdAt!.replaceAll('-', '/');
+
+      return HistoryCard(
+        historyID: historyItem.historyID.toString(),
+        orderID: "ID"+historyItem.orderID!,
+        name: historyItem.name!,
+        date: formattedDate, 
+        time: '',  
+        status: historyItem.status!,
+        iconColor: historyItem.status! == 'complete' ? Colors.green : Colors.red,
+        icon: historyItem.status! == 'complete' ? Icons.check_circle : Icons.cancel,
+        reason: historyItem.cancellationReason!,
+        price: historyItem.price?.toString() ?? '',
+        showRating: historyItem.status! == 'complete' ? true : false,
+        isRated: historyItem.isRated!,
+        reloadData: _loadData,
+      );
+    },
+  );
+}
+
+
   Widget _buildWorkerList() {
-    // Placeholder for notification list
-     return ListView(
+    if (workHistory.isEmpty) {
+    return Center(
+      child: Text(
+        'No work history available',
+        style: TextStyle(fontSize: 18, color: Colors.grey),
+      ),
+    );
+  }
+
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      children: [
-        // HistoryCard for a completed job with a price
-        HistoryCard(
-          id: 'ID165187',
-          name: 'Gaysowadorn Yinggay',
-          date: '2/06/2024',
-          time: '13:00',
-          status: 'Completed',
-          iconColor: Colors.green,
-          icon: FontAwesomeIcons.broom,
-          
-          price: '200.00', // Include price for completed jobs
-        ),
-        // HistoryCard for a canceled job (no price)
-        HistoryCard(
-          id: 'ID122231',
-          name: 'Kaweephop Noppakun',
-          date: '26/02/2024',
-          time: '20:00',
-          status: 'Canceled',
-          statusColor: Colors.red,
-          iconColor: Colors.red,
-          icon: Icons.cancel,
-          reason: 'Accident on leg',
-          price: '', // No price for canceled jobs
-        ),
-        // HistoryCard for another completed job with a price
-      ],
+      itemCount: workHistory.length,
+      itemBuilder: (context, index) {
+        History historyItem = workHistory[index];
+        String formattedDate = historyItem.createdAt!.replaceAll('-', '/');
+
+        return HistoryCard(
+          historyID: historyItem.historyID.toString(),
+          orderID: "ID"+historyItem.orderID!,
+          name: historyItem.name!,
+          date: formattedDate, 
+          time: '',  
+          status: historyItem.status!,
+          iconColor: historyItem.status! == 'complete' ? Colors.green : Colors.red,
+          icon: historyItem.status! == 'complete' ? Icons.check_circle : Icons.cancel,
+          reason: historyItem.cancellationReason!,
+          price: historyItem.price?.toString() ?? '',
+          isRated: historyItem.isRated!,
+        );
+      },
     );
   }
 }
