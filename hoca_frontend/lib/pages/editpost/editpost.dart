@@ -153,66 +153,89 @@ class _EditPostPageState extends State<EditPostPage> {
     return Scaffold(
       body: Stack(
         children: [
-          HeaderSection(title: "Edit Worker Post",),
+          const HeaderSection(title: "Edit Worker Post"),
           _isLoading
-              ? const Center(child: CircularProgressIndicator()) // Show loading indicator
+              ? const Center(child: CircularProgressIndicator())
               : _hasError
-                  ? const Center(child: Text('Error loading post data')) // Show error message if any error occurs
-                  : Center(
-                      child: Form(
-                        key: _formKey,
+                  ? const Center(child: Text('Error loading post data'))
+                  : Padding(
+                      padding: const EdgeInsets.only(top: 100.0),
+                      child: SingleChildScrollView(
                         child: Column(
-                          mainAxisSize: MainAxisSize.min,
                           children: [
-                            const SizedBox(height: 80),
-                            FormContainer(
-                              workerNameController: _workerNameController,
-                              workingPriceController: _workingPriceController,
-                              idLineController: _idLineController,
-                              phoneNumberController: _phoneNumberController,
-                              descriptionController: _descriptionController,
-                              selectedGender: _selectedGender,
-                              onGenderChanged: (value) {
-                                setState(() {
-                                  _selectedGender = value!;
-                                });
-                              },
-                              selectedCategories: selectedCategory,
-                              toggleCategory: toggleCategory,
-                            ),
-                            const SizedBox(height: 10),
+                            _buildFormContainer(),
+                            const SizedBox(height: 1),
+                            _buildSubmitButton(),
+                            const SizedBox(height: 24),
                           ],
                         ),
                       ),
                     ),
-          Positioned(
-            bottom: 10,
-            left: 0,
-            right: 0,
-            child: Center(
-              child: ElevatedButton(
-                onPressed: _submitForm,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 100, vertical: 15),
-                  backgroundColor: const Color(0xFF87C4FF),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(
-                  'Next',
-                  style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFormContainer() {
+    return Container(
+      margin: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
           ),
         ],
+      ),
+      child: Form(
+        key: _formKey,
+        child: FormContainer(
+          workerNameController: _workerNameController,
+          workingPriceController: _workingPriceController,
+          idLineController: _idLineController,
+          phoneNumberController: _phoneNumberController,
+          descriptionController: _descriptionController,
+          selectedGender: _selectedGender,
+          onGenderChanged: (value) {
+            if (value != null) {
+              setState(() => _selectedGender = value);
+            }
+          },
+          selectedCategories: selectedCategory,
+          toggleCategory: toggleCategory,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    final bool isButtonEnabled = selectedCategory != null;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: ElevatedButton(
+        onPressed: isButtonEnabled ? _submitForm : null,
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(vertical: 15),
+          backgroundColor: isButtonEnabled
+              ? const Color(0xFF87C4FF)
+              : Colors.grey.shade300,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          minimumSize: const Size(200, 50),
+        ),
+        child: Text(
+          'Next',
+          style: GoogleFonts.poppins(
+            fontSize: 20,
+            color: isButtonEnabled ? Colors.white : Colors.grey.shade500,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
       ),
     );
   }

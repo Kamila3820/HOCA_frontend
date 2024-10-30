@@ -194,7 +194,7 @@ class _EditPostConState extends State<EditPostCon> {
         "category_id": widget.formData?["categories"],
         "placetype_ids": placetypeIDs,
         "phone_number": widget.formData?["phoneNumber"],
-        "location": "Test UnSucc",
+        "location": "Locate Me",
         "latitude": "13.7563",
         "longtitude": "100.5018",
         "price": widget.formData?["price"],
@@ -257,7 +257,7 @@ class _EditPostConState extends State<EditPostCon> {
           top: 170,
           right: 30,
           child: GestureDetector(
-            // onTap: _onLocationButtonPressed, // Navigate to PostLocation page
+            onTap: _onLocationButtonPressed, // Navigate to PostLocation page
             child: Container(
               width: 45,
               height: 45,
@@ -415,4 +415,4 @@ class _EditPostConState extends State<EditPostCon> {
       }
     });
   }
-}
+} 

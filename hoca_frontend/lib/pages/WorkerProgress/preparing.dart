@@ -271,15 +271,83 @@ class WorkerArrivalPage extends StatelessWidget {
                 ],
               ),
             ),
-              const SizedBox(height: 30), // Add some space before the image
-                  // Runman Image
-                  Center(
-                    child: Image.asset(
-                      'assets/images/runman.png', // Path to your image
-                      height: 180, // Set the height as needed
-                      fit: BoxFit.cover, // Adjust the fit as needed
+             const SizedBox(height: 10),
+            Container(
+              height: 240,
+              width: 320,
+              margin: const EdgeInsets.symmetric(horizontal: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.5),
+                    spreadRadius: 1,
+                    blurRadius: 10,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Order Details',
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
+                   const SizedBox(height: 12),
+                  Text(
+                    'Location :',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '679/210 Prachauthit 45 Thung Khru , Bangkok',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Specific Place :',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    'Condominium floor 4 room23',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.black87,
+                    ),
+                  ),
+                 
+                 const SizedBox(height: 12),
+                  Text(
+                    'Note from a customer :',
+                    style: GoogleFonts.poppins(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  Text(
+                    '-',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
                   const SizedBox(height: 40), // Optional: Add some space before the button
 ElevatedButton(
   onPressed: () {
