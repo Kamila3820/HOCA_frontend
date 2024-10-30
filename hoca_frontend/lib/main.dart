@@ -42,9 +42,14 @@ class HOCAApp extends StatelessWidget {
 class MainScreen extends StatefulWidget {
   final String? latitude;
   final String? longitude;
-  final String? address;
+  final String? address;  // Add this line
 
-  const MainScreen({super.key, this.latitude, this.longitude, this.address});
+  const MainScreen({
+    super.key, 
+    this.latitude, 
+    this.longitude,
+    this.address,  // Add this line
+  });
 
   @override
   _MainScreenState createState() => _MainScreenState();
@@ -55,11 +60,15 @@ class _MainScreenState extends State<MainScreen> {
 
   late final List<Widget> _pages;
 
-  @override
+   @override
   void initState() {
     super.initState();
     _pages = [
-      HomePage(latitude: widget.latitude, longitude: widget.longitude, address: widget.address,),
+      HomePage(
+        latitude: widget.latitude,
+        longitude: widget.longitude,
+        address: widget.address,  // Add this line
+      ),
       const HistoryPage(),
       const ProgressPage(),
       const ProfilePage(),

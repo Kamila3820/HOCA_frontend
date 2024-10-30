@@ -5,11 +5,19 @@ import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// Replace the existing CancelOrderDialog with this version
 class WorkerCancelOrderDialog extends StatefulWidget {
   final String orderID;
 
-  const WorkerCancelOrderDialog({super.key, required this.orderID});
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const WorkerCancelOrderDialog({
+    super.key, required this.orderID,
+    this.latitude,
+    this.longitude,
+    this.address,
+  });
 
   @override
   State<WorkerCancelOrderDialog> createState() => _CancelOrderDialogState();
@@ -87,6 +95,15 @@ class _CancelOrderDialogState extends State<WorkerCancelOrderDialog> {
     }
   }
 
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -134,9 +151,24 @@ class _CancelOrderDialogState extends State<WorkerCancelOrderDialog> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: selectedReason == null || isLoading
-                    ? null  // Button is disabled when no reason is selected or while loading
-                    : cancelOrderByUser, // Call the cancellation function
+                onPressed: selectedReason == null 
+                    ? null  // Button is disabled when no reason is selected
+                    : () async {
+                        // Get saved location data
+                        final locationData = await _getSavedLocation();
+                        print('Selected reason: $selectedReason');
+                        // Navigate to MainScreen with location data
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => MainScreen(
+                              latitude: locationData['latitude'],
+                              longitude: locationData['longitude'],
+                              address: locationData['address'],
+                            ),
+                          ),
+                        );
+                      },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF87C4FF),
                   disabledBackgroundColor: Colors.grey[300], // Color when button is disabled
