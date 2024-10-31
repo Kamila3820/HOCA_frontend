@@ -65,6 +65,15 @@ Future<Map<String, String>> _getSavedLocation() async {
     };
   }
 
+  void handleNavigation(UserOrder? order) {
+    if (order?.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,22 +101,9 @@ Future<Map<String, String>> _getSavedLocation() async {
             } else {
               final order = snapshot.data!;
 
-              if (order.status == "complete" || order.status == "cancelled") {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProgressPage()), 
-                  );
-                });
-              } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProgressPage()), 
-                  );
-                });
-                return const Center(child: CircularProgressIndicator()); // Show loading indicator until navigation
-              }
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
 
               return Column(
         children: [
@@ -158,11 +154,17 @@ Container(
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
-                ),
+                 order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.workerAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                 const SizedBox(width: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

@@ -179,11 +179,17 @@ class _UserArrivalPageState extends State<UserArrivalPage> {
                   Row(
                     children: [
                       // Worker Image
-                     const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
-                ),
+                      order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.workerAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                       const SizedBox(width: 12),
                       // Worker Details
                       Expanded(

@@ -1,20 +1,41 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/workerorder.dart';
+import 'package:hoca_frontend/models/workerprepare.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/working.dart';
+import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class WorkerArrivalPage extends StatelessWidget {
-   final String? latitude;
+class WorkerArrivalPage extends StatefulWidget {
+  final String orderID;
+
+  final String? latitude;
   final String? longitude;
   final String? address;
 
   const WorkerArrivalPage({
-    super.key,
-       this.latitude,
+    super.key, required this.orderID,
+    this.latitude,
     this.longitude,
     this.address,
   });
+
+  @override
+  State<WorkerArrivalPage> createState() => _WorkerArrivalPageState();
+}
+
+class _WorkerArrivalPageState extends State<WorkerArrivalPage> {
+  late Future<WorkerPrepare?> orderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    orderFuture = fetchWorkerOrder(widget.orderID);
+  }
 
    Future<Map<String, String>> _getSavedLocation() async {
     final prefs = await SharedPreferences.getInstance();
@@ -25,12 +46,105 @@ class WorkerArrivalPage extends StatelessWidget {
     };
   }
 
+  Future<WorkerPrepare?> fetchWorkerOrder(String orderID) async {
+  String url = "/v1/order/worker/prepare/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  try {
+    final response = await Caller.dio.get(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', // Add token to header
+        },
+      ),
+    );
+
+    // Check if the response data is null and handle it
+    if (response.data == null) {
+      return null; // Return null if no active order is found
+    }
+
+    return WorkerPrepare.fromJson(response.data); // Continue with parsing if data exists
+  } catch (e) {
+    debugPrint('Error fetching worker order: $e');
+    return null;
+  }
+}
+
+void callWorkingOrder(String orderID) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      await Caller.dio.patch("/v1/order/update/$orderID", 
+      data: {
+        "status": "working"
+      }, 
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', 
+        },
+      ),);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerdonePage(orderID: orderID,)),
+      );
+    } on DioException catch (error) {
+      // Handle error
+      Caller.handle(context, error);
+    }
+  }
+
+  void handleNavigation(WorkerPrepare? order) {
+    if (order == null || order.orderStatus == "complete" || order.orderStatus == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.orderStatus == "working") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerdonePage(orderID: widget.orderID,)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: 
-         Column(
+      body: FutureBuilder<WorkerPrepare?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+
+             return Column(
           children: [
             Container(
   height: 120.0,
@@ -122,11 +236,17 @@ class WorkerArrivalPage extends StatelessWidget {
                   Row(
                     children: [
                       // Worker Image
-                      const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
-                ),
+                      order.userAvatar != null && order.userAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.userAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                       const SizedBox(width: 12),
                       // Worker Details
                       Expanded(
@@ -134,7 +254,7 @@ class WorkerArrivalPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Jintara Maliwan',
+                              order.contactName!,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -152,7 +272,7 @@ class WorkerArrivalPage extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '098-765-4321',
+                                      order.contactPhone!,
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Color.fromARGB(255, 0, 0, 0),
@@ -162,7 +282,7 @@ class WorkerArrivalPage extends StatelessWidget {
                                 ),
                                 // Time text added here
                                 Text(
-                                  'Time: 7 MAR 2024 19.03',
+                                  'Time: ${order.createdAt?.replaceAll("-", "/")}',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: Color.fromARGB(255, 0, 0, 0),
@@ -191,7 +311,7 @@ class WorkerArrivalPage extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '800 THB',
+                              text: '${order.price} THB',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -199,7 +319,7 @@ class WorkerArrivalPage extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: ' - QR Payment',
+                              text: ' - ${order.paymentType}',
                               style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -218,17 +338,24 @@ class WorkerArrivalPage extends StatelessWidget {
   TextSpan(
     children: [
       TextSpan(
-        text: 'Client ',
+        text: 'Approx ',
         style: GoogleFonts.poppins(
           fontSize: 14,
-          fontWeight: FontWeight.w700, // Bold weight
+          fontWeight: FontWeight.w500, // Bold weight
         ),
       ),
       TextSpan(
-        text: 'need your help',
+        text: '${order.distance!.first.legs!.first.duration!.text}',
         style: GoogleFonts.poppins(
           fontSize: 14,
-          fontWeight: FontWeight.w500, // Normal weight
+          fontWeight: FontWeight.w700, // Normal weight
+        ),
+      ),
+      TextSpan(
+        text: ' to arriving in',
+        style: GoogleFonts.poppins(
+          fontSize: 14,
+          fontWeight: FontWeight.w500, // Bold weight
         ),
       ),
     ],
@@ -287,7 +414,7 @@ class WorkerArrivalPage extends StatelessWidget {
                         .end, // Aligns items to the end (right side)
                     children: [
                       Text(
-                        'Arriving in 20 mins',
+                        '${order.distance!.first.legs!.first.distance!.text}',
                         style: GoogleFonts.poppins(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
@@ -337,7 +464,7 @@ class WorkerArrivalPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '679/210 Prachauthit 45 Thung Khru , Bangkok',
+                    order.location!,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.black87,
@@ -352,7 +479,7 @@ class WorkerArrivalPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    'Condominium floor 4 room23',
+                    order.specPlace ?? "-",
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: Colors.black87,
@@ -368,7 +495,7 @@ class WorkerArrivalPage extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    '-',
+                    order.note ?? "-",
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.black87,
@@ -426,10 +553,7 @@ ElevatedButton(
             TextButton(
               onPressed: () {
                 // Navigate to the next page
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const WorkerdonePage()),
-                );
+                callWorkingOrder(widget.orderID);
               },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.white,
@@ -465,10 +589,14 @@ ElevatedButton(
   ),
 ),
           ],
+             );
+            }
+        },
         ),
       );
     
   }
+            }
 
   Widget _buildProgressStep(String label,
       {required bool isActive, required bool isCompleted}) {
@@ -499,4 +627,3 @@ ElevatedButton(
       ],
     );
   }
-}

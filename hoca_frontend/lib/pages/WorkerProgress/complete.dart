@@ -1,21 +1,32 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/workerorder.dart';
+import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class WorkerCompletionPage extends StatelessWidget {
-  final String customerName;
+class WorkerCompletionPage extends StatefulWidget {
+  final String orderID;
+
   final String? latitude;
   final String? longitude;
   final String? address;
-  
+
   const WorkerCompletionPage({
-    super.key, 
-    this.customerName = "Jintara Maliwan",
+    super.key, required this.orderID,
     this.latitude,
     this.longitude,
     this.address,
   });
+
+  @override
+  State<WorkerCompletionPage> createState() => _WorkerCompletionPageState();
+}
+
+class _WorkerCompletionPageState extends State<WorkerCompletionPage> {
+  late Future<WorkerOrder?> orderFuture;
 
   Future<Map<String, String>> _getSavedLocation() async {
     final prefs = await SharedPreferences.getInstance();
@@ -26,10 +37,75 @@ class WorkerCompletionPage extends StatelessWidget {
     };
   }
 
+  Future<WorkerOrder?> fetchWorkerOrder(String orderID) async {
+  String url = "/v1/order/worker/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  try {
+    final response = await Caller.dio.get(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', // Add token to header
+        },
+      ),
+    );
+
+    // Check if the response data is null and handle it
+    if (response.data == null) {
+      return null; // Return null if no active order is found
+    }
+
+    return WorkerOrder.fromJson(response.data); // Continue with parsing if data exists
+  } catch (e) {
+    debugPrint('Error fetching worker order: $e');
+    return null;
+  }
+}
+
+void handleNavigation(WorkerOrder? order) {
+    if (order?.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
+      backgroundColor: Colors.white,
+      body: FutureBuilder<WorkerOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+               return Column(
         children: [
           // Header with customer info and completion status
           Container(
@@ -89,7 +165,7 @@ Container(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              customerName,
+              order.contactName!,
               style: GoogleFonts.poppins(
                 fontSize: 16,
                 fontWeight: FontWeight.w600,
@@ -226,9 +302,14 @@ Container(
 
 
         ],
+               );
+            }
+        },
       ),
     );
   }
+
+            }
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Column(
@@ -254,4 +335,3 @@ Container(
       ],
     );
   }
-}

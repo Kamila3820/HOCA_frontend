@@ -18,6 +18,9 @@ WorkerOrder _$WorkerOrderFromJson(Map<String, dynamic> json) => WorkerOrder(
       userAvatar: json['user_avatar'] as String?,
       note: json['note'] as String?,
       specPlace: json['specific_place'] as String?,
+      location: json['location'] as String?,
+      createdAt: json['created_at'] as String?,
+      endedAt: json['ended_at'] as String?,
     );
 
 Map<String, dynamic> _$WorkerOrderToJson(WorkerOrder instance) =>
@@ -30,7 +33,10 @@ Map<String, dynamic> _$WorkerOrderToJson(WorkerOrder instance) =>
       'user_avatar': instance.userAvatar,
       'payment_type': instance.payment,
       'specific_place': instance.specPlace,
+      'location': instance.location,
       'note': instance.note,
       'order_status': instance.status,
       'price': instance.price,
+      'created_at': instance.createdAt,
+      'ended_at': instance.endedAt,
     };

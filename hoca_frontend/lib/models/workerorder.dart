@@ -28,6 +28,9 @@ class WorkerOrder {
   @JsonKey(name: 'specific_place')
   final String? specPlace;
 
+  @JsonKey(name: 'location')
+  final String? location;
+
   @JsonKey(name: 'note')
   final String? note;
 
@@ -36,6 +39,12 @@ class WorkerOrder {
 
   @JsonKey(name: 'price')
   final double? price;
+
+  @JsonKey(name: 'created_at')
+  final String? createdAt;
+
+  @JsonKey(name: 'ended_at')
+  final String? endedAt;
 
   WorkerOrder({
     required this.id,
@@ -49,6 +58,9 @@ class WorkerOrder {
     required this.userAvatar,
     required this.note,
     required this.specPlace,
+    required this.location,
+    required this.createdAt,
+    required this.endedAt
   });
 
   factory WorkerOrder.fromJson(Map<String, dynamic> json) => _$WorkerOrderFromJson(json);

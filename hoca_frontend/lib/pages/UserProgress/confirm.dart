@@ -34,6 +34,35 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
     )..repeat();
 
     orderFuture = fetchOrderById(widget.orderID);
+    _setTimerConfirmation(widget.orderID);
+  }
+
+  void _setTimerConfirmation(String orderID) async {
+    String url = "/v1/order/timer/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return null;
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        return null;
+      } else {
+        throw Exception('Failed to set timer confirmation');
+      } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+
   }
 
   Future<UserOrder?> fetchOrderById(String orderID) async {
@@ -190,47 +219,54 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
               children: [
                 // Worker info row
                 Row(
-                  children: [
-                    // Worker image
-                    const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
+  children: [
+    // Worker image
+    order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.workerAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
+    const SizedBox(width: 15),
+    
+    // Worker details
+    Expanded(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            order.workerName!,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          Row(
+            children: [
+              const Icon(Icons.access_time, size: 16, color: Colors.grey),
+              const SizedBox(width: 4),
+              Flexible(
+                child: Text(
+                  'Waiting for houseworker to confirm',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
-                    const SizedBox(width: 15),
-                    // Worker details
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            order.workerName!,
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          Row(
-                            children: [
-                              const Icon(Icons.access_time, size: 16, color: Colors.grey),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  'Waiting for houseworker to confirm',
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 12,
-                                    color: Colors.grey,
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    ),
+  ],
+),
                 const SizedBox(height: 15),
                 // Payment info
 Row(

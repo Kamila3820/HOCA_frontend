@@ -1,10 +1,14 @@
 import 'dart:async';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/workerorder.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/cancel.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
+import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class WorkerProgressPage extends StatefulWidget {
@@ -26,54 +30,122 @@ class WorkerProgressPage extends StatefulWidget {
 }
 
 class _WorkerProgressPageState extends State<WorkerProgressPage> {
-  Timer? _timer;
-  int _remainingSeconds = 7 * 60; // 7 minutes in seconds
-
-  Future<Map<String, String>> _getSavedLocation() async {
-    final prefs = await SharedPreferences.getInstance();
-    return {
-      'latitude': prefs.getString('latitude') ?? '',
-      'longitude': prefs.getString('longitude') ?? '',
-      'address': prefs.getString('address') ?? '',
-    };
-  }
+  late Future<WorkerOrder?> orderFuture;
 
   @override
   void initState() {
     super.initState();
-    startTimer();
+
+    orderFuture = fetchWorkerOrder(widget.orderID);
   }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+      return {
+        'latitude': prefs.getString('latitude') ?? '',
+        'longitude': prefs.getString('longitude') ?? '',
+        'address': prefs.getString('address') ?? '',
+      };
   }
 
-  void startTimer() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _timer?.cancel();
-        }
-      });
-    });
+  Future<WorkerOrder?> fetchWorkerOrder(String orderID) async {
+  String url = "/v1/order/worker/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  try {
+    final response = await Caller.dio.get(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', // Add token to header
+        },
+      ),
+    );
+
+    // Check if the response data is null and handle it
+    if (response.data == null) {
+      return null; // Return null if no active order is found
+    }
+
+    return WorkerOrder.fromJson(response.data); // Continue with parsing if data exists
+  } catch (e) {
+    debugPrint('Error fetching worker order: $e');
+    return null;
+  }
+}
+
+void callConfirmOrder(String orderID) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      await Caller.dio.patch("/v1/order/update/$orderID", 
+      data: {
+        "status": "preparing"
+      }, 
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', 
+        },
+      ),);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerArrivalPage(orderID: orderID,)),
+      );
+    } on DioException catch (error) {
+      // Handle error
+      Caller.handle(context, error);
+    }
   }
 
-  String get timerDisplay {
-    int minutes = _remainingSeconds ~/ 60;
-    int seconds = _remainingSeconds % 60;
-    return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  void handleNavigation(WorkerOrder? order) {
+    if (order == null || order.status == "complete" || order.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.status == "preparing") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerArrivalPage(orderID: order.id.toString(),)),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: 
-         Column(
+      body: FutureBuilder<WorkerOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+               return Column(
           children: [
             Container(
               height: 120.0,
@@ -158,18 +230,24 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                 children: [
                   Row(
                     children: [
-                      const CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.grey,
-                        child: Icon(Icons.person, color: Colors.white, size: 30),
-                      ),
+                      order.userAvatar != null && order.userAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.userAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Jintara Maliwan',
+                              order.contactName!,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -187,7 +265,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '098-765-4321',
+                                      order.contactPhone!,
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Colors.black,
@@ -196,7 +274,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                                   ],
                                 ),
                                 Text(
-                                  'Time: 7 MAR 2024 19.03',
+                                  'Time: ${order.createdAt?.replaceAll("-", "/")}',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: Colors.black,
@@ -265,7 +343,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'Look like someone needs your help...',
+                        'Look like ${order.contactName} needs your help...',
                         style: GoogleFonts.poppins(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -314,7 +392,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                     ),
                   ),
                   Text(
-                    '679/210 Prachauthit 45 Thung Khru , Bangkok',
+                    order.location!,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.black87,
@@ -329,7 +407,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                     ),
                   ),
                   Text(
-                    'Condominium floor 4 room23',
+                    order.specPlace ?? "-",
                     style: GoogleFonts.poppins(
                       fontSize: 13,
                       color: Colors.black87,
@@ -344,7 +422,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                     ),
                   ),
                   Text(
-                    '-',
+                    order.note ?? '-',
                     style: GoogleFonts.poppins(
                       fontSize: 14,
                       color: Colors.black87,
@@ -437,11 +515,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
         ),
         TextButton(
           onPressed: () {
-            // Navigate to the next page
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const WorkerArrivalPage()),
-            );
+            callConfirmOrder(order.id.toString());
           },
           style: TextButton.styleFrom(
             foregroundColor: Colors.white,
@@ -483,7 +557,7 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
               ),
             ),
             // Timer Display
-            Container(
+           Container(
               margin: const EdgeInsets.only(top: 1),
               padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
               decoration: BoxDecoration(
@@ -491,19 +565,23 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                timerDisplay,
+                'Please confirm the order before: ${order.endedAt?.replaceAll("-", "/")}',
                 style: GoogleFonts.poppins(
                   fontSize: 24,
                   fontWeight: FontWeight.w600,
-                  color: _remainingSeconds <= 30 ? Colors.red : Colors.blue,
+                  color: Colors.blue,
                 ),
               ),
             ),
           ],
+               );
+            }
+        },
         ),
       );
-    
   }
+
+            }
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Column(
@@ -529,4 +607,3 @@ class _WorkerProgressPageState extends State<WorkerProgressPage> {
       ],
     );
   }
-}

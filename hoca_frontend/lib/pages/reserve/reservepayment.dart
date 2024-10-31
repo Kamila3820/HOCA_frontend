@@ -1,40 +1,154 @@
 import 'dart:async';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/models/profile.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentDialog extends StatefulWidget {
-  const PaymentDialog({super.key});
+  final String postID;
+
+  const PaymentDialog({super.key, required this.postID});
 
   @override
   State<PaymentDialog> createState() => _PaymentDialogState();
 }
 
 class _PaymentDialogState extends State<PaymentDialog> {
-  String? contactName;
-  String? contactPhone;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _placeTypeController = TextEditingController();
+  final TextEditingController _noteController = TextEditingController();
   String? _selectedPaymentMethod;
-  String? _placeType;
-  String? _noteToWorker;
   String? _selectedAddress;
   LatLng? _selectedLocation;
 
   final _formKey = GlobalKey<FormState>();
   final Completer<GoogleMapController> _controller = Completer();
 
-  // static const LatLng _initialPosition = LatLng(13.736717, 100.523186); // Default to Bangkok
-  LatLng _currentPosition = LatLng(13.736717, 100.523186);
-
-@override
+  @override
   void initState() {
     super.initState();
-    _initializePosition(); // Call an async function from here
+    _initializePosition();
+    _fetchUserData(); 
   }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _phoneController.dispose();
+    _placeTypeController.dispose();
+    _noteController.dispose();
+    super.dispose();
+  }
+
+  // Helper method to show SnackBar at the top
+  void _showTopSnackBar(String message, {bool isError = false}) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 10,
+        right: 10,
+      ),
+      dismissDirection: DismissDirection.up,
+    );
+
+    // Remove current SnackBar if any
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    // Show new SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  Future<Profile> fetchUser() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        '/v1/user/profile',
+        options: Options(
+          headers: {
+            'x-auth-token': '$token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return Profile.fromJson(response.data);
+      } else {
+        throw Exception('Failed to load user data');
+      }
+    } catch (error) {
+      throw Exception('Failed to load user data: $error');
+    }
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final userContact = await fetchUser();
+      print("Fetched User: ${userContact.username}, ${userContact.phonenumber}");
+      setState(() {
+        _nameController.text = userContact.username!;
+        _phoneController.text = userContact.phonenumber!;
+      });
+    } catch (error) {
+      _showTopSnackBar('Failed to load user data: $error', isError: true);
+    } 
+  }
+
+  void callReservePost(String postID) async {
+
+    try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+      print(_nameController.text);
+      print(_phoneController.text);
+      print(_selectedPaymentMethod);
+      print(_placeTypeController.text);
+      print(_noteController.text);
+
+
+      final response = await Caller.dio.post(
+        '/v1/order/create/$postID',
+        data: {
+          "contact_name": _nameController.text,
+          "contact_phone": _phoneController.text,
+          "payment_type": _selectedPaymentMethod,
+          "specific_place": _placeTypeController.text,
+          "note": _noteController.text
+        },
+        options: Options(
+          headers: {
+            'x-auth-token': '$token',
+          },
+        ),    
+      );
+
+      if (response.statusCode == 200) {
+        _showTopSnackBar('Place your order successfully');
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+      } else {
+        throw Exception('Failed to update profile');
+      }
+    } catch (error) {
+      _showTopSnackBar('Failed to update profile: $error', isError: true);
+    } 
+  }
+
+  // static const LatLng _initialPosition = LatLng(13.736717, 100.523186); // Default to Bangkok
+  LatLng _currentPosition = LatLng(13.736717, 100.523186);
 
   Future<void> _initializePosition() async {
     LatLng initialPosition = await _loadPosition();
@@ -195,7 +309,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 ),
               ),
               const SizedBox(height: 16.0),
-              _buildTextField('Name', onSaved: (value) => contactName = value),
+              _buildTextField('Name', controller: _nameController),
               const SizedBox(height: 16.0),
               _buildPhoneField(),
               const SizedBox(height: 16.0),
@@ -206,12 +320,13 @@ class _PaymentDialogState extends State<PaymentDialog> {
               const SizedBox(height: 16.0),
               _buildSectionTitle('Specify a type of your place'),
               const SizedBox(height: 8.0),
-              _buildTextField('', onSaved: (value) => _placeType = value),
+              _buildTextField('', controller: _placeTypeController),
               const SizedBox(height: 16.0),
               _buildSectionTitle('Note to a worker (if any)'),
               const SizedBox(height: 8.0),
               _buildTextField(
                 '',
+                controller: _noteController,
                 maxLength: 500,
                 validator: (value) {
                   if (value != null && value.length > 500) {
@@ -219,7 +334,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   }
                   return null;
                 },
-                onSaved: (value) => _noteToWorker = value,
               ),
             ],
           ),
@@ -238,6 +352,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
               _showSuccessAlertAndNavigate(context);
+              callReservePost(widget.postID);
             }
           },
           child: Text(
@@ -261,25 +376,25 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   Widget _buildTextField(
     String label, {
+    TextEditingController? controller,
     String? Function(String?)? validator,
-    void Function(String?)? onSaved,
     int? maxLength,
   }) {
     return TextFormField(
+      controller: controller,
       decoration: InputDecoration(
         labelText: label,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(10.0)),
       ),
       maxLength: maxLength,
       validator: validator,
-      onSaved: onSaved,
     );
   }
 
   Widget _buildPhoneField() {
     return _buildTextField(
       'Phone Number',
-      onSaved: (value) => contactPhone = value,
+      controller: _phoneController,
       validator: (value) {
         if (value == null || value.length != 10) {
           return 'Phone number must be exactly 10 digits';

@@ -1,21 +1,43 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/workerorder.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/complete.dart';
+import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
+import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class WorkerdonePage extends StatelessWidget {
+class WorkerdonePage extends StatefulWidget {
+  final String orderID;
+
   final String? latitude;
   final String? longitude;
   final String? address;
+
   const WorkerdonePage({
-    super.key,
+    super.key, required this.orderID,
     this.latitude,
     this.longitude,
     this.address,
-    });
+  });
 
-    Future<Map<String, String>> _getSavedLocation() async {
+  @override
+  State<WorkerdonePage> createState() => _WorkerdonePageState();
+}
+
+class _WorkerdonePageState extends State<WorkerdonePage> {
+  late Future<WorkerOrder?> orderFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    orderFuture = fetchWorkerOrder(widget.orderID);
+  }
+
+  Future<Map<String, String>> _getSavedLocation() async {
     final prefs = await SharedPreferences.getInstance();
     return {
       'latitude': prefs.getString('latitude') ?? '',
@@ -24,12 +46,104 @@ class WorkerdonePage extends StatelessWidget {
     };
   }
 
+  Future<WorkerOrder?> fetchWorkerOrder(String orderID) async {
+  String url = "/v1/order/worker/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  try {
+    final response = await Caller.dio.get(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', // Add token to header
+        },
+      ),
+    );
+
+    // Check if the response data is null and handle it
+    if (response.data == null) {
+      return null; // Return null if no active order is found
+    }
+
+    return WorkerOrder.fromJson(response.data); // Continue with parsing if data exists
+  } catch (e) {
+    debugPrint('Error fetching worker order: $e');
+    return null;
+  }
+}
+
+void callCompleteOrder(String orderID) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final token = prefs.getString('token');
+      await Caller.dio.patch("/v1/order/update/$orderID", 
+      data: {
+        "status": "complete"
+      }, 
+      options: Options(
+        headers: {
+          'x-auth-token': '$token', 
+        },
+      ),);
+
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerArrivalPage(orderID: orderID,)),
+      );
+    } on DioException catch (error) {
+      // Handle error
+      Caller.handle(context, error);
+    }
+  }
+
+  void handleNavigation(WorkerOrder? order) {
+    if (order == null || order.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.status == "complete") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => WorkerCompletionPage(orderID: widget.orderID,)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: 
-         Column(
+      body: FutureBuilder<WorkerOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+              return Column(
           children: [
             Container(
   height: 120.0,
@@ -121,11 +235,17 @@ class WorkerdonePage extends StatelessWidget {
                   Row(
                     children: [
                       // Worker Image
-                      const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
-                ),
+                      order.userAvatar != null && order.userAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.userAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                       const SizedBox(width: 12),
                       // Worker Details
                       Expanded(
@@ -133,7 +253,7 @@ class WorkerdonePage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Jintara Maliwan',
+                              order.contactName!,
                               style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
@@ -151,7 +271,7 @@ class WorkerdonePage extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 4),
                                     Text(
-                                      '098-765-4321',
+                                      order.contactPhone!,
                                       style: GoogleFonts.poppins(
                                         fontSize: 12,
                                         color: Color.fromARGB(255, 0, 0, 0),
@@ -161,7 +281,7 @@ class WorkerdonePage extends StatelessWidget {
                                 ),
                                 // Time text added here
                                 Text(
-                                  'Time: 7 MAR 2024 19.03',
+                                  'Time: ${order.createdAt?.replaceAll("-", "/")}',
                                   style: GoogleFonts.poppins(
                                     fontSize: 12,
                                     color: Color.fromARGB(255, 0, 0, 0),
@@ -191,7 +311,7 @@ Row(
       text: TextSpan(
         children: [
           TextSpan(
-            text: '800 THB',
+            text: '${order.price} THB',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -199,7 +319,7 @@ Row(
             ),
           ),
           TextSpan(
-            text: ' - QR Payment',
+            text: ' - ${order.payment}',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -212,33 +332,6 @@ Row(
   ],
 ),
 const SizedBox(height: 8), // Add some space between the texts
-Row(
-  mainAxisAlignment: MainAxisAlignment.end, // Align text to the right
-  children: [
-    RichText(
-      text: TextSpan(
-        children: [
-          TextSpan(
-            text: 'Artiwara ',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF87C4FF),
-            ),
-          ),
-          TextSpan(
-            text: '0987654321',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: Color(0xFF87C4FF),
-            ),
-          ),
-        ],
-      ),
-    ),
-  ],
-),
 const SizedBox(height: 16),
 // New Circle Checkboxes Row
 Row(
@@ -347,10 +440,7 @@ ElevatedButton(
                   onPressed: isChecked
                       ? () {
                           // Navigate to the next page if the checkbox is checked
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => const WorkerCompletionPage()),
-                          );
+                          callCompleteOrder(widget.orderID);
                         }
                       : null, // Disable button if unchecked
                   style: TextButton.styleFrom(
@@ -392,10 +482,14 @@ ElevatedButton(
 ),
 
           ],
+              );
+            }
+        },
         ),
       );
     
   }
+            }
 
   Widget _buildCircleCheckbox({
   required String label,
@@ -465,4 +559,4 @@ ElevatedButton(
       ],
     );
   }
-}
+

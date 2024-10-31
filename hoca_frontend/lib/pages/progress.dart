@@ -78,7 +78,7 @@ class _ProgressPageState extends State<ProgressPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => WorkerArrivalPage(),
+            builder: (context) => WorkerArrivalPage(orderID: workerOrder.id.toString()),
           ),
         );
         break;
@@ -86,7 +86,7 @@ class _ProgressPageState extends State<ProgressPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => WorkerdonePage(),
+            builder: (context) => WorkerdonePage(orderID: workerOrder.id.toString()),
           ),
         );
         break;

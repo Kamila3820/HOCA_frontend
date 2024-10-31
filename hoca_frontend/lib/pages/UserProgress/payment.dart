@@ -53,6 +53,20 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     }
   }
 
+  void handleNavigation(UserOrder? order) {
+    if (order == null || order.status == "complete" || order.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    } else if (order.status == "complete") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => UserPaymentPage(orderID: widget.orderID)),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -80,22 +94,9 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
             } else {
               final order = snapshot.data!;
 
-              if (order.status == "complete" || order.status == "cancelled") {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => ProgressPage()), 
-                  );
-                });
-              } else {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => UserCompletionPage(orderID: widget.orderID,)), 
-                  );
-                });
-                return const Center(child: CircularProgressIndicator()); // Show loading indicator until navigation
-              }
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
 
 
               return Column(
@@ -158,11 +159,17 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
             padding: const EdgeInsets.all(20),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 28,
-                  backgroundColor: Colors.grey,
-                  child: Icon(Icons.person, color: Colors.white, size: 30),
-                ),
+                 order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.workerAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
                 const SizedBox(width: 15),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,

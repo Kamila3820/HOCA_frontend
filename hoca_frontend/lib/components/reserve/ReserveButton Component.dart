@@ -13,8 +13,6 @@ class ReserveButton extends StatefulWidget {
 
 class _ReserveButtonState extends State<ReserveButton> {
   
-
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -24,7 +22,7 @@ class _ReserveButtonState extends State<ReserveButton> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return const PaymentDialog(); // Use the new dialog widget here
+              return PaymentDialog(postID: widget.postID,); // Use the new dialog widget here
             },
           );
         },
