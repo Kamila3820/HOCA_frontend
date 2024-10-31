@@ -10,8 +10,15 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPaymentPage extends StatefulWidget {
   final String orderID;
+    final String? latitude;
+  final String? longitude;
+  final String? address;
 
-  const UserPaymentPage({super.key, required this.orderID});
+  const UserPaymentPage({super.key, required this.orderID,
+   this.latitude,
+    this.longitude,
+    this.address,
+  });
 
   @override
   State<UserPaymentPage> createState() => _UserPaymentPageState();
@@ -19,6 +26,15 @@ class UserPaymentPage extends StatefulWidget {
 
 class _UserPaymentPageState extends State<UserPaymentPage> {
   late Future<UserOrder?> orderFuture;
+
+ Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
 
   @override
   void initState() {
@@ -116,12 +132,22 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
           alignment: Alignment.centerLeft,
           child: IconButton(
             icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () {
-              showDialog(
-                          context: context,
-                          builder: (BuildContext context) => const MainScreen(),
-                        );
-            },
+            onPressed: () async {
+                          // Get saved location data
+                          final locationData = await _getSavedLocation();
+
+                          // Navigate to MainScreen with location data
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainScreen(
+                                latitude: locationData['latitude'],
+                                longitude: locationData['longitude'],
+                                address: locationData['address'],
+                              ),
+                            ),
+                          );
+                        },
           ),
         ),
         Center(

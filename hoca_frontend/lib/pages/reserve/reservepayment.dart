@@ -1,12 +1,10 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
-import 'package:hoca_frontend/classes/caller.dart';
-import 'package:hoca_frontend/models/profile.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -340,27 +338,40 @@ class _PaymentDialogState extends State<PaymentDialog> {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(
-            'Cancel',
-            style: GoogleFonts.poppins(color: Colors.red),
-          ),
-        ),
-        ElevatedButton(
-          onPressed: () {
+  TextButton(
+    onPressed: () => Navigator.of(context).pop(),
+    child: Text(
+      'Cancel',
+      style: GoogleFonts.poppins(color: Colors.red,fontWeight: FontWeight.bold,),
+    ),
+  ),
+  ElevatedButton(
+    onPressed: _selectedPaymentMethod == null
+        ? null  // Disable the button if no payment method is selected
+        : () {
             if (_formKey.currentState!.validate()) {
               _formKey.currentState!.save();
               _showSuccessAlertAndNavigate(context);
               callReservePost(widget.postID);
             }
           },
-          child: Text(
-            'Submit',
-            style: GoogleFonts.poppins(color: Colors.white),
-          ),
-        ),
-      ],
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Color(0xFF87C4FF), // Set your desired color here
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0), // Optional: round the button
+      ),
+    ),
+    child:Text(
+  'Submit',
+  style: GoogleFonts.poppins(
+    color: Colors.white,
+    fontWeight: FontWeight.bold, // Make the text bold
+  ),
+),
+
+  ),
+],
+
     );
   }
 

@@ -8,8 +8,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 // Replace the existing CancelOrderDialog with this version
 class UserCancelOrderDialog extends StatefulWidget {
   final String orderID;
+  final String? latitude;
+  final String? longitude;
+  final String? address;
 
-  const UserCancelOrderDialog({super.key, required this.orderID});
+  const UserCancelOrderDialog({
+    super.key, required this.orderID,
+    this.latitude,
+    this.longitude,
+    this.address,
+    });
 
   @override
   State<UserCancelOrderDialog> createState() => _CancelOrderDialogState();
@@ -87,6 +95,15 @@ class _CancelOrderDialogState extends State<UserCancelOrderDialog> {
     }
   }
 
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
@@ -136,7 +153,26 @@ class _CancelOrderDialogState extends State<UserCancelOrderDialog> {
               child: ElevatedButton(
                 onPressed: selectedReason == null || isLoading
                     ? null  // Button is disabled when no reason is selected or while loading
-                    : cancelOrderByUser, // Call the cancellation function
+                    : () async {
+  // Cancel the order first
+  cancelOrderByUser();
+
+  // Get saved location data
+  final locationData = await _getSavedLocation();
+  print('Selected reason: $selectedReason');
+
+  // Navigate to MainScreen with location data
+  Navigator.pushReplacement(
+    context,
+    MaterialPageRoute(
+      builder: (context) => MainScreen(
+        latitude: locationData['latitude'],
+        longitude: locationData['longitude'],
+        address: locationData['address'],
+      ),
+    ),
+  );
+},
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF87C4FF),
                   disabledBackgroundColor: Colors.grey[300], // Color when button is disabled
