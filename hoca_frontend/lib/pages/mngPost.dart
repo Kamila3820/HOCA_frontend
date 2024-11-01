@@ -318,6 +318,7 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
                                     ProfilePicture(
+                                      postID: post.postID.toString(),
                                       imageUrl: post.avatarUrl,
                                       rating: post.totalScore,
                                       status: post.activeStatus,

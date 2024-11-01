@@ -5,6 +5,8 @@ import 'package:geocoding/geocoding.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geocoding/geocoding.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/models/profile.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';

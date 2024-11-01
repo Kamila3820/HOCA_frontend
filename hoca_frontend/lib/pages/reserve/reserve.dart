@@ -115,7 +115,7 @@ class _ReservePageState extends State<ReservePage> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    ProfilePicture(imageUrl: post.avatarUrl, rating: post.totalScore,),
+                                    ProfilePicture(postID: post.postID.toString(), imageUrl: post.avatarUrl, rating: post.totalScore,),
                                     const SizedBox(height: 15),
                                     NameRating(name: post.name, taskCount: post.categoryID,),
                                     const SizedBox(height: 20),

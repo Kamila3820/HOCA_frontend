@@ -1,9 +1,14 @@
 import 'dart:ui';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/models/ratingmetrics.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePicture extends StatelessWidget {
+  final String postID;
   final String? imageUrl;
   final double? rating;
   final bool? status;
@@ -11,13 +16,39 @@ class ProfilePicture extends StatelessWidget {
 
   const ProfilePicture({
     super.key, 
+    required this.postID,
     required this.imageUrl, 
     required this.rating, 
     this.status, 
     this.onRatingTap
   });
 
-  void _showRatingDialog(BuildContext context) {
+  void _showRatingDialog(BuildContext context) async {
+    RatingMetrics? ratingMetrics;
+    String url = "/v1/rating/metric/$postID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        ratingMetrics = RatingMetrics.fromJson(response.data);
+      } else {
+        // Handle server errors
+        print("Failed to load rating metrics: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching rating metrics: $e");
+    }
+
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -34,42 +65,42 @@ class ProfilePicture extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                  Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Row(
-      children: [
-        const Icon(Icons.feedback, color: Colors.blue), // Add the feedback icon here
-        const SizedBox(width: 8.0), // Space between icon and text
-        Text(
-          'Customer Feedback',
-          style: GoogleFonts.montserrat(
-            fontSize: 18.0,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-    IconButton(
-      icon: const Icon(Icons.close),
-      onPressed: () => Navigator.of(context).pop(),
-    ),
-  ],
-),
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.feedback, color: Colors.blue), // Add the feedback icon here
+                          const SizedBox(width: 8.0), // Space between icon and text
+                          Text(
+                            'Customer Feedback',
+                            style: GoogleFonts.montserrat(
+                              fontSize: 18.0,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
 
                   const SizedBox(height: 16.0),
                   Container(
                   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                   decoration: BoxDecoration(
-    color: const Color(0xFF87C4FF),
-    borderRadius: BorderRadius.circular(12),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.2), // Shadow color
-        offset: const Offset(0, 4),           // Position of shadow
-        blurRadius: 6,                         // Blur effect
-      ),
-    ],
-  ),
+                  color: const Color(0xFF87C4FF),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2), // Shadow color
+                      offset: const Offset(0, 4),           // Position of shadow
+                      blurRadius: 6,                         // Blur effect
+                    ),
+                  ],
+                ),
                   child: Column(
                     children: [
                       Text(
@@ -91,7 +122,7 @@ class ProfilePicture extends StatelessWidget {
                       ),
                       const SizedBox(height: 8.0),
                       Text(
-                        'Based on 20 reviews',
+                        'Based on ${ratingMetrics?.totalRating} reviews',
                         style: GoogleFonts.montserrat(
                           fontSize: 14.0,
                           color: Colors.grey[800],
@@ -101,10 +132,10 @@ class ProfilePicture extends StatelessWidget {
                   ),
                 ),
                   const SizedBox(height: 24.0),
-                  _ratingRow('Maximum score', '8.0/10', Color(0xFF90D26D)),
-                  _ratingRow('Minimum score', '6.3/10', Colors.yellow.shade300),
-                  _starRatingRow('Work', 3.0),
-                  _starRatingRow('Security', 2.0),
+                  _ratingRow('Maximum score', '${ratingMetrics?.maxScore}/10', Color(0xFF90D26D)),
+                  _ratingRow('Minimum score', '${ratingMetrics?.minScore}/10', Colors.yellow.shade300),
+                  _starRatingRow('Avg. Work', ratingMetrics!.avgWork!),
+                  _starRatingRow('Avg. Security', ratingMetrics!.avgSecurity!),
                 ],
               ),
             ),
