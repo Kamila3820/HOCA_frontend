@@ -87,6 +87,17 @@ class _NotiPageState extends State<NotiPage> {
       "user_rating": "rated your post",
     };
 
+    const notificationTitles = {
+    "confirmation": "Confirmation",
+    "preparing": "Preparing",
+    "working": "Working",
+    "complete": "Complete",
+    "user_cancel": "User Cancel",
+    "worker_cancel": "Worker Cancel",
+    "system_cancel": "System Cancel",
+    "user_rating": "User Rating",
+  };
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,17 +145,27 @@ class _NotiPageState extends State<NotiPage> {
                     itemCount: notificationsList.length,
                     itemBuilder: (context, index) {
                       Notifications notification = notificationsList[index];
-                      String title = notification.type ?? 'Unknown Notification';
-                      String message = notification.order != null
-                          ? 'Order notification'
-                          : notification.rating != null
-                              ? 'Rating notification'
-                              : 'General notification';
+                      String title = notificationTitles[notification.type] ?? 'Unknown Notification';
+                      String message = notificationTypes[notification.type] ?? 'No message available';
+
+                    Color titleColor;
+                    if (notification.type == "complete") {
+                      titleColor = Colors.green; // Green for Complete
+                    } else if (notification.type == "confirmation") {
+                      titleColor = Colors.blue; // Blue for Confirmation
+                    } else if (notification.type == "user_cancel" ||
+                               notification.type == "worker_cancel" ||
+                               notification.type == "system_cancel") {
+                      titleColor = Colors.red;
+                    } else {
+                      titleColor = Colors.black; 
+                    }
 
                       return buildNotificationCard(
                         imageUrl: notification.avatar!,
                         title: notification.type!,
-                        message: message
+                        message: message,
+                        titleColor: titleColor
                       );
                     },
                   )

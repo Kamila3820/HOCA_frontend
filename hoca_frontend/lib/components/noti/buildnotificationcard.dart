@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-Widget buildNotificationCard({required String imageUrl, required String title, required String message}) {
+Widget buildNotificationCard({required String imageUrl, required String title, required String message, Color titleColor = Colors.black }) {
   return Card(
     elevation: 2,
     child: Padding(
@@ -24,9 +24,10 @@ Widget buildNotificationCard({required String imageUrl, required String title, r
                 Text(
                   title,
                   style: GoogleFonts.poppins(
-                    textStyle: const TextStyle(
+                    textStyle: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w500,
+                      color: titleColor,
                     ),
                   ),
                 ),
