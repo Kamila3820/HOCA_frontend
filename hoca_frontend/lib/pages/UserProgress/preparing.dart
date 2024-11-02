@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/prepareorder.dart';
-import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/UserProgress/payment.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -5,6 +5,7 @@ import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/models/posts.dart';
 import 'package:hoca_frontend/pages/reserve/reserve.dart';
+import 'package:page_transition/page_transition.dart';
 
 class WorkerPost extends StatefulWidget {
   final Post post;
@@ -72,9 +73,13 @@ class _WorkerPostState extends State<WorkerPost> {
   return GestureDetector(
     onTap: () {
       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ReservePage(postID: widget.post.postID.toString(),),
-      ));
+  context,
+  PageTransition(
+    type: PageTransitionType.bottomToTop,
+    child: ReservePage(postID: widget.post.postID.toString()),
+    duration: const Duration(milliseconds: 400),
+  ),
+);
     },
     child: Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

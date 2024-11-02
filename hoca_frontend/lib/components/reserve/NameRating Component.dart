@@ -19,11 +19,11 @@ class NameRating extends StatelessWidget {
             color: Color.fromARGB(255, 255, 255, 255),
           ),
         ),
-        const SizedBox(width: 8),
-        Text(
-          '($taskCount times)', // Display dynamic task count
-          style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-        ),
+        // const SizedBox(width: 8),
+        // Text(
+        //   '(0 times)', // Display dynamic task count
+        //   style: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+        // ),
       ],
     );
   }

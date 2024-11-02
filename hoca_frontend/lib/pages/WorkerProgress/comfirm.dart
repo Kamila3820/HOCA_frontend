@@ -558,21 +558,30 @@ void callConfirmOrder(String orderID) async {
             ),
             // Timer Display
            Container(
-              margin: const EdgeInsets.only(top: 1),
-              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 24),
-              decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Please confirm the order before: ${order.endedAt?.replaceAll("-", "/")}',
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Colors.blue,
-                ),
-              ),
-            ),
+  margin: const EdgeInsets.only(top: 1),
+  padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(20),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.grey.withOpacity(0.5),
+        spreadRadius: 2,
+        blurRadius: 2,
+        offset: const Offset(0, 3), // changes position of shadow
+      ),
+    ],
+  ),
+  child: Text(
+    'Please confirm the order before: ${order.endedAt?.replaceAll("-", "/")}',
+    style: GoogleFonts.poppins(
+      fontSize: 14,
+      fontWeight: FontWeight.w600,
+      color: Color.fromARGB(252, 237, 90, 90),
+    ),
+  ),
+)
+
           ],
                );
             }

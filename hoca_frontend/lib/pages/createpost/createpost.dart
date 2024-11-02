@@ -3,6 +3,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/FormContainer.dart';
 import 'package:hoca_frontend/components/createpost/HeaderSection.dart';
 import 'package:hoca_frontend/pages/createpost/createpostcon.dart';
+import 'package:page_transition/page_transition.dart';
 
 class CreatePostPage extends StatefulWidget {
   const CreatePostPage({super.key});
@@ -59,13 +60,16 @@ class _CreatePostPageState extends State<CreatePostPage> {
       "gender": _selectedGender,
       "categories": _selectedCategory,
     };
+Navigator.push(
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft,
+    child: CreatePostCon(formData: formData),
+    duration: const Duration(milliseconds: 550),
+    curve: Curves.easeInOut,
+  ),
+);
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => CreatePostCon(formData: formData),
-      ),
-    );
   }
 
   @override
