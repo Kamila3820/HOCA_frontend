@@ -48,13 +48,8 @@ class _ManagePostPageState extends State<ManagePostPage> {
       // Successfully found post, parse the response
         return Post.fromJson(response.data);
       } else if (response.data == null) {
+        // Post not found, return null to indicate no post
         return null;
-        Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => CreatePostPage()),
-        );
-
-      
       } else {
         // Other errors
         throw Exception('Failed to load post');
