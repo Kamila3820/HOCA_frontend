@@ -336,7 +336,7 @@ const SizedBox(height: 30),
           // Finding worker section
          Expanded(
   child: Container(
-    margin: const EdgeInsets.only(left: 20, right: 20, bottom: 150), // Adds a margin to the bottom
+    margin: const EdgeInsets.only(left: 20, right: 20, bottom: 130), // Adds a margin to the bottom
     padding: const EdgeInsets.all(20),
     decoration: BoxDecoration(
       color: Colors.white,
@@ -390,7 +390,7 @@ const SizedBox(height: 30),
         ),
         const SizedBox(height: 20),
         Text(
-          'Waiting for the houseworker to confirm...',
+          'Waiting for the houseworker to confirm..',
           style: GoogleFonts.poppins(
             fontSize: 16,
             fontWeight: FontWeight.w500,

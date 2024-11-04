@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hoca_frontend/pages/mngPost.dart';
+import 'package:page_transition/page_transition.dart';
 
 class CustomFloatingActionButton extends StatelessWidget {
   final VoidCallback? onPressed;
@@ -28,10 +29,16 @@ class CustomFloatingActionButton extends StatelessWidget {
         ),
         child: FloatingActionButton(
           onPressed: onPressed ?? () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => ManagePostPage()),
-            );
+           Navigator.push(
+  context,
+  PageTransition(
+    type: PageTransitionType.bottomToTop,
+    child: ManagePostPage(),
+    duration: const Duration(milliseconds: 550),
+    curve: Curves.easeInOut,
+  ),
+);
+
           },
           backgroundColor: const Color(0xFF7E869E).withOpacity(0.5),
           shape: const CircleBorder(),

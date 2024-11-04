@@ -15,6 +15,7 @@ import 'package:hoca_frontend/pages/createpost/postlocation.dart'; // Import the
 import 'package:hoca_frontend/pages/mngPost.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CreatePostCon extends StatefulWidget {
@@ -96,11 +97,15 @@ class _CreatePostConState extends State<CreatePostCon> {
     if (_currentLocation != null) {
       // Navigate to PostLocation page and wait for result
       final result = await Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => PostLocation(initialLocation: _currentLocation!),
-        ),
-      );
+  context,
+  PageTransition(
+    type: PageTransitionType.topToBottom,
+    child: PostLocation(initialLocation: _currentLocation!),
+    duration: const Duration(milliseconds: 550),
+    curve: Curves.easeInOut,
+  ),
+);
+
 
       // Check if result is not null and update _locationName
       if (result != null) {

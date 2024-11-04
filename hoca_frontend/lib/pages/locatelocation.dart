@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 class LocateLocationPage extends StatefulWidget {
@@ -131,14 +132,18 @@ Widget build(BuildContext context) {
                   onPressed: () {
                     if (_selectedLocation != null && _selectedAddress != null) {
                       Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(
-                          builder: (context) => MainScreen(
-                            latitude: _selectedLocation!.latitude.toString(),
-                            longitude: _selectedLocation!.longitude.toString(),
-                            address: _selectedAddress,
-                          ),
-                        ),
-                      );
+  PageTransition(
+    type: PageTransitionType.fade,
+    child: MainScreen(
+      latitude: _selectedLocation!.latitude.toString(),
+      longitude: _selectedLocation!.longitude.toString(),
+      address: _selectedAddress,
+    ),
+    duration: const Duration(milliseconds: 600),
+    curve: Curves.easeInOut,
+  ),
+);
+
                     }
                   },
                   style: ElevatedButton.styleFrom(

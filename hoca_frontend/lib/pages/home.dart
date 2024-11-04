@@ -11,6 +11,7 @@ import 'package:hoca_frontend/pages/service/cleaning.dart';
 import 'package:hoca_frontend/pages/service/clothes.dart';
 import 'package:hoca_frontend/pages/service/gardening.dart';
 import 'package:hoca_frontend/pages/service/pets.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
@@ -79,10 +80,13 @@ class _HomePageState extends State<HomePage> {
   void navigateToLocateLocation() async {
     final result = await Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const LocateLocationPage(),
+       PageTransition(
+        type: PageTransitionType.leftToRight,
+        child: const LocateLocationPage(),
+        duration: const Duration(milliseconds: 400),
       ),
     );
+    
 
     if (result is Map && result.containsKey('address')) {
       setState(() {
@@ -212,7 +216,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 const TextSpan(text: 'Welcome!, '),
                                 TextSpan(
-                                  text: 'Thanadol',
+                                  text: 'Jiblek',
                                   style: GoogleFonts.poppins(
                                     textStyle: const TextStyle(fontWeight: FontWeight.bold),
                                   ),
@@ -253,9 +257,11 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () async {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => const NotiPage(),
-                          ),
+                          PageTransition(
+              type: PageTransitionType.topToBottom,
+              child: const NotiPage(),
+              duration: const Duration(milliseconds: 300),
+            ),
                         ).then((_) async {
                           final prefs = await SharedPreferences.getInstance();
                           prefs.setBool('hasNewNoti', false);
@@ -326,9 +332,12 @@ class _HomePageState extends State<HomePage> {
                         // Removed the isEmpty check, directly navigate to CleanPage
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => CleanPage(posts: filteredPosts),
-                          ),
+                          PageTransition(
+              type: PageTransitionType.rightToLeft,
+              child: CleanPage(posts: filteredPosts),
+              duration: const Duration(milliseconds: 300),
+            ),
+                   
                         ).then((result) {
                           if (result == true) {
                             reload();
@@ -346,9 +355,11 @@ class _HomePageState extends State<HomePage> {
                         // Removed the isEmpty check, directly navigate to CleanPage
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => ClothesPage(posts: filteredPosts),
-                          ),
+                          PageTransition(
+              type: PageTransitionType.rightToLeft,
+              child: ClothesPage(posts: filteredPosts),
+              duration: const Duration(milliseconds: 300),
+            ),
                         ).then((result) {
                           if (result == true) {
                             reload();
@@ -367,9 +378,11 @@ class _HomePageState extends State<HomePage> {
                         // Removed the isEmpty check, always navigate
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => GardeningPage(posts: filteredPosts),
-                          ),
+                          PageTransition(
+              type: PageTransitionType.rightToLeft,
+              child: GardeningPage(posts: filteredPosts),
+              duration: const Duration(milliseconds: 300),
+            ),
                         ).then((result) {
                           if (result == true) {
                             reload();
@@ -387,9 +400,11 @@ class _HomePageState extends State<HomePage> {
                         // Removed the isEmpty check, directly navigate to CleanPage
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                            builder: (context) => PetsPage(posts: filteredPosts),
-                          ),
+                          PageTransition(
+              type: PageTransitionType.rightToLeft,
+              child: PetsPage(posts: filteredPosts),
+              duration: const Duration(milliseconds: 300),
+            ),
                         ).then((result) {
                           if (result == true) {
                             reload();

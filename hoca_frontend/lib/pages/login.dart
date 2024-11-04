@@ -53,7 +53,7 @@ void callLogin() async {
     Navigator.pushReplacement(
       context,
       PageTransition(
-        type: PageTransitionType.rightToLeft,
+        type: PageTransitionType.bottomToTop,
         child: const LocateLocationPage(),
         duration: const Duration(milliseconds: 550),
         curve: Curves.easeInOut,
