@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/models/homepost.dart';
 import 'package:hoca_frontend/models/placetype.dart';
@@ -273,24 +274,49 @@ class _WorkerPostState extends State<WorkerPost> {
                   Container(
                     margin: const EdgeInsets.only(left: 3),
                     child: Row(
-                      children: [
-                        const Icon(
-                          Icons.location_on,
-                          color: Color(0xFF39A7FF),
-                          size: 12,
-                        ),
-                        const SizedBox(width: 4),
-                        Text(
-                          "${widget.post.distance!} km",
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 10,
-                              color: Colors.black54,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
+  children: [
+    const Icon(
+      Icons.location_on,
+      color: Color(0xFF39A7FF),
+      size: 12,
+    ),
+    const SizedBox(width: 4),
+    Text(
+      "${widget.post.distance!} km",
+      style: GoogleFonts.poppins(
+        textStyle: const TextStyle(
+          fontSize: 10,
+          color: Colors.black54,
+        ),
+      ),
+    ),
+    const SizedBox(width: 8), // Add spacing before the pipe
+    const Text(
+      '|', // Pipe separator
+      style: TextStyle(
+        fontSize: 10,
+        color: Colors.black54,
+      ),
+    ),
+    const SizedBox(width: 8), // Add spacing after the pipe
+    const FaIcon(
+      FontAwesomeIcons.running, // Font Awesome walking man icon
+      color: Colors.black54,
+      size: 12,
+    ),
+    const SizedBox(width: 4),
+    Text(
+      "฿0", // The text you want to add
+      style: GoogleFonts.poppins(
+        textStyle: const TextStyle(
+          fontSize: 10,
+          color: Colors.black54,
+        ),
+      ),
+    ),
+  ],
+),
+
                   ),
                   const SizedBox(height: 4),
                   Container(
