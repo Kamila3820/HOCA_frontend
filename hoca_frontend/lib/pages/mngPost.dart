@@ -12,6 +12,7 @@ import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/createpost/createpost.dart';
 import 'package:hoca_frontend/pages/editpost/editpost.dart';
+import 'package:hoca_frontend/pages/mngpayment.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ManagePostPage extends StatefulWidget {
@@ -116,6 +117,15 @@ class _ManagePostPageState extends State<ManagePostPage> {
         MaterialPageRoute(builder: (context) => EditPostPage(postID: postID,)),
       );
       break;
+
+      case 'payment':
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => const PaymentServiceFeePage(),
+    ),
+  );
+  break;
 
     case 'open':
       url = "/v1/post/open/$postID";  
@@ -280,6 +290,13 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
                                             title: Text('Edit post'),
                                           ),
                                         ),
+                                         const PopupMenuItem<String>(
+                                          value: 'payment',
+                                          child: ListTile(
+                                            leading: Icon(Icons.payment),
+                                            title: Text('Pay the service fee '),
+                                          ),
+                                        ),
                                         PopupMenuItem<String>(
                                           value: 'open',
                                           enabled: !post.activeStatus!,
@@ -367,4 +384,5 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
       ),
     );
   }
+  
 }

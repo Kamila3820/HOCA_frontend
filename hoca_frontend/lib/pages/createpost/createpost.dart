@@ -20,7 +20,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
   
   // Form state
   String _selectedGender = '';
-  int? _selectedCategory;
+  final List<int> _selectedCategories = [];
+  TimeOfDay _startTime = TimeOfDay.now();
+  TimeOfDay _endTime = TimeOfDay.now();
 
   @override
   void initState() {
@@ -36,72 +38,106 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   @override
   void dispose() {
-    _controllers.values.forEach((controller) => controller.dispose());
+    for (var controller in _controllers.values) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
   void _toggleCategory(int category) {
     setState(() {
-      _selectedCategory = _selectedCategory == category ? null : category;
+      if (_selectedCategories.contains(category)) {
+        _selectedCategories.remove(category);
+      } else if (_selectedCategories.length < 3) {
+        _selectedCategories.add(category);
+      }
     });
   }
 
-  void _submitForm() {
-    if (!_formKey.currentState!.validate()) {
-      return;
+// In CreatePostPage class, update the _submitForm method:
+
+void _submitForm() {
+  final formState = _formKey.currentState;
+  if (formState == null) return;
+
+  // Validate time selections
+  bool isStartTimeValid = _startTime.hour != 0 || _startTime.minute != 0;
+  bool isEndTimeValid = _endTime.hour != 0 || _endTime.minute != 0;
+  
+  setState(() {
+    if (!isStartTimeValid) {
+      // Handle start time error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select a start time'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
+    if (!isEndTimeValid) {
+      // Handle end time error
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please select an end time'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  });
 
-    final formData = {
-      "name": _controllers['workerName']!.text,
-      "price": _controllers['workingPrice']!.text,
-      "idLine": _controllers['idLine']!.text,
-      "phoneNumber": _controllers['phoneNumber']!.text,
-      "description": _controllers['description']!.text,
-      "gender": _selectedGender,
-      "categories": _selectedCategory,
-    };
-Navigator.push(
-  context,
-  PageTransition(
-    type: PageTransitionType.rightToLeft,
-    child: CreatePostCon(formData: formData),
-    duration: const Duration(milliseconds: 550),
-    curve: Curves.easeInOut,
-  ),
-);
-
+  if (!formState.validate() || !isStartTimeValid || !isEndTimeValid) {
+    return;
   }
+
+  final formData = {
+    "name": _controllers['workerName']!.text,
+    "price": _controllers['workingPrice']!.text,
+    "idLine": _controllers['idLine']!.text,
+    "phoneNumber": _controllers['phoneNumber']!.text,
+    "description": _controllers['description']!.text,
+    "gender": _selectedGender,
+    "categories": _selectedCategories,
+    "startTime": "${_startTime.hour.toString().padLeft(2, '0')}:${_startTime.minute.toString().padLeft(2, '0')}",
+    "endTime": "${_endTime.hour.toString().padLeft(2, '0')}:${_endTime.minute.toString().padLeft(2, '0')}",
+  };
+
+  Navigator.push(
+    context,
+    PageTransition(
+      type: PageTransitionType.rightToLeft,
+      child: CreatePostCon(formData: formData),
+      duration: const Duration(milliseconds: 550),
+      curve: Curves.easeInOut,
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: 
-        Stack(
-          children: [
-            const HeaderSection(title: "Create Worker"),
-            
-            Padding(
-              padding: const EdgeInsets.only(top: 100.0),
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    _buildFormContainer(),
-                    const SizedBox(height: 1),
-                    _buildSubmitButton(),
-                    const SizedBox(height: 24),
-                  ],
-                ),
+      body: Stack(
+        children: [
+          const HeaderSection(title: "Create Worker"),
+          Padding(
+            padding: const EdgeInsets.only(top: 100.0),
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  _buildFormContainer(),
+                  const SizedBox(height: 1),
+                  _buildSubmitButton(),
+                  const SizedBox(height: 24),
+                ],
               ),
             ),
-          ],
-        ),
-      );
-    
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildFormContainer() {
     return Container(
-      // height: 690,
       margin: const EdgeInsets.all(16.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -128,25 +164,33 @@ Navigator.push(
               setState(() => _selectedGender = value);
             }
           },
-          selectedCategories: _selectedCategory,
+          selectedCategories: _selectedCategories,
           toggleCategory: _toggleCategory,
+          startTime: _startTime,
+          endTime: _endTime,
+          onStartTimeChanged: (TimeOfDay time) {
+            setState(() => _startTime = time);
+          },
+          onEndTimeChanged: (TimeOfDay time) {
+            setState(() => _endTime = time);
+          },
         ),
       ),
     );
   }
 
   Widget _buildSubmitButton() {
-    final bool isButtonEnabled = _selectedCategory != null;
+    final bool isButtonEnabled = _selectedCategories.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ElevatedButton(
-        onPressed: isButtonEnabled ? _submitForm : null, // Button is null (disabled) when no category is selected
+        onPressed: isButtonEnabled ? _submitForm : null,
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(vertical: 15),
           backgroundColor: isButtonEnabled 
-            ? const Color(0xFF87C4FF)  // Original color when enabled
-            : Colors.grey.shade300,    // Grey color when disabled
+            ? const Color(0xFF87C4FF)
+            : Colors.grey.shade300,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -156,7 +200,7 @@ Navigator.push(
           'Next',
           style: GoogleFonts.poppins(
             fontSize: 20,
-            color: isButtonEnabled ? Colors.white : Colors.grey.shade500, // Different text color when disabled
+            color: isButtonEnabled ? Colors.white : Colors.grey.shade500,
             fontWeight: FontWeight.w600,
           ),
         ),

@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/classes/caller.dart';
-import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
+import 'package:hoca_frontend/components/createpostcon/Famiyandduration.dart';
 import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
@@ -36,6 +36,7 @@ class _CreatePostConState extends State<CreatePostCon> {
   String? _selectedFamilyAmount;
   LatLng? _currentLocation;
   String _locationName = "Choose Your Location"; // Default location text
+   bool _isDurationSelected = false;
 
   String convertIndicesToPlacetypeIDs(List<int> selectedIndices) {
     return selectedIndices.map((index) => (index + 1).toString()).join(',');
@@ -133,27 +134,41 @@ class _CreatePostConState extends State<CreatePostCon> {
     }
   }
 
-  void _validateForm() {
-  if (_formKey.currentState!.validate()) {
-    if (_selectedBoxIndices.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select at least one type of place to work'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } else if (!_imageSelected) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please upload or take a photo.'),
-          backgroundColor: Colors.red,
-        ),
-      );
-    } else {
-      callCreatePost();
+ void _validateForm() {
+    if (_formKey.currentState!.validate()) {
+      if (_selectedBoxIndices.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select at least one type of place to work'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (!_imageSelected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please upload or take a photo.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (!_isDurationSelected) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select duration'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else if (_locationName == "Choose Your Location") {  // Add this condition
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select your location'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      } else {
+        callCreatePost();
+      }
     }
   }
-}
 
 
   void callCreatePost() async {
@@ -173,9 +188,9 @@ class _CreatePostConState extends State<CreatePostCon> {
         "category_id": widget.formData?["categories"],
         "placetype_ids": placetypeIDs,
         "phone_number": widget.formData?["phoneNumber"],
-        "location": "Test UnSucc",
-        "latitude": "13.7563",
-        "longtitude": "100.5018",
+        "location": _locationName,  // Updated to use selected location name
+        "latitude": _currentLocation?.latitude.toString() ?? "13.7563",  // Updated to use actual latitude
+        "longtitude": _currentLocation?.longitude.toString() ?? "100.5018",  // Updated to use actual longitude
         "price": widget.formData?["price"],
         "prompt_pay": widget.formData?["idLine"],
         "gender": widget.formData?["gender"],
@@ -222,17 +237,22 @@ class _CreatePostConState extends State<CreatePostCon> {
           selectedBoxIndices: _selectedBoxIndices,
           onBoxTapped: _onBoxTapped,
         ),
-        FamilyAmountSelector(
-          formKey: _formKey,
-          selectedFamilyAmount: _selectedFamilyAmount,
-          onFamilyAmountChanged: (value) {
-            setState(() {
-              _selectedFamilyAmount = value;
-            });
-          },
-        ),
+         FamilyAmountSelector(
+    formKey: _formKey,
+    selectedFamilyAmount: _selectedFamilyAmount,
+    onFamilyAmountChanged: (value) {
+      setState(() {
+        _selectedFamilyAmount = value;
+      });
+    },
+    onDurationSelected: (selected) {
+      setState(() {
+        _isDurationSelected = selected;
+      });
+    },
+  ),
         Positioned(
-          top: 170,
+          top: 155,
           right: 30,
           child: GestureDetector(
             onTap: _onLocationButtonPressed, // Navigate to PostLocation page
@@ -241,7 +261,7 @@ class _CreatePostConState extends State<CreatePostCon> {
               height: 45,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF87C4FF).withOpacity(0.6),
+                color: const Color(0xFF87C4FF).withOpacity(0.6),  
               ),
               child: const Center(
                 child: FaIcon(
@@ -255,7 +275,7 @@ class _CreatePostConState extends State<CreatePostCon> {
         ),
         // Positioned ImagePicker and Create Post Button at the bottom
         Positioned(
-          bottom: 30,
+          bottom: 20,
           left: 0,
           right: 0,
           child: Column(
@@ -272,7 +292,7 @@ class _CreatePostConState extends State<CreatePostCon> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 1),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: ImagePickerSection(
@@ -350,30 +370,34 @@ class _CreatePostConState extends State<CreatePostCon> {
               ),
               const SizedBox(height: 16),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: _imageSelected ? _validateForm : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF87C4FF),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    child: Text(
-                      "Create Post",
-                      style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+    child: SizedBox(
+      width: double.infinity,
+      height: 50,
+      child: ElevatedButton(
+        onPressed: (_imageSelected && _isDurationSelected && _locationName != "Choose Your Location") 
+          ? _validateForm 
+          : null,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: (_imageSelected && _isDurationSelected && _locationName != "Choose Your Location")
+              ? const Color(0xFF87C4FF)
+              : Colors.grey,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        child: Text(
+          "Create Post",
+          style: GoogleFonts.poppins(
+            textStyle: const TextStyle(
+              fontSize: 16,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    ),
+  ),
             ],
           ),
         ),

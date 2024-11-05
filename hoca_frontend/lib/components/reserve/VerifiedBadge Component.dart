@@ -7,12 +7,12 @@ class VerifiedBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.start,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 2.0),
           decoration: BoxDecoration(
-            color: Color(0xFF90D26D),
+            color: const Color(0xFF90D26D),
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(
@@ -26,10 +26,27 @@ class VerifiedBadge extends StatelessWidget {
           child: Text(
             'verified',
             style: GoogleFonts.poppins(
-              color: Color.fromARGB(255, 255, 255, 255),
+              color: const Color.fromARGB(255, 255, 255, 255),
               fontWeight: FontWeight.w500,
             ),
           ),
+        ),
+        Row(
+          children: [
+            const Icon(
+              Icons.access_time,
+              color: Colors.grey,
+              size: 16,
+            ),
+            const SizedBox(width: 4),
+            Text(
+              '8:00AM-12:00AM',
+              style: GoogleFonts.poppins(
+                color: Colors.grey[700],
+                fontSize: 14,
+              ),
+            ),
+          ],
         ),
       ],
     );
