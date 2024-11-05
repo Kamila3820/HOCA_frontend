@@ -15,7 +15,7 @@ class FormContainer extends StatelessWidget {
   final TextEditingController descriptionController;
   final String selectedGender;
   final Function(String?) onGenderChanged;
-  final int? selectedCategories;
+  final List<int>? selectedCategories;
   final Function(int) toggleCategory;
 
   const FormContainer({
@@ -75,7 +75,7 @@ class FormContainer extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: CategoriesSection(
-                selectedCategory: selectedCategories,
+                selectedCategories: selectedCategories!,
                 toggleCategory: toggleCategory,
               ),
             ),

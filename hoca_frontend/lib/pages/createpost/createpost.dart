@@ -14,13 +14,12 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  
   // Controllers
   late final Map<String, TextEditingController> _controllers;
   
   // Form state
   String _selectedGender = '';
-  int? _selectedCategory;
+  List<int> _selectedCategories = [];
 
   @override
   void initState() {
@@ -42,7 +41,11 @@ class _CreatePostPageState extends State<CreatePostPage> {
 
   void _toggleCategory(int category) {
     setState(() {
-      _selectedCategory = _selectedCategory == category ? null : category;
+      if (_selectedCategories.contains(category)) {
+        _selectedCategories.remove(category);
+      } else if (_selectedCategories.length < 3) {
+        _selectedCategories.add(category);
+      }
     });
   }
 
@@ -58,7 +61,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
       "phoneNumber": _controllers['phoneNumber']!.text,
       "description": _controllers['description']!.text,
       "gender": _selectedGender,
-      "categories": _selectedCategory,
+      "categories": _selectedCategories.join(','),
     };
 Navigator.push(
   context,
@@ -128,7 +131,7 @@ Navigator.push(
               setState(() => _selectedGender = value);
             }
           },
-          selectedCategories: _selectedCategory,
+          selectedCategories: _selectedCategories,
           toggleCategory: _toggleCategory,
         ),
       ),
@@ -136,7 +139,7 @@ Navigator.push(
   }
 
   Widget _buildSubmitButton() {
-    final bool isButtonEnabled = _selectedCategory != null;
+    final bool isButtonEnabled = _selectedCategories.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -4,12 +4,12 @@ import 'package:hoca_frontend/components/createpost/buildCategoryChip.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class CategoriesSection extends StatelessWidget {
-  final int? selectedCategory; // Now stores the selected category as an integer
+  final List<int> selectedCategories; // Now stores multiple selected categories as a list of integers
   final Function(int) toggleCategory; // Expects an integer for category selection
 
   const CategoriesSection({
     super.key,
-    required this.selectedCategory,
+    required this.selectedCategories,
     required this.toggleCategory,
   });
 
@@ -24,24 +24,15 @@ class CategoriesSection extends StatelessWidget {
           spacing: 4.0,
           runSpacing: 4.0,
           children: [
-            buildCategoryChip(
-                selectedCategory, 'Deep cleaning', FontAwesomeIcons.broom, 1, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Floor care', FontAwesomeIcons.broom, 2, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Window care', FontAwesomeIcons.broom, 3, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Laundry', FontAwesomeIcons.shirt, 4, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Sewing', FontAwesomeIcons.shirt, 5, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Lawn Mowing', FontAwesomeIcons.seedling, 6, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Watering', FontAwesomeIcons.seedling,  7, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Yard cleanup', FontAwesomeIcons.seedling, 8, toggleCategory),
-            buildCategoryChip(
-                selectedCategory, 'Pet sitting', FontAwesomeIcons.paw, 9, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Deep cleaning', FontAwesomeIcons.broom, 1, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Floor care', FontAwesomeIcons.broom, 2, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Window care', FontAwesomeIcons.broom, 3, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Laundry', FontAwesomeIcons.shirt, 4, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Sewing', FontAwesomeIcons.shirt, 5, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Lawn Mowing', FontAwesomeIcons.seedling, 6, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Watering', FontAwesomeIcons.seedling, 7, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Yard cleanup', FontAwesomeIcons.seedling, 8, toggleCategory),
+            buildCategoryChip(selectedCategories, 'Pet sitting', FontAwesomeIcons.paw, 9, toggleCategory),
           ],
         ),
       ],

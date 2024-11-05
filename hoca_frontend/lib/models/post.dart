@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/userrating.dart';
 import 'package:json_annotation/json_annotation.dart';
@@ -21,9 +23,6 @@ class Post {
   @JsonKey(name: 'avatar')
   final String? avatarUrl;
 
-  @JsonKey(name: 'category_id')
-  final int? categoryID;
-
   @JsonKey(name: 'location')
   final String? location;
 
@@ -40,7 +39,10 @@ class Post {
   final String? promptPay;
 
   @JsonKey(name: 'distance')
-  final String? distance;  
+  final String? distance; 
+
+  @JsonKey(name: 'distance_fee')
+  final String? distanceFee;  
 
   @JsonKey(name: 'phone_number')
   final String? phoneNumber;
@@ -51,11 +53,23 @@ class Post {
   @JsonKey(name: 'amount_family')
   final String? amountFamily;
 
+  @JsonKey(name: 'duration')
+  final String? duration;
+
+  @JsonKey(name: 'available_start')
+  final String? availableStart;
+
+  @JsonKey(name: 'available_end')
+  final String? availableEnd;
+
   @JsonKey(name: 'total_score')
   final double? totalScore;  // Nullable
 
   @JsonKey(name: 'active_status')
   final bool? activeStatus;
+
+  @JsonKey(name: 'categories')
+  final List<Categories>? categoryID;
 
   @JsonKey(name: 'place_types')
   final List<PlaceType>? placeTypeID;
@@ -82,9 +96,13 @@ class Post {
     required this.price,
     required this.promptPay,
     this.distance,  // Nullable
+    this.distanceFee,
     required this.phoneNumber,
     required this.gender,
     required this.amountFamily,
+    required this.duration,
+    required this.availableStart,
+    required this.availableEnd,
     this.totalScore,  // Nullable
     required this.activeStatus,
     required this.placeTypeID,  // Nullable

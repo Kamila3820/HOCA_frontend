@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/createpost/FormContainer.dart';
 import 'package:hoca_frontend/components/createpost/HeaderSection.dart';
+import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/editpost/editpostcon.dart';
@@ -32,7 +33,8 @@ class _EditPostPageState extends State<EditPostPage> {
   String? amntFamily;
   String? imageUrl;
   String _selectedGender = "Male";
-  int? selectedCategory;
+  List<Categories> availableCategories = [];
+  List<Categories> selectedCategories = []; // Updated to track selected categories
   bool _isLoading = true; // Add loading state
   bool _hasError = false; // Add error state
 
@@ -65,7 +67,8 @@ class _EditPostPageState extends State<EditPostPage> {
       _phoneNumberController.text = post.phoneNumber ?? '';
       _descriptionController.text = post.description ?? '';
       _selectedGender = post.gender ?? "Male";
-      selectedCategory = post.categoryID;
+      selectedCategories = post.categoryID!.where((cat) => post.categoryID!.contains(cat.id)).toList();
+      availableCategories = post.categoryID!;
       location = post.location;
       latitude = post.locationLat;
       longitude = post.locationLong;
@@ -86,16 +89,23 @@ class _EditPostPageState extends State<EditPostPage> {
     }
   }
 
-  void toggleCategory(int category) {
-    setState(() {
-      selectedCategory = selectedCategory == category ? null : category;
-    });
-  }
+  void toggleCategory(int categoryId) {
+  setState(() {
+    // Find the category by its ID
+    final category = availableCategories.firstWhere((cat) => cat.id == categoryId);
+
+    if (selectedCategories.contains(category)) {
+      selectedCategories.remove(category);
+    } else if (selectedCategories.length < 3) {
+      selectedCategories.add(category);
+    }
+  });
+}
 
   // Method to handle form submission
   void _submitForm() {
     // Check if a category is selected
-    if (selectedCategory == null) {
+    if (selectedCategories == null) {
       // Show an error if the category is not selected
       showDialog(
         context: context,
@@ -127,7 +137,7 @@ class _EditPostPageState extends State<EditPostPage> {
       "phoneNumber": _phoneNumberController.text,
       "description": _descriptionController.text,
       "gender": _selectedGender,
-      "categories": selectedCategory,
+      "categories": selectedCategories,
     };
 
     // If form is valid, navigate to EditPostCon and pass form data
@@ -204,7 +214,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() => _selectedGender = value);
             }
           },
-          selectedCategories: selectedCategory,
+          selectedCategories: selectedCategories.map((cat) => cat.id).toList(),
           toggleCategory: toggleCategory,
         ),
       ),
@@ -212,7 +222,7 @@ class _EditPostPageState extends State<EditPostPage> {
   }
 
   Widget _buildSubmitButton() {
-    final bool isButtonEnabled = selectedCategory != null;
+    final bool isButtonEnabled = selectedCategories != null;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),

@@ -306,7 +306,7 @@ class _WorkerPostState extends State<WorkerPost> {
     ),
     const SizedBox(width: 4),
     Text(
-      "฿0", // The text you want to add
+      "฿${widget.post.distanceFee}", // The text you want to add
       style: GoogleFonts.poppins(
         textStyle: const TextStyle(
           fontSize: 10,

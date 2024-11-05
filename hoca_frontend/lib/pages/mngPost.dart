@@ -326,11 +326,11 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
                                     const SizedBox(height: 15),
                                     NameRating(
                                       name: post.name,
-                                      taskCount: post.categoryID,
+                                      taskCount: 0,
                                     ),
                                     const SizedBox(height: 20),
                                     TaskButtons(
-                                      categoryID: post.categoryID,
+                                      categories: post.categoryID!,
                                     ),
                                     const SizedBox(height: 10),
                                     VerifiedBadge(),

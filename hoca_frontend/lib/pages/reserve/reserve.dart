@@ -117,9 +117,9 @@ class _ReservePageState extends State<ReservePage> {
                                   children: [
                                     ProfilePicture(postID: post.postID.toString(), imageUrl: post.avatarUrl, rating: post.totalScore,),
                                     const SizedBox(height: 15),
-                                    NameRating(name: post.name, taskCount: post.categoryID,),
+                                    NameRating(name: post.name, taskCount: 0,),
                                     const SizedBox(height: 20),
-                                    TaskButtons(categoryID: post.categoryID,),
+                                    TaskButtons(categories: post.categoryID!,),
                                     const SizedBox(height: 10),
                                     VerifiedBadge(),
                                     const SizedBox(height: 20),

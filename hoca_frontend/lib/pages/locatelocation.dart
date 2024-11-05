@@ -1,9 +1,12 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocateLocationPage extends StatefulWidget {
   final LatLng? location;
@@ -25,6 +28,65 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
     _selectedLocation = widget.location ?? LatLng(13.7563, 100.5018);
     _getAddress(_selectedLocation!);
     _checkPermissions();
+  }
+
+  void _showTopSnackBar(String message, {bool isError = false}) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: isError ? Colors.red : Colors.green,
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+        top: MediaQuery.of(context).padding.top + 10,
+        left: 10,
+        right: 10,
+      ),
+      dismissDirection: DismissDirection.up,
+    );
+
+    // Remove current SnackBar if any
+    ScaffoldMessenger.of(context).removeCurrentSnackBar();
+    // Show new SnackBar
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  void updateLocationUser() async {
+      try {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      String? token = prefs.getString('token');
+
+      final response = await Caller.dio.patch(
+        '/v1/user/location/edit',
+        data: {
+          "location": _selectedAddress,
+          "latitude": _selectedLocation?.latitude.toString(),
+          "longtitude": _selectedLocation?.longitude.toString(),
+        },
+        options: Options(
+          headers: {
+            'x-auth-token': '$token',
+          },
+        ),    
+      );
+
+      if (response.statusCode == 200) {
+        Navigator.of(context).pushReplacement(
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: MainScreen(
+              latitude: _selectedLocation!.latitude.toString(),
+              longitude: _selectedLocation!.longitude.toString(),
+              address: _selectedAddress,
+            ),
+            duration: const Duration(milliseconds: 600),
+            curve: Curves.easeInOut,
+          ),
+        );
+      } else {
+        throw Exception('Failed to update location');
+      }
+    } catch (error) {
+      _showTopSnackBar('Failed to update location: $error', isError: true);
+    } 
   }
 
   Future<void> _checkPermissions() async {
@@ -131,19 +193,7 @@ Widget build(BuildContext context) {
                 child: ElevatedButton(
                   onPressed: () {
                     if (_selectedLocation != null && _selectedAddress != null) {
-                      Navigator.of(context).pushReplacement(
-  PageTransition(
-    type: PageTransitionType.fade,
-    child: MainScreen(
-      latitude: _selectedLocation!.latitude.toString(),
-      longitude: _selectedLocation!.longitude.toString(),
-      address: _selectedAddress,
-    ),
-    duration: const Duration(milliseconds: 600),
-    curve: Curves.easeInOut,
-  ),
-);
-
+                          updateLocationUser();
                     }
                   },
                   style: ElevatedButton.styleFrom(

@@ -170,8 +170,26 @@ class _NotiPageState extends State<NotiPage> {
                     },
                   )
                 : const Center(
-                    child: CircularProgressIndicator(),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.notifications_none, // Bell icon
+                          size: 48.0,
+                          color: Colors.grey, // Customize color if needed
+                        ),
+                        SizedBox(height: 8.0), // Spacing between icon and text
+                        Text(
+                          "No notification yet",
+                          style: TextStyle(
+                            fontSize: 16.0,
+                            color: Colors.grey, // Customize color if needed
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+
           ),
 
         ],
