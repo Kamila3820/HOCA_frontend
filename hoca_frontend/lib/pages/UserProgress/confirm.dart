@@ -316,7 +316,7 @@ Row(
             ),
           ),
           TextSpan(
-            text: ' - '+order.payment!,
+            text: ' - ${order.payment!}',
             style: GoogleFonts.poppins(
               fontSize: 14,
               fontWeight: FontWeight.w600,

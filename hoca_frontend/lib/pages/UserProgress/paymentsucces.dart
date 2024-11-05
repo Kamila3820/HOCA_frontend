@@ -149,7 +149,7 @@ class PaymentSuccessPage extends StatelessWidget {
                   ),
                   child: const Icon(
                     Icons.check,
-                    color: const Color(0xFF90D26D),
+                    color: Color(0xFF90D26D),
                     size: 150 ,
                   ),
                 ),

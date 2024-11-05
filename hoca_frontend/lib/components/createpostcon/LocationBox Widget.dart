@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class LocationBox extends StatelessWidget {
-  final String locationName; // Added to receive location name
+  final String locationName;
 
   const LocationBox({super.key, required this.locationName});
   
@@ -40,14 +40,17 @@ class LocationBox extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             Text(
-              locationName, // Display the selected location name
+              locationName,
               style: GoogleFonts.poppins(
                 textStyle: const TextStyle(
                   fontSize: 12,
                   color: Color.fromARGB(243, 0, 0, 0),
                 ),
               ),
+              maxLines: 2, // Allow up to 2 lines for the address
+              overflow: TextOverflow.ellipsis, // Add ellipsis when text overflows
             ),
+            
           ],
         ),
       ),

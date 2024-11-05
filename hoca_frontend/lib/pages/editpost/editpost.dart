@@ -21,15 +21,23 @@ class EditPostPage extends StatefulWidget {
 
 class _EditPostPageState extends State<EditPostPage> {
   final _formKey = GlobalKey<FormState>();
+  
+  // Controllers for form fields
   final TextEditingController _workerNameController = TextEditingController();
   final TextEditingController _workingPriceController = TextEditingController();
   final TextEditingController _idLineController = TextEditingController();
   final TextEditingController _phoneNumberController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
+  
+  // Time variables
+  late TimeOfDay _startTime;
+  late TimeOfDay _endTime;
+  
+  // Variables for data state and UI
   String? location;
   String? latitude;
   String? longitude;
-  List<PlaceType>? placeTypes; // Capture place types as a list of PlaceType objects
+  List<PlaceType>? placeTypes;
   String? amntFamily;
   String? imageUrl;
   String _selectedGender = "Male";
@@ -41,7 +49,10 @@ class _EditPostPageState extends State<EditPostPage> {
   @override
   void initState() {
     super.initState();
-    _fetchPostData(widget.postID); // Fetch the post data when the page loads
+    // Initialize with default times
+    _startTime = const TimeOfDay(hour: 9, minute: 0);
+    _endTime = const TimeOfDay(hour: 17, minute: 0);
+    _fetchPostData(widget.postID);
   }
 
   Future<void> _fetchPostData(String postID) async {
@@ -54,13 +65,13 @@ class _EditPostPageState extends State<EditPostPage> {
         url,
         options: Options(
           headers: {
-            'x-auth-token': '$token', // Add token to header
+            'x-auth-token': '$token',
           },
         ),
       );
       final post = Post.fromJson(response.data);
 
-      // Populate the form fields with fetched post data
+      // Populate fields with fetched data
       _workerNameController.text = post.name ?? '';
       _workingPriceController.text = post.price.toString();
       _idLineController.text = post.promptPay ?? '';
@@ -72,16 +83,33 @@ class _EditPostPageState extends State<EditPostPage> {
       location = post.location;
       latitude = post.locationLat;
       longitude = post.locationLong;
-      placeTypes = post.placeTypeID; // Capture place types as a list of PlaceType objects
+      placeTypes = post.placeTypeID;
       amntFamily = post.amountFamily;
-      imageUrl = post.avatarUrl; // Capture image
+      imageUrl = post.avatarUrl;
+
+      // Parse and set time if available
+      // if (post.startTime != null) {
+      //   final startTimeParts = post.startTime!.split(':');
+      //   _startTime = TimeOfDay(
+      //     hour: int.parse(startTimeParts[0]),
+      //     minute: int.parse(startTimeParts[1]),
+      //   );
+      // }
+      
+      // if (post.endTime != null) {
+      //   final endTimeParts = post.endTime!.split(':');
+      //   _endTime = TimeOfDay(
+      //     hour: int.parse(endTimeParts[0]),
+      //     minute: int.parse(endTimeParts[1]),
+      //   );
+      // }
 
       setState(() {
         _isLoading = false;
         _hasError = false;
       });
     } catch (error) {
-      Caller.handle(context, error as DioError); // Handle error gracefully
+      Caller.handle(context, error as DioError);
       setState(() {
         _isLoading = false;
         _hasError = true;
@@ -102,11 +130,14 @@ class _EditPostPageState extends State<EditPostPage> {
   });
 }
 
-  // Method to handle form submission
+  String _formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hour.toString().padLeft(2, '0');
+    final minute = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minute';
+  }
+
   void _submitForm() {
-    // Check if a category is selected
-    if (selectedCategories == null) {
-      // Show an error if the category is not selected
+    if (selectedCategories.isEmpty) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -129,7 +160,6 @@ class _EditPostPageState extends State<EditPostPage> {
       return;
     }
 
-    // Create a formData map to pass the collected form data
     Map<String, dynamic> formData = {
       "name": _workerNameController.text,
       "price": _workingPriceController.text,
@@ -140,7 +170,6 @@ class _EditPostPageState extends State<EditPostPage> {
       "categories": selectedCategories,
     };
 
-    // If form is valid, navigate to EditPostCon and pass form data
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -216,13 +245,21 @@ class _EditPostPageState extends State<EditPostPage> {
           },
           selectedCategories: selectedCategories.map((cat) => cat.id).toList(),
           toggleCategory: toggleCategory,
+          startTime: _startTime,
+          endTime: _endTime,
+          onStartTimeChanged: (TimeOfDay time) {
+            setState(() => _startTime = time);
+          },
+          onEndTimeChanged: (TimeOfDay time) {
+            setState(() => _endTime = time);
+          },
         ),
       ),
     );
   }
 
   Widget _buildSubmitButton() {
-    final bool isButtonEnabled = selectedCategories != null;
+    final bool isButtonEnabled = selectedCategories.isNotEmpty;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),

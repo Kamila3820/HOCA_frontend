@@ -7,7 +7,7 @@ Widget buildCategoryChip(
   bool isSelected = selectedCategories.contains(value);
   
   return GestureDetector(
-    onTap: () => toggleCategory(value), // Pass the integer value
+    onTap: () => toggleCategory(value),
     child: Chip(
       avatar: Icon(
         icon,

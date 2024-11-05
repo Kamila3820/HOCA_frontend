@@ -373,7 +373,8 @@ Row(
                   const SizedBox(height: 40), // Optional: Add some space before the button
 ElevatedButton(
   onPressed: () {
-    bool isChecked = false; // Initial checkbox state
+    bool isChecked1 = false; // First checkbox state
+    bool isChecked2 = false; // Second checkbox state
 
     showDialog(
       context: context,
@@ -392,7 +393,7 @@ ElevatedButton(
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Confirm Arrival',
+                        'Confirm Working',
                         style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -411,41 +412,71 @@ ElevatedButton(
                   ),
                 ],
               ),
-              content: Row(
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Checkbox(
-                    value: isChecked,
-                    onChanged: (bool? value) {
-                      setState(() {
-                        isChecked = value ?? false;
-                      });
-                    },
-                    shape: CircleBorder(), // Circular shape for checkbox
-                    activeColor: const Color(0xFF87C4FF), // Checkbox color
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      "I am honored to have never taken anything that isn't mine.",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        color: Colors.black54,
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isChecked1,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked1 = value ?? false;
+                          });
+                        },
+                        shape: CircleBorder(), // Circular shape for checkbox
+                        activeColor: const Color(0xFF87C4FF), // Checkbox color
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "I am honored to have never taken anything that isn't mine.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8), // Add spacing between rows
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: isChecked2,
+                        onChanged: (bool? value) {
+                          setState(() {
+                            isChecked2 = value ?? false;
+                          });
+                        },
+                        shape: CircleBorder(), // Circular shape for checkbox
+                        activeColor: const Color(0xFF87C4FF), // Checkbox color
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "I assure you that I took great care to leave everything in your space exactly as it was, without any damage.",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            color: Colors.black54,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
               actions: [
                 TextButton(
-                  onPressed: isChecked
+                  onPressed: (isChecked1 && isChecked2)
                       ? () {
-                          // Navigate to the next page if the checkbox is checked
+                          // Navigate to the next page if both checkboxes are checked
                           callCompleteOrder(widget.orderID);
                         }
-                      : null, // Disable button if unchecked
+                      : null, // Disable button if either checkbox is unchecked
                   style: TextButton.styleFrom(
                     foregroundColor: Colors.white,
-                    backgroundColor: isChecked
+                    backgroundColor: (isChecked1 && isChecked2)
                         ? const Color(0xFF87C4FF) // Enabled color
                         : Colors.white, // Disabled color
                   ),
@@ -479,7 +510,7 @@ ElevatedButton(
       fontWeight: FontWeight.w600,
     ),
   ),
-),
+)
 
           ],
               );
