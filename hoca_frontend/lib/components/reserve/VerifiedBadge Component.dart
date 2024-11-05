@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class VerifiedBadge extends StatelessWidget {
-  const VerifiedBadge({super.key});
+  final String? availableStart;
+  final String? availableEnd;
+
+  const VerifiedBadge({super.key, required this.availableStart, required this.availableEnd});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +43,7 @@ class VerifiedBadge extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '8:00AM-12:00AM',
+              '${availableStart}-${availableEnd}',
               style: GoogleFonts.poppins(
                 color: Colors.grey[700],
                 fontSize: 14,

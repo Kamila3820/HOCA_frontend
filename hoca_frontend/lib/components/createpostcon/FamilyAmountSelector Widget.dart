@@ -21,8 +21,8 @@ class FamilyAmountSelector extends StatefulWidget {
 
 class _FamilyAmountSelectorState extends State<FamilyAmountSelector> {
   String? _selectedArea;
-  int? _selectedTaskers;
-  int? _selectedHours;
+  String? _selectedTaskers;
+  String? _selectedHours;
   bool _isDurationSelected = false;
 
   void _showDurationSelectorDialog() {
@@ -247,7 +247,7 @@ Widget _buildSelectedDurationInfo() {
 }
 
 class DurationSelectorDialog extends StatefulWidget {
-  final Function(String, int, int) onDurationSelected;
+  final Function(String, String, String) onDurationSelected;
 
   const DurationSelectorDialog({
     super.key,
@@ -261,12 +261,12 @@ class DurationSelectorDialog extends StatefulWidget {
 class _DurationSelectorDialogState extends State<DurationSelectorDialog> {
   String? selectedArea;
   final List<Map<String, dynamic>> durations = [
-    {"area": "60", "taskers": 2, "hours": 3},
-    {"area": "80", "taskers": 2, "hours": 4},
-    {"area": "100", "taskers": 3, "hours": 3},
-    {"area": "150", "taskers": 3, "hours": 4},
-    {"area": "200", "taskers": 4, "hours": 4},
-    {"area": "400", "taskers": 4, "hours": 8},
+    {"area": "60", "taskers": "2", "hours": "3"},
+    {"area": "80", "taskers": "2", "hours": "4"},
+    {"area": "100", "taskers": "3", "hours": "3"},
+    {"area": "150", "taskers": "3", "hours": "4"},
+    {"area": "200", "taskers": "4", "hours": "4"},
+    {"area": "400", "taskers": "4", "hours": "8"},
   ];
 
   @override

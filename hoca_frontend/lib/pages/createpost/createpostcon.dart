@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/classes/caller.dart';
-import 'package:hoca_frontend/components/createpostcon/Famiyandduration.dart';
+import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';
@@ -36,7 +36,8 @@ class _CreatePostConState extends State<CreatePostCon> {
   String? _selectedFamilyAmount;
   LatLng? _currentLocation;
   String _locationName = "Choose Your Location"; // Default location text
-   bool _isDurationSelected = false;
+  bool _isDurationSelected = false;
+  
 
   String convertIndicesToPlacetypeIDs(List<int> selectedIndices) {
     return selectedIndices.map((index) => (index + 1).toString()).join(',');
@@ -185,7 +186,7 @@ class _CreatePostConState extends State<CreatePostCon> {
         "name": widget.formData?["name"],
         "description": widget.formData?["desciption"],
         "file": imageFile,
-        "category_id": widget.formData?["categories"],
+        "category_ids": widget.formData?["categories"],
         "placetype_ids": placetypeIDs,
         "phone_number": widget.formData?["phoneNumber"],
         "location": _locationName,  // Updated to use selected location name
@@ -195,6 +196,9 @@ class _CreatePostConState extends State<CreatePostCon> {
         "prompt_pay": widget.formData?["idLine"],
         "gender": widget.formData?["gender"],
         "amount_family": _selectedFamilyAmount,
+        // "duration": ,
+        "available_start": widget.formData?["availableStart"],
+        "available_end": widget.formData?["availableEnd"],
       });
 
       final prefs = await SharedPreferences.getInstance();
@@ -238,19 +242,19 @@ class _CreatePostConState extends State<CreatePostCon> {
           onBoxTapped: _onBoxTapped,
         ),
          FamilyAmountSelector(
-    formKey: _formKey,
-    selectedFamilyAmount: _selectedFamilyAmount,
-    onFamilyAmountChanged: (value) {
-      setState(() {
-        _selectedFamilyAmount = value;
-      });
-    },
-    onDurationSelected: (selected) {
-      setState(() {
-        _isDurationSelected = selected;
-      });
-    },
-  ),
+            formKey: _formKey,
+            selectedFamilyAmount: _selectedFamilyAmount,
+            onFamilyAmountChanged: (value) {
+              setState(() {
+                _selectedFamilyAmount = value;
+              });
+            },
+            onDurationSelected: (selected) {
+              setState(() {
+                _isDurationSelected = selected;
+              });
+            },
+          ),
         Positioned(
           top: 155,
           right: 30,

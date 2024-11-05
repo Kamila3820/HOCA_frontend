@@ -6,7 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart'; // Google Maps
 import 'package:hoca_frontend/classes/caller.dart';
-import 'package:hoca_frontend/components/createpostcon/Famiyandduration.dart';
+import 'package:hoca_frontend/components/createpostcon/FamilyAmountSelector%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/HeaderContainer.dart';
 import 'package:hoca_frontend/components/createpostcon/LocationBox%20Widget.dart';
 import 'package:hoca_frontend/components/createpostcon/WorkTypeSelector%20Widget.dart';

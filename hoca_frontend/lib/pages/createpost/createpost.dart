@@ -101,6 +101,8 @@ void _submitForm() {
       "description": _controllers['description']!.text,
       "gender": _selectedGender,
       "categories": _selectedCategories.join(','),
+      "availableStart": _startTime.toString(),
+      "availableEnd": _endTime.toString(),
     };
 Navigator.push(
   context,

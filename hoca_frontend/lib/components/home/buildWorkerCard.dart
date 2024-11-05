@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/homepost.dart';
 import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/post.dart';
@@ -30,42 +31,20 @@ class _WorkerPostState extends State<WorkerPost> {
     super.initState();
   }
 
+  List<String> getCategoryNames(List<Categories> categories) {
+    return categories.map((category) => category.name).take(3).toList();
+  }
+
   String getPlaceTypeNames(List<PlaceType> placeTypes) {
     return placeTypes.map((placeType) => placeType.name ?? "Unknown").join(" / ");
   }
 
   @override
   Widget build(BuildContext context) {
-    String categoryType = "";
-
-    if (widget.post.categoryID == 1) {
-      categoryType = "Deep cleaning";
-    }
-    if (widget.post.categoryID == 2) {
-      categoryType = "Floor care";
-    }
-    if (widget.post.categoryID == 3) {
-      categoryType = "Window care";
-    }
-    if (widget.post.categoryID == 4) {
-      categoryType = "Laundry";
-    }
-    if (widget.post.categoryID == 5) {
-      categoryType = "Sewing";
-    }
-    if (widget.post.categoryID == 6) {
-      categoryType = "Lawn mowing";
-    }
-    if (widget.post.categoryID == 7) {
-      categoryType = "Watering";
-    }
-    if (widget.post.categoryID == 8) {
-      categoryType = "Yard cleanup";
-    }
-    if (widget.post.categoryID == 9) {
-      categoryType = "Pet sitting";
-    }
-   
+    List<String> selectedCategories = widget.post.categoryID != null 
+        ? getCategoryNames(widget.post.categoryID!)
+        : ["Unknown"];
+        
     // Get the place type names from placeTypeID
      String placeTypeNames = widget.post.placeTypeID != null && widget.post.placeTypeID!.isNotEmpty
       ? getPlaceTypeNames(widget.post.placeTypeID!)
@@ -199,47 +178,48 @@ class _WorkerPostState extends State<WorkerPost> {
               ),
             ),
             Positioned(
-              top: 190,
-              left: 2,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Container(
-                        padding: const EdgeInsets.all(2.0),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFEED9), // Light peach color
-                          borderRadius: BorderRadius.circular(8),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.1), // Shadow color
-                              spreadRadius: 1, // How much the shadow spreads
-                              blurRadius: 3, // How blurry the shadow is
-                              offset: const Offset(0, 2), // Position of the shadow (x, y)
-                            ),
-                          ],
-                        ),
-                        child: Text(
-                          categoryType,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            textStyle: const TextStyle(
-                              fontSize: 9,
-                               fontWeight: FontWeight.bold,
-                              color: Color.fromARGB(228, 0, 0, 0), // Ensure readability against the light background
+                top: 190,
+                left: 2,
+                right: 0,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 1.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      ...selectedCategories.map((category) => Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                        child: Container(
+                          padding: const EdgeInsets.all(4.0),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFEED9), 
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                spreadRadius: 1,
+                                blurRadius: 3,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            category,
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                fontSize: 9,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(228, 0, 0, 0),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    
-                  ],
+                      )).toList(),
+                    ],
+                  ),
                 ),
               ),
-            ),
+
             Positioned(
               top: 210,
               left: 12,
