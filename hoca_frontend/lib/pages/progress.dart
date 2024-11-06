@@ -192,10 +192,10 @@ Future<WorkerOrder?> fetchWorkerOrder() async {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                _buildProgressStep('Confirm', isActive: true, isCompleted: true),
+                _buildProgressStep('Confirm', isActive: false, isCompleted: false),
                 _buildProgressStep('Preparing', isActive: false, isCompleted: false),
                 _buildProgressStep('Working', isActive: false, isCompleted: false),
-                _buildProgressStep('Complete', isActive: false, isCompleted: false),
+                
               ],
             ),
           ),
@@ -203,11 +203,12 @@ Future<WorkerOrder?> fetchWorkerOrder() async {
           Expanded(
             child: Center(
               child: Text(
-                'Progress Details Will Be Shown Here',
+                'Your order will be show here soon..',
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
                     fontSize: 20,
-                    color: Colors.black,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -222,7 +223,7 @@ Future<WorkerOrder?> fetchWorkerOrder() async {
     return Column(
       children: [
         Container(
-          width: 70,
+          width: 100,
           height: 4,
           color: isCompleted ? Colors.blue : (isActive ? Colors.blue : const Color.fromARGB(255, 255, 255, 255)),
         ),

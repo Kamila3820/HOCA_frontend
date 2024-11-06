@@ -178,7 +178,7 @@ class _WorkerPostState extends State<WorkerPost> {
               ),
             ),
             Positioned(
-                top: 190,
+                top: 185,
                 left: 2,
                 right: 0,
                 child: Padding(
@@ -197,7 +197,7 @@ class _WorkerPostState extends State<WorkerPost> {
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.1),
                                 spreadRadius: 1,
-                                blurRadius: 3,
+                                blurRadius: 1,
                                 offset: const Offset(0, 2),
                               ),
                             ],
@@ -321,7 +321,7 @@ class _WorkerPostState extends State<WorkerPost> {
                 "฿ ${widget.post.price}",
                 style: GoogleFonts.poppins(
                   textStyle: const TextStyle(
-                    fontSize: 10,
+                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),

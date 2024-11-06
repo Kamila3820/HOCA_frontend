@@ -174,7 +174,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
                 _buildProgressStep('Confirm', isActive: false, isCompleted: false),
                 _buildProgressStep('Preparing', isActive: false, isCompleted: false),
                 _buildProgressStep('Working', isActive: true, isCompleted: true),
-                _buildProgressStep('Complete', isActive: false, isCompleted: false),
+               
               ],
             ),
           ),
@@ -315,7 +315,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     return Column(
       children: [
         Container(
-          width: 70,
+          width: 100,
           height: 4,
           color: isCompleted
               ? Colors.blue

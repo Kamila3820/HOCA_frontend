@@ -220,7 +220,7 @@ class _ProgressPageState extends State<UserProgressPage> with SingleTickerProvid
                 _buildProgressStep('Confirm', isActive: true, isCompleted: true),
                 _buildProgressStep('Preparing', isActive: false, isCompleted: false),
                 _buildProgressStep('Working', isActive: false, isCompleted: false),
-                _buildProgressStep('Complete', isActive: false, isCompleted: false),
+                
               ],
             ),
           ),
@@ -343,8 +343,8 @@ const SizedBox(height: 30),
       boxShadow: [
         BoxShadow(
           color: Colors.grey.withOpacity(0.3),
-          spreadRadius: 5,
-          blurRadius: 10,
+          spreadRadius: 2,
+          blurRadius: 2,
           offset: const Offset(0, 3), // Changes position of shadow
         ),
       ],
@@ -452,7 +452,7 @@ const SizedBox(height: 30),
     return Column(
       children: [
         Container(
-          width: 70,
+          width: 100,
           height: 4,
           color: isCompleted
               ? Colors.blue

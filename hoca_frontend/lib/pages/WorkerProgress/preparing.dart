@@ -206,8 +206,7 @@ void callWorkingOrder(String orderID) async {
                       isActive: true, isCompleted: true),
                   _buildProgressStep('Working',
                       isActive: false, isCompleted: false),
-                  _buildProgressStep('Complete',
-                      isActive: false, isCompleted: false),
+              
                 ],
               ),
             ),
@@ -428,7 +427,7 @@ void callWorkingOrder(String orderID) async {
             ),
              const SizedBox(height: 10),
             Container(
-              height: 240,
+              height: 270,
               width: 320,
               margin: const EdgeInsets.symmetric(horizontal: 16),
               padding: const EdgeInsets.all(16),
@@ -444,64 +443,89 @@ void callWorkingOrder(String orderID) async {
                   ),
                 ],
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Order Details',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                   const SizedBox(height: 12),
-                  Text(
-                    'Location :',
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    order.location!,
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Specific Place :',
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    order.specPlace ?? "-",
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                      color: Colors.black87,
-                    ),
-                  ),
-                 
-                 const SizedBox(height: 12),
-                  Text(
-                    'Note from a customer :',
-                    style: GoogleFonts.poppins(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  Text(
-                    order.note ?? "-",
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
+             child: Column(
+  crossAxisAlignment: CrossAxisAlignment.start,
+  children: [
+    Row(
+      children: [
+        Icon(
+          Icons.receipt_long, // Use an icon of your choice
+          color: Colors.blue, // Set the color of the icon
+          size: 20,
+        ),
+        const SizedBox(width: 8), // Add spacing between the icon and text
+        Text(
+          'Order Details',
+          style: GoogleFonts.poppins(
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            color: const Color.fromARGB(172, 0, 0, 0), // Set the color of the text to match the icon if desired
+          ),
+        ),
+      ],
+    ),
+    const SizedBox(height: 12),
+    Text(
+      'Location :',
+      style: GoogleFonts.poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    Text(
+      order.location!,
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        color: Colors.black87,
+      ),
+    ),
+    const SizedBox(height: 12),
+    Text(
+      'Duration :',
+      style: GoogleFonts.poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    Text(
+      'Max 60 m² - 2 Taskers / 3 hours',
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        color: Colors.black87,
+      ),
+    ),
+    const SizedBox(height: 12),
+    Text(
+      'Specific Place :',
+      style: GoogleFonts.poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    Text(
+      order.specPlace ?? "-",
+      style: GoogleFonts.poppins(
+        fontSize: 13,
+        color: Colors.black87,
+      ),
+    ),
+    const SizedBox(height: 12),
+    Text(
+      'Note from a customer :',
+      style: GoogleFonts.poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+    Text(
+      order.note ?? '-',
+      style: GoogleFonts.poppins(
+        fontSize: 14,
+        color: Colors.black87,
+      ),
+    ),
+  ],
+),
             ),
                   const SizedBox(height: 40), // Optional: Add some space before the button
 ElevatedButton(
@@ -602,7 +626,7 @@ ElevatedButton(
     return Column(
       children: [
         Container(
-          width: 70,
+          width: 100,
           height: 4,
           color: isCompleted
               ? Colors.blue

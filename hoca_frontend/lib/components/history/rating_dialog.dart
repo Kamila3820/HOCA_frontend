@@ -8,8 +8,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'rating_section.dart';
 
 void showRatingDialog(BuildContext context, String historyID, Function reloadData) {
-  int? workScore; // For work score rating
-  int? securityScore; // For security score rating
+  int? workScore;
+  int? securityScore;
   final TextEditingController commentController = TextEditingController();
 
   showDialog(
@@ -19,119 +19,142 @@ void showRatingDialog(BuildContext context, String historyID, Function reloadDat
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF87C4FF),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                padding: const EdgeInsets.all(12),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.8, // 80% of screen height
+            maxWidth: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+          ),
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF87C4FF),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: const EdgeInsets.all(12),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            'Rating your experience!\nTo give recommend to a worker',
+                            style: GoogleFonts.poppins(
+                              textStyle: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ),
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.close,
+                            color: Color.fromARGB(255, 0, 0, 0),
+                            size: 24,
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: RatingSectionWithIcon(
+                      title: 'Work',
+                      tooltipMessage: 'Rate the quality and efficiency of the work performed',
+                      onRatingUpdate: (rating) {
+                        workScore = rating;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: RatingSectionWithIcon(
+                      title: 'Security',
+                      tooltipMessage: 'Rate how safe and secure you felt during the service',
+                      onRatingUpdate: (rating) {
+                        securityScore = rating;
+                      },
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Share your experience',
+                    style: GoogleFonts.poppins(
+                      textStyle: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  TextField(
+                    controller: commentController,
+                    maxLines: 3,
+                    decoration: InputDecoration(
+                      hintText: 'Let us know your great experience!',
+                      hintStyle: const TextStyle(
+                        color: Colors.black54,
+                        fontSize: 14,
+                        fontWeight: FontWeight.normal,
+                      ),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      contentPadding: const EdgeInsets.all(12),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (workScore != null && securityScore != null) {
+                          _submitRating(context, historyID, workScore!, securityScore!, 
+                              commentController.text, reloadData);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Please provide ratings for both Work and Security.')
+                            ),
+                          );
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF87C4FF),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 24,
+                          vertical: 12,
+                        ),
+                      ),
                       child: Text(
-                        'Rating your experience!\nTo give recommend to a worker',
+                        'Send rating',
                         style: GoogleFonts.poppins(
                           textStyle: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 0, 0, 0),
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),
                     ),
-                    IconButton(
-                      icon: SizedBox(
-                        width: 40,
-                        height: 40,
-                        child: Icon(Icons.close, color: const Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              Center(child: RatingSectionWithIcon(
-                title: 'Work',
-                tooltipMessage: 'Rate the quality and efficiency of the work performed',
-                onRatingUpdate: (rating) {
-                    workScore = rating; // Update work score
-                },
-              )),
-              const SizedBox(height: 16),
-              Center(child: RatingSectionWithIcon(
-                title: 'Security',
-                tooltipMessage: 'Rate how safe and secure you felt during the service',
-                onRatingUpdate: (rating) {
-                    securityScore = rating; // Update security score
-                },
-              )),
-              const SizedBox(height: 16),
-              Text(
-                'Share your experience',
-                style: GoogleFonts.poppins(
-                  textStyle: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 8),
-              TextField(
-                controller: commentController,
-                maxLines: 3,
-                decoration: InputDecoration(
-                  hintText: 'Let us know your great experience!',
-                  hintStyle: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                  ),
-                  border: OutlineInputBorder(),
-                ),
-              ),
-              const SizedBox(height: 16),
-              Center(
-                child: ElevatedButton(
-                  onPressed: () {
-                    if (workScore != null && securityScore != null) {
-                      _submitRating(context, historyID, workScore!, securityScore!, commentController.text, reloadData);
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please provide ratings for both Work and Security.'))
-                      );
-                    }
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF87C4FF),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5),
-                    ),
-                  ),
-                  child: Text(
-                    'Send rating',
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
         ),
       );

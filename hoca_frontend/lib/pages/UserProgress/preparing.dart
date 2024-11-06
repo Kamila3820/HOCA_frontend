@@ -150,7 +150,7 @@ class _UserArrivalPageState extends State<UserArrivalPage> {
                   _buildProgressStep('Confirm', isActive: false, isCompleted: false),
                   _buildProgressStep('Preparing', isActive: true, isCompleted: false),
                   _buildProgressStep('Working', isActive: false, isCompleted: false),
-                  _buildProgressStep('Complete', isActive: false, isCompleted: false),
+               
                 ],
               ),
             ),
@@ -386,7 +386,7 @@ Expanded(
     return Column(
       children: [
         Container(
-          width: 70,
+          width: 100,
           height: 4,
           color: isCompleted
               ? Colors.blue
