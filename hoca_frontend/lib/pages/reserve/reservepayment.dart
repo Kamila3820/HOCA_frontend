@@ -131,14 +131,14 @@ class _PaymentDialogState extends State<PaymentDialog> {
         ),    
       );
 
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         _showTopSnackBar('Place your order successfully');
         Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => ProgressPage()),
       );
       } else {
-        throw Exception('Failed to update profile');
+        throw Exception('Failed to place new order');
       }
     } catch (error) {
       _showTopSnackBar('Failed to update profile: $error', isError: true);
