@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
@@ -29,12 +30,22 @@ class _PaymentDialogState extends State<PaymentDialog> {
 
   final _formKey = GlobalKey<FormState>();
   final Completer<GoogleMapController> _controller = Completer();
+  // Define a list of dropdown options for cleaning area, taskers, and hours
+  final List<Map<String, String>> _placeOptions = [
+  {'title': 'Max 60 m²', 'subtitle': '2 Taskers / 3 hours'},
+  {'title': 'Max 80 m²', 'subtitle': '2 Taskers / 4 hours'},
+  {'title': 'Max 100 m²', 'subtitle': '3 Taskers / 3 hours'},
+  {'title': 'Max 150 m²', 'subtitle': '3 Taskers / 4 hours'},
+  {'title': 'Max 200 m²', 'subtitle': '4 Taskers / 4 hours'},
+  {'title': 'Max 400 m²', 'subtitle': '4 Taskers / 8 hours'},
+];
+  String? _selectedPlaceOption; // Variable to store the selected dropdown option
 
   @override
   void initState() {
     super.initState();
     _initializePosition();
-    _fetchUserData(); 
+    _fetchUserData();
   }
 
   @override
@@ -93,18 +104,18 @@ class _PaymentDialogState extends State<PaymentDialog> {
   Future<void> _fetchUserData() async {
     try {
       final userContact = await fetchUser();
-      print("Fetched User: ${userContact.username}, ${userContact.phonenumber}");
+      print(
+          "Fetched User: ${userContact.username}, ${userContact.phonenumber}");
       setState(() {
         _nameController.text = userContact.username!;
         _phoneController.text = userContact.phonenumber!;
       });
     } catch (error) {
       _showTopSnackBar('Failed to load user data: $error', isError: true);
-    } 
+    }
   }
 
   void callReservePost(String postID) async {
-
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       String? token = prefs.getString('token');
@@ -113,7 +124,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
       print(_selectedPaymentMethod);
       print(_placeTypeController.text);
       print(_noteController.text);
-
 
       final response = await Caller.dio.post(
         '/v1/order/create/$postID',
@@ -128,21 +138,21 @@ class _PaymentDialogState extends State<PaymentDialog> {
           headers: {
             'x-auth-token': '$token',
           },
-        ),    
+        ),
       );
 
       if (response.statusCode == 200) {
         _showTopSnackBar('Place your order successfully');
         Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ProgressPage()),
-      );
+          context,
+          MaterialPageRoute(builder: (context) => ProgressPage()),
+        );
       } else {
         throw Exception('Failed to update profile');
       }
     } catch (error) {
       _showTopSnackBar('Failed to update profile: $error', isError: true);
-    } 
+    }
   }
 
   // static const LatLng _initialPosition = LatLng(13.736717, 100.523186); // Default to Bangkok
@@ -153,7 +163,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
     setState(() {
       _currentPosition = initialPosition;
     });
-    _getAddress(initialPosition); // Any additional logic after setting the position
+    _getAddress(
+        initialPosition); // Any additional logic after setting the position
   }
 
   Future<LatLng> _loadPosition() async {
@@ -168,7 +179,6 @@ class _PaymentDialogState extends State<PaymentDialog> {
       return LatLng(13.736717, 100.523186);
     }
   }
-
 
   Future<void> _getAddress(LatLng location) async {
     try {
@@ -265,7 +275,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
     );
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       shape: RoundedRectangleBorder(
@@ -292,8 +302,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                         const SizedBox(width: 8.0),
                         Expanded(
                           child: Text(
-                            _selectedAddress ??
-                                'Selected location: $_currentPosition',
+                            _selectedAddress ?? 'Selected location: $_currentPosition',
                             style: GoogleFonts.poppins(fontSize: 16),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 3,
@@ -316,6 +325,8 @@ class _PaymentDialogState extends State<PaymentDialog> {
               _buildRadioOption('Cash', 'cash'),
               _buildRadioOption('QR code Payment', 'qrcode'),
               const SizedBox(height: 16.0),
+              _buildPlaceDropdown(), // Add the dropdown here
+              const SizedBox(height: 16.0),
               _buildSectionTitle('Specify a type of your place'),
               const SizedBox(height: 8.0),
               _buildTextField('', controller: _placeTypeController),
@@ -333,54 +344,117 @@ class _PaymentDialogState extends State<PaymentDialog> {
                   return null;
                 },
               ),
+              const SizedBox(height: 16.0),
+              _buildPaymentSummary(),
             ],
           ),
         ),
       ),
       actions: [
-  TextButton(
-    onPressed: () => Navigator.of(context).pop(),
-    child: Text(
-      'Cancel',
-      style: GoogleFonts.poppins(color: Colors.red,fontWeight: FontWeight.bold,),
-    ),
-  ),
-  ElevatedButton(
-    onPressed: _selectedPaymentMethod == null
-        ? null  // Disable the button if no payment method is selected
-        : () {
-            if (_formKey.currentState!.validate()) {
-              _formKey.currentState!.save();
-              _showSuccessAlertAndNavigate(context);
-              callReservePost(widget.postID);
-            }
-          },
-    style: ElevatedButton.styleFrom(
-      backgroundColor: Color(0xFF87C4FF), // Set your desired color here
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // Optional: round the button
-      ),
-    ),
-    child:Text(
-  'Submit',
-  style: GoogleFonts.poppins(
-    color: Colors.white,
-    fontWeight: FontWeight.bold, // Make the text bold
-  ),
-),
-
-  ),
-],
-
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(
+            'Cancel',
+            style: GoogleFonts.poppins(color: Colors.red, fontWeight: FontWeight.bold),
+          ),
+        ),
+        ElevatedButton(
+          onPressed: _selectedPaymentMethod == null
+              ? null
+              : () {
+                  if (_formKey.currentState!.validate()) {
+                    _formKey.currentState!.save();
+                    _showSuccessAlertAndNavigate(context);
+                    callReservePost(widget.postID);
+                  }
+                },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF87C4FF),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+          ),
+          child: Text(
+            'Submit',
+            style: GoogleFonts.poppins(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
     );
   }
+
+  Widget _buildPlaceDropdown() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        'Select the duration',
+        style: GoogleFonts.poppins(
+          fontSize: 17,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      const SizedBox(height: 8.0), // Spacing between header and dropdown
+      DropdownButtonFormField<String>(
+        value: _selectedPlaceOption,
+        items: _placeOptions.map((option) {
+          return DropdownMenuItem<String>(
+            value: '${option['title']} - ${option['subtitle']}',
+            child: RichText(
+              text: TextSpan(
+                children: [
+                  TextSpan(
+                    text: option['title'],
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: Colors.black, // Black color for title
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  TextSpan(
+                    text: ' - ${option['subtitle']}',
+                    style: GoogleFonts.poppins(
+                      fontSize: 14,
+                      color: const Color.fromARGB(255, 92, 92, 92), // Grey color for subtitle
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }).toList(),
+        onChanged: (newValue) {
+          setState(() {
+            _selectedPlaceOption = newValue;
+          });
+        },
+        decoration: InputDecoration(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          contentPadding: const EdgeInsets.symmetric(horizontal: 12.0),
+        ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'Please select a place option';
+          }
+          return null;
+        },
+      ),
+    ],
+  );
+}
+
 
   Widget _buildSectionTitle(String title) {
     return Align(
       alignment: Alignment.centerLeft,
       child: Text(
         title,
-        style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+        style: GoogleFonts.poppins(fontSize: 17, fontWeight: FontWeight.w600),
       ),
     );
   }
@@ -424,6 +498,75 @@ class _PaymentDialogState extends State<PaymentDialog> {
             setState(() => _selectedPaymentMethod = newValue),
       ),
       title: Text(title, style: GoogleFonts.poppins()),
+    );
+  }
+
+  Widget _buildPaymentSummary() {
+    return Container(
+      padding: const EdgeInsets.all(16.0),
+      decoration: BoxDecoration(
+        color: const Color.fromARGB(83, 135, 195, 255),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Payment Summary',
+            style: GoogleFonts.poppins(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: 8.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Subtotal:',
+                style: GoogleFonts.poppins(),
+              ),
+              Text(
+                '฿1,000',
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+              ),
+            ],
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Discount:',
+                style: GoogleFonts.poppins(),
+              ),
+              Text(
+                '-฿100',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+            ],
+          ),
+          const Divider(thickness: 1.0),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Total:',
+                style: GoogleFonts.poppins(fontSize: 16),
+              ),
+              Text(
+                '฿900',
+                style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
