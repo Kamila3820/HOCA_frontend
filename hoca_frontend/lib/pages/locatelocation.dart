@@ -143,19 +143,30 @@ class _LocateLocationPageState extends State<LocateLocationPage> {
 Widget build(BuildContext context) {
   return Scaffold(
     appBar: AppBar(
-      title: const Text(
+  title: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: const [
+      Icon(
+        Icons.location_on, // Choose the icon you want
+        color: Colors.blue,
+      ),
+      SizedBox(width: 8), // Space between icon and text
+      Text(
         'Location Details',
         style: TextStyle(
-          color: Colors.black,
-          fontSize: 16,
+          color: Color.fromARGB(191, 0, 0, 0),
+          fontSize: 20,
           fontWeight: FontWeight.w600,
         ),
       ),
-      backgroundColor: Colors.white,
-      iconTheme: const IconThemeData(color: Colors.black),
-      elevation: 0,
-      centerTitle: true,
-    ),
+    ],
+  ),
+  backgroundColor: Colors.white,
+  iconTheme: const IconThemeData(color: Colors.black),
+  elevation: 0,
+  centerTitle: true,
+),
+
     body: _selectedAddress == null
         ? Center(child: CircularProgressIndicator()) // Loading indicator while fetching address
         : Column(

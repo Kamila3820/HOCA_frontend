@@ -1,8 +1,5 @@
-import 'dart:convert';
-
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/history/history_card.dart';
@@ -77,6 +74,7 @@ class _HistoryPageState extends State<HistoryPage> {
   int _selectedTabIndex = 0;
   List<dynamic> userHistory = [];
   List<dynamic> workHistory = [];
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -84,11 +82,24 @@ class _HistoryPageState extends State<HistoryPage> {
     if (_selectedTabIndex == 0) {
       _fetchUserHistory();
       _fetchWorkedHistory();
+       _fetchData();
     }
   }
 
   void _loadData() {
     _fetchUserHistory();
+  }
+  Future<void> _fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await _fetchUserHistory();
+    await _fetchWorkedHistory();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> _fetchUserHistory() async {
@@ -159,12 +170,14 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
-  @override
+ @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      body: RefreshIndicator(
+        onRefresh: _fetchData,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           Container(
             height: 150.0,
             width: double.infinity,
@@ -201,9 +214,14 @@ class _HistoryPageState extends State<HistoryPage> {
             },
           ),
           Expanded(
-            child: _selectedTabIndex == 0 ? _buildUserList() : _buildWorkerList(),
-          ),
+              child: _isLoading
+                  ? Center(child: CircularProgressIndicator())
+                  : _selectedTabIndex == 0
+                      ? _buildUserList()
+                      : _buildWorkerList(),
+            ),
         ],
+      ),
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:hoca_frontend/pages/UserProgress/preparing.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/comfirm.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/working.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ProgressPage extends StatefulWidget {
@@ -35,27 +36,39 @@ class _ProgressPageState extends State<ProgressPage> {
       switch (customerOrder.status) {
       case 'confirmation':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserProgressPage(orderID: customerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose the transition type
+    child: UserProgressPage(orderID: customerOrder.id.toString()),
+    duration: Duration(milliseconds: 300), // Optional: set duration
+    reverseDuration: Duration(milliseconds: 300), // Optional: set reverse duration
+  ),
+);
+
         break;
       case 'preparing':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserArrivalPage(orderID: customerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Customize the transition type as desired
+    child: UserArrivalPage(orderID: customerOrder.id.toString()),
+    duration: Duration(milliseconds: 400), // Optional: customize transition speed
+    reverseDuration: Duration(milliseconds: 400), // Optional: customize reverse transition
+  ),
+);
+
         break;
       case 'working':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserPaymentPage(orderID: customerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose a suitable transition type
+    child: UserPaymentPage(orderID: customerOrder.id.toString()),
+    duration: Duration(milliseconds: 300), // Optional: set transition duration
+    reverseDuration: Duration(milliseconds: 300), // Optional: set reverse duration
+  ),
+);
+
         break;
       default:
         break;
@@ -68,27 +81,40 @@ class _ProgressPageState extends State<ProgressPage> {
     switch (workerOrder.status) {
       case 'confirmation':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WorkerProgressPage(orderID: workerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose the desired transition type
+    alignment: Alignment.bottomCenter, // Optional: set the origin point for scaling
+    child: WorkerProgressPage(orderID: workerOrder.id.toString()),
+    duration: Duration(milliseconds: 300), // Optional: adjust duration
+    reverseDuration: Duration(milliseconds: 300), // Optional: adjust reverse duration
+  ),
+);
+
         break;
       case 'preparing':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WorkerArrivalPage(orderID: workerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose your preferred transition type
+    child: WorkerArrivalPage(orderID: workerOrder.id.toString()),
+    duration: Duration(milliseconds: 300), // Optional: transition duration
+    reverseDuration: Duration(milliseconds: 300), // Optional: reverse transition duration
+  ),
+);
+
         break;
       case 'working':
         Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => WorkerdonePage(orderID: workerOrder.id.toString()),
-          ),
-        );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose the transition type (fade, scale, etc.)
+    child: WorkerdonePage(orderID: workerOrder.id.toString()),
+    duration: Duration(milliseconds: 300), // Set transition duration
+    reverseDuration: Duration(milliseconds: 300), // Set reverse transition duration
+  ),
+);
+
         break;
       default:
         break;

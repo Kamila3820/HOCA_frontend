@@ -13,10 +13,18 @@ import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/createpost/createpost.dart';
 import 'package:hoca_frontend/pages/editpost/editpost.dart';
 import 'package:hoca_frontend/pages/mngpayment.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ManagePostPage extends StatefulWidget {
-  const ManagePostPage({super.key});
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const ManagePostPage({super.key,this.latitude,
+    this.longitude,
+    this.address,});
+  
 
   @override
   _ManagePostPageState createState() => _ManagePostPageState();
@@ -61,6 +69,15 @@ class _ManagePostPageState extends State<ManagePostPage> {
     }
   }
 
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
+  }
+
   void _showDeleteConfirmationDialog(BuildContext context, String postID, String? token, String resMessage) {
   showDialog(
     context: context,
@@ -79,10 +96,10 @@ class _ManagePostPageState extends State<ManagePostPage> {
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.grey, // No button color
+              backgroundColor: Colors.white, // No button color
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             ),
-            child: const Text('No', style: TextStyle(color: Colors.black),),
+            child: const Text('No', style: TextStyle(color: Colors.red),),
             onPressed: () {
               Navigator.of(context).pop(); // Close the dialog
             },
@@ -113,18 +130,23 @@ class _ManagePostPageState extends State<ManagePostPage> {
   switch (value) {
     case 'edit':
       Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => EditPostPage(postID: postID,)),
-      );
+  context,
+  PageTransition(
+    type: PageTransitionType.rightToLeft, // Choose your desired transition type
+    child: EditPostPage(postID: postID),
+  ),
+);
       break;
 
       case 'payment':
   Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (context) => const PaymentServiceFeePage(),
-    ),
-  );
+  context,
+  PageTransition(
+    type: PageTransitionType.bottomToTop, // Specify the transition type
+    duration: Duration(milliseconds: 500), // Set the duration of the transition
+    child: const PaymentServiceFeePage(),
+  ),
+);
   break;
 
     case 'open':
@@ -268,13 +290,20 @@ Future<void> _callApi(String url, String? token, String resMessage, {bool should
     color: Color.fromARGB(255, 0, 0, 0),
     size: 40.0,
   ),
-  onPressed: () {
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const MainScreen()),
-      (route) => false, // This removes all previous routes.
-    );
-  },
+  onPressed: () async {
+                                  final locationData = await _getSavedLocation();
+                                  Navigator.pushReplacement(
+  context,
+  PageTransition(
+    type: PageTransitionType.fade, // Choose your preferred transition type
+    child: MainScreen(
+      latitude: locationData['latitude'],
+      longitude: locationData['longitude'],
+      address: locationData['address'],
+    ),
+  ),
+);
+                                },
 ),
 
 
