@@ -56,7 +56,7 @@ class _WorkerPostState extends State<WorkerPost> {
   context,
   PageTransition(
     type: PageTransitionType.bottomToTop,
-    child: ReservePage(postID: widget.post.postID.toString()),
+    child: ReservePage(postID: widget.post.postID.toString(), workPrice: widget.post.price!, distancePrice: int.tryParse(widget.post.distanceFee ?? '0') ?? 0,),
     duration: const Duration(milliseconds: 400),
   ),
 );

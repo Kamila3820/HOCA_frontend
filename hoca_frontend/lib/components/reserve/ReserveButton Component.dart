@@ -4,8 +4,10 @@ import 'package:hoca_frontend/pages/reserve/reservepayment.dart';
 
 class ReserveButton extends StatefulWidget {
   final String postID;
+  final double workPrice;
+  final int distancePrice;
 
-  const ReserveButton({super.key, required this.postID});
+  const ReserveButton({super.key, required this.postID, required this.workPrice, required this.distancePrice});
 
   @override
   _ReserveButtonState createState() => _ReserveButtonState();
@@ -22,7 +24,7 @@ class _ReserveButtonState extends State<ReserveButton> {
           showDialog(
             context: context,
             builder: (BuildContext context) {
-              return PaymentDialog(postID: widget.postID,); // Use the new dialog widget here
+              return PaymentDialog(postID: widget.postID, workPrice: widget.workPrice, distancePrice: widget.distancePrice,); // Use the new dialog widget here
             },
           );
         },

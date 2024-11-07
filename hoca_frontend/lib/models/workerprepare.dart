@@ -34,6 +34,9 @@ class WorkerPrepare {
   @JsonKey(name: 'note')
   final String? note;
 
+  @JsonKey(name: 'duration')
+  final String? duration;
+
   @JsonKey(name: 'created_at')
   final String? createdAt;
 
@@ -47,6 +50,7 @@ class WorkerPrepare {
     required this.userAvatar,
     required this.location,
     required this.note,
+    required this.duration,
     required this.specPlace,
     required this.createdAt,
   });

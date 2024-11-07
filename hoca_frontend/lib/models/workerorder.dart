@@ -34,6 +34,9 @@ class WorkerOrder {
   @JsonKey(name: 'note')
   final String? note;
 
+  @JsonKey(name: 'duration')
+  final String? duration;
+
   @JsonKey(name: 'order_status')
   final String? status;
 
@@ -57,6 +60,7 @@ class WorkerOrder {
     required this.contactPhone,
     required this.userAvatar,
     required this.note,
+    required this.duration,
     required this.specPlace,
     required this.location,
     required this.createdAt,

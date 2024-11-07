@@ -19,6 +19,7 @@ WorkerPrepare _$WorkerPrepareFromJson(Map<String, dynamic> json) =>
       userAvatar: json['user_avatar'] as String?,
       location: json['location'] as String?,
       note: json['note'] as String?,
+      duration: json['duration'] as String?,
       specPlace: json['specific_place'] as String?,
       createdAt: json['created_at'] as String?,
     );
@@ -35,6 +36,7 @@ Map<String, dynamic> _$WorkerPrepareToJson(WorkerPrepare instance) =>
       'location': instance.location,
       'specific_place': instance.specPlace,
       'note': instance.note,
+      'duration': instance.duration,
       'created_at': instance.createdAt,
     };
 

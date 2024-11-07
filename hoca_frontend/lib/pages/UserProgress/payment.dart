@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
+import 'package:hoca_frontend/models/qrpayment.dart';
 import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -62,6 +63,28 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
       } else {
         throw Exception('Failed to load post');
       } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+  }
+
+  Future<void> callQRpayment(String orderID) async {
+    String url = "/v1/order/payment/qr/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.post(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+
+      final qrpay = QRpayment.fromJson(response.data);
     } catch (error) {
       Caller.handle(context, error as DioError); 
       rethrow; 

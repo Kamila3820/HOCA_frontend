@@ -12,8 +12,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentDialog extends StatefulWidget {
   final String postID;
+  final double workPrice;
+  final int distancePrice;
 
-  const PaymentDialog({super.key, required this.postID});
+  const PaymentDialog({super.key, required this.postID, required this.distancePrice, required this.workPrice});
 
   @override
   State<PaymentDialog> createState() => _PaymentDialogState();
@@ -132,7 +134,9 @@ class _PaymentDialogState extends State<PaymentDialog> {
           "contact_phone": _phoneController.text,
           "payment_type": _selectedPaymentMethod,
           "specific_place": _placeTypeController.text,
-          "note": _noteController.text
+          "note": _noteController.text,
+          "duration": _selectedPlaceOption,
+          "price": widget.workPrice + widget.distancePrice,
         },
         options: Options(
           headers: {
@@ -439,7 +443,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'Please select a place option';
+            return 'Please select a duration option';
           }
           return null;
         },
@@ -527,7 +531,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 style: GoogleFonts.poppins(),
               ),
               Text(
-                '฿1,000',
+                '฿${widget.workPrice}',
                 style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
               ),
             ],
@@ -536,11 +540,11 @@ class _PaymentDialogState extends State<PaymentDialog> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Discount:',
+                'Fare:',
                 style: GoogleFonts.poppins(),
               ),
               Text(
-                '-฿100',
+                '+฿${widget.distancePrice}',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   color: Colors.green,
@@ -557,7 +561,7 @@ class _PaymentDialogState extends State<PaymentDialog> {
                 style: GoogleFonts.poppins(fontSize: 16),
               ),
               Text(
-                '฿900',
+                '${widget.workPrice + widget.distancePrice}',
                 style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,

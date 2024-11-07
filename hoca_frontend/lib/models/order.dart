@@ -28,6 +28,9 @@ class Order {
   @JsonKey(name: 'note')
   final String? note;
 
+  @JsonKey(name: 'duration')
+  final String? duration;
+
   @JsonKey(name: 'order_status')
   final String? status;
 
@@ -55,6 +58,7 @@ class Order {
     required this.contactName,
     required this.contactPhone,
     required this.note,
+    required this.duration,
     required this.specPlace,
     required this.price,
     required this.payment,

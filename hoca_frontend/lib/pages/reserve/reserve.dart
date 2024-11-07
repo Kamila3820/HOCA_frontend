@@ -14,8 +14,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class ReservePage extends StatefulWidget {
   final String postID;
+  final double workPrice;
+  final int distancePrice;
 
-  const ReservePage({super.key, required this.postID});
+  const ReservePage({super.key, required this.postID, required this.workPrice, required this.distancePrice});
 
   @override
   _ReservePageState createState() => _ReservePageState();
@@ -140,7 +142,7 @@ class _ReservePageState extends State<ReservePage> {
                   ),
                 ),
                 // Reserve Button
-                ReserveButton(postID: post.postID.toString(),),
+                ReserveButton(postID: post.postID.toString(), workPrice: widget.workPrice, distancePrice: widget.distancePrice,),
               ],
             );
           }

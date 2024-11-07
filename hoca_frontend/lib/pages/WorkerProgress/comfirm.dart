@@ -417,7 +417,7 @@ void callConfirmOrder(String orderID) async {
       ),
     ),
     Text(
-      'Max 60 m² - 2 Taskers / 3 hours',
+      order.duration ?? "-",
       style: GoogleFonts.poppins(
         fontSize: 14,
         color: Colors.black87,
