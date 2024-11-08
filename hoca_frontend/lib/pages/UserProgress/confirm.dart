@@ -440,7 +440,7 @@ Navigator.pushReplacement(
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Please wait while the worker reviews and confirms within 7 minutes,\n'
+                                  'Please wait while the worker reviews and confirms within 4 minutes,\n'
                                   'You will be notified once the confirmation is complete.',
                                   style: GoogleFonts.poppins(
                                     fontSize: 14,

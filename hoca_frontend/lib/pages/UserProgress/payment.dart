@@ -5,7 +5,6 @@ import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/qrpayment.dart';
 import 'package:hoca_frontend/models/userorder.dart';
-import 'package:hoca_frontend/pages/history.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,12 +16,12 @@ class UserPaymentPage extends StatefulWidget {
   final String? address;
 
   const UserPaymentPage({
-    super.key,
+    Key? key,
     required this.orderID,
     this.latitude,
     this.longitude,
     this.address,
-  });
+  }) : super(key: key);
 
   @override
   State<UserPaymentPage> createState() => _UserPaymentPageState();
@@ -105,15 +104,19 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     if (order == null ||
         order.status == "complete" ||
         order.status == "cancelled") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ProgressPage()),
-      );
-    } else if (order.status == "complete") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HistoryPage()),
-      );
+      _getSavedLocation().then((locationData) {
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: MainScreen(
+              latitude: locationData['latitude'],
+              longitude: locationData['longitude'],
+              address: locationData['address'],
+            ),
+          ),
+        );
+      });
     }
   }
 
