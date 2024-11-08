@@ -11,10 +11,10 @@ class MessageNotificationTab extends StatelessWidget {
   final int selectedIndex;
 
   const MessageNotificationTab({
-    Key? key,
+    super.key,
     required this.onTabSelected,
     required this.selectedIndex,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -246,7 +246,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
       return HistoryCard(
         historyID: historyItem.historyID.toString(),
-        orderID: "ID"+historyItem.orderID!,
+        orderID: "ID${historyItem.orderID!}",
         name: historyItem.name!,
         date: formattedDate, 
         time: '',  
@@ -283,7 +283,7 @@ class _HistoryPageState extends State<HistoryPage> {
 
         return HistoryCard(
           historyID: historyItem.historyID.toString(),
-          orderID: "ID"+historyItem.orderID!,
+          orderID: "ID${historyItem.orderID!}",
           name: historyItem.name!,
           date: formattedDate, 
           time: '',  

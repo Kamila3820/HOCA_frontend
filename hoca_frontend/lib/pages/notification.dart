@@ -54,7 +54,7 @@ class _NotiPageState extends State<NotiPage> {
             .toList();
 
         if (notificationsList.isNotEmpty) {
-          String latestNotiID = notificationsList.first.notiID.toString()!;
+          String latestNotiID = notificationsList.first.notiID.toString();
 
           // If the latest notiID is different from the last fetched one, mark it as new
           if (lastFetchedNotiID == null || lastFetchedNotiID != latestNotiID) {

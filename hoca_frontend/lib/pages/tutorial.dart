@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class PetComparisonPage extends StatelessWidget {
-  const PetComparisonPage({Key? key}) : super(key: key);
+  const PetComparisonPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +60,7 @@ class PetComparisonPage extends StatelessWidget {
                 child: Stack(
                   children: [
                     Center(
-                      child: Container(
+                      child: SizedBox(
                         width: 40,
                         height: 40,
                         child: const Icon(
@@ -115,11 +115,11 @@ class PetFeatureCard extends StatelessWidget {
   final String description;
 
   const PetFeatureCard({
-    Key? key,
+    super.key,
     required this.icon,
     required this.title,
     required this.description,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

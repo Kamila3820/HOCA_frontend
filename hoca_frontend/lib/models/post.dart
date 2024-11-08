@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/userrating.dart';

@@ -16,12 +16,12 @@ class UserPaymentPage extends StatefulWidget {
   final String? address;
 
   const UserPaymentPage({
-    Key? key,
+    super.key,
     required this.orderID,
     this.latitude,
     this.longitude,
     this.address,
-  }) : super(key: key);
+  });
 
   @override
   State<UserPaymentPage> createState() => _UserPaymentPageState();

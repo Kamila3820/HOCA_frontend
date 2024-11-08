@@ -13,7 +13,7 @@ class PostLocation extends StatefulWidget {
 }
 
 class _PostLocationState extends State<PostLocation> {
-  static const LatLng _bangkokLocation = LatLng(13.7563, 100.5018);
+  static const LatLng _bangkokLocation = LatLng(13.6507, 100.4937);
   late LatLng _selectedLocation;
   String? _selectedAddress;
   GoogleMapController? _mapController;

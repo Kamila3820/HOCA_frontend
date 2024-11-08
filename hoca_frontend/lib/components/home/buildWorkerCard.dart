@@ -214,7 +214,7 @@ class _WorkerPostState extends State<WorkerPost> {
                             ),
                           ),
                         ),
-                      )).toList(),
+                      )),
                     ],
                   ),
                 ),

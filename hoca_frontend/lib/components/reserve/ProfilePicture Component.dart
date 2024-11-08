@@ -135,7 +135,7 @@ class ProfilePicture extends StatelessWidget {
                   _ratingRow('Maximum score', '${ratingMetrics?.maxScore}/10', Color(0xFF90D26D)),
                   _ratingRow('Minimum score', '${ratingMetrics?.minScore}/10', Colors.yellow.shade300),
                   _starRatingRow('Avg. Work', ratingMetrics!.avgWork!),
-                  _starRatingRow('Avg. Security', ratingMetrics!.avgSecurity!),
+                  _starRatingRow('Avg. Security', ratingMetrics.avgSecurity!),
                 ],
               ),
             ),
