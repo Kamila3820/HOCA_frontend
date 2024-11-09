@@ -31,10 +31,14 @@ class UserOrder {
   @JsonKey(name: 'price')
   final double? price;
 
+  @JsonKey(name: 'paid')
+  final bool? paid;
+
   UserOrder({
     required this.id,
     required this.userID,
     required this.price,
+    required this.paid,
     required this.payment,
     required this.postID,
     required this.status,

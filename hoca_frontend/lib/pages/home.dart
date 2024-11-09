@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/home/home_components.dart';
 import 'package:hoca_frontend/models/post.dart';
+import 'package:hoca_frontend/models/profile.dart';
 import 'package:hoca_frontend/pages/locatelocation.dart';
 import 'package:hoca_frontend/pages/notification.dart';
 import 'package:hoca_frontend/pages/service/cleaning.dart';
@@ -26,6 +27,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  String? username;
+  Profile? profile;
   List<Post> posts = [];
   String selectedLatitude = "";
   String selectedLongitude = "";
@@ -44,6 +47,7 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       checkNewNotifications();
+      callUserName();
       SharedPreferences prefs = await SharedPreferences.getInstance();
 
       if (widget.latitude != null && widget.longitude != null) {
@@ -74,6 +78,23 @@ class _HomePageState extends State<HomePage> {
           showLocationAlert();
         }
       }
+    });
+  }
+
+  void callUserName() async {
+    String url = "/v1/user/profile";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    Caller.dio.get(
+      url,
+      options: Options(
+        headers: {'x-auth-token': '$token'},
+      ),
+    ).then((response) {
+      profile = Profile.fromJson(response.data);
+    }).onError((DioException error, _) {
+      Caller.handle(context, error);
     });
   }
 
@@ -216,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                               children: [
                                 const TextSpan(text: 'Welcome!, '),
                                 TextSpan(
-                                  text: 'Jiblek',
+                                  text: profile?.username!,
                                   style: GoogleFonts.poppins(
                                     textStyle: const TextStyle(fontWeight: FontWeight.bold),
                                   ),

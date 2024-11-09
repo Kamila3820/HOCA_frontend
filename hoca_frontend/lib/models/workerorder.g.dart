@@ -10,6 +10,7 @@ WorkerOrder _$WorkerOrderFromJson(Map<String, dynamic> json) => WorkerOrder(
       id: (json['id'] as num).toInt(),
       userID: json['user_id'] as String?,
       price: (json['price'] as num?)?.toDouble(),
+      paid: json['paid'] as bool?,
       payment: json['payment_type'] as String?,
       postID: (json['worker_post_id'] as num?)?.toInt(),
       status: json['order_status'] as String?,
@@ -39,6 +40,7 @@ Map<String, dynamic> _$WorkerOrderToJson(WorkerOrder instance) =>
       'duration': instance.duration,
       'order_status': instance.status,
       'price': instance.price,
+      'paid': instance.paid,
       'created_at': instance.createdAt,
       'ended_at': instance.endedAt,
     };

@@ -6,6 +6,7 @@ import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/workerorder.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/complete.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
+import 'package:hoca_frontend/pages/history.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -89,7 +90,7 @@ void callCompleteOrder(String orderID) async {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => WorkerArrivalPage(orderID: orderID,)),
+        MaterialPageRoute(builder: (context) => HistoryPage()),
       );
     } on DioException catch (error) {
       // Handle error

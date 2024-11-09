@@ -1,17 +1,172 @@
+import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/models/inquirypayment.dart';
+import 'package:qr_flutter/qr_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentServiceFeePage extends StatefulWidget {
-  const PaymentServiceFeePage({super.key});
+  final String postID;
+
+  const PaymentServiceFeePage({super.key, required this.postID});
 
   @override
   _PaymentServiceFeePageState createState() => _PaymentServiceFeePageState();
 }
 
 class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
-  
-  final double serviceFee = 99.99;
+  String? qrImageBase64; // To store the base64 image data
+  int? orderCount;
+  int? amount;
+  String? startFrom;
+  String? endFrom;
+  String? endedAt;
+  Timer? _timer;
 
+
+  @override
+  void initState() {
+    super.initState();
+    _initializePaymentProcess(widget.postID);
+  }
+
+  Future<void> _initializePaymentProcess(String postID) async {
+  String? transactionId = await _fetchQRPayment(postID);
+  if (transactionId != null) {
+    _startPollingPaymentStatus(transactionId);
+  } else {
+    print('Transaction ID not available');
+  }
+}
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
+  }
+
+  void _startPollingPaymentStatus(String transactionId) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      checkPaymentStatus(transactionId);
+    });
+  }
+
+  Future<String?> _fetchQRPayment(String orderID) async {
+  try {
+    final response = await callQRpayment(orderID);
+    if (response != null && response['transactionId'] != null) {
+      setState(() {
+        qrImageBase64 = response['qrImageBase64']; // Set QR code data if applicable
+      });
+      orderCount = response['order_count'];
+      amount = response['amount'];
+      startFrom = response['start_from'];
+      endFrom = response['end_from'];
+      endedAt = response['ended_at'];
+      return response['transactionId']; // Return the transaction ID
+    }
+  } catch (e) {
+    print('Error fetching QR payment: $e');
+  }
+  return null;
+}
+
+
+  Future<Map<String, dynamic>?> callQRpayment(String postID) async {
+    String url = "/v1/order/worker/fee/$postID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.post(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 201) {
+        // Assuming the response data includes 'transactionId' and 'qrImageBase64'
+        return {
+          'transactionId': response.data['transactionId'],
+          'qrImageBase64': response.data['qrRawData'],
+          'order_count': response.data['order_count'],
+          'amount': response.data['amount'],
+          'start_from': response.data['start_from'],
+          'end_from': response.data['end_from'],
+          'ended_at': response.data['ended_at'],
+        };
+      } else {
+        print('Failed to get QR payment');
+      }
+    } catch (error) {
+      Caller.handle(context, error as DioError);
+      print('Error in callQRpayment: $error');
+    }
+    return null;
+}
+
+  Future<void> checkPaymentStatus(String transactionId) async {
+    String url = "/v1/order/payment/fee"; // Adjust the endpoint accordingly
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        data: {
+          "transactionId": transactionId,
+        },
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        final inquiry = InquiryPayment.fromJson(response.data);
+        // Handle the response data (e.g., payment status, transaction details)
+        print("Payment status: ${inquiry.paymentSuccess}");
+        if (inquiry.paymentSuccess == true) {
+          _timer?.cancel();
+          // If payment is successful, handle the success scenario
+          showPaymentSuccess();
+        }
+      } else {
+        print('Failed to check payment status');
+      }
+    } catch (error) {
+      Caller.handle(context, error as DioError);
+      print('Error in checkPaymentStatus: $error');
+    }
+  }
+
+  void showPaymentSuccess() {
+    // Display a success message or navigate to a success page
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Payment Success'),
+        content: Text('The payment has been confirmed.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              
+              // Optionally, navigate to another page
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -85,7 +240,7 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                           ),
                           const SizedBox(height: 15),
                           Text(
-                            'Amount: \$${serviceFee.toStringAsFixed(2)}',
+                            'Amount: \$${amount}',
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
                                 fontSize: 18,
@@ -95,7 +250,7 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                           ),
                           const SizedBox(height: 10),
                           Text(
-                            'This fee includes:',
+                            'This fee details:',
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
                                 fontSize: 16,
@@ -104,10 +259,9 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          _buildFeatureItem('Profile visibility boost'),
-                          _buildFeatureItem('Priority in search results'),
-                          _buildFeatureItem('Access to premium features'),
-                          _buildFeatureItem('24/7 customer support'),
+                          _buildFeatureItem('Period: ${startFrom!.replaceAll("-", "/")} - ${endFrom!.replaceAll("-", "/")}'),
+                          _buildFeatureItem('Cash order amount: ${orderCount}'),
+                          _buildFeatureItem('A fee collected to pay for services \nrelated to the order by cash'),
                         ],
                       ),
                     ),
@@ -124,6 +278,10 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
+                        
+                          // QR Code Image
+
+                        if (qrImageBase64 != null && qrImageBase64!.isNotEmpty) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: Image.asset(
@@ -133,7 +291,6 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                             ),
                           ),
                           const SizedBox(height: 10),
-                          // QR Code Image
                           Container(
                             padding: const EdgeInsets.all(1),
                             decoration: BoxDecoration(
@@ -148,10 +305,9 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                                 ),
                               ],
                             ),
-                            child: Image.asset(
-                              'assets/images/qrcode.png',
-                              height: 200,
-                              fit: BoxFit.contain,
+                            child: QrImageView(
+                              data: qrImageBase64!, // The text to encode
+                              size: 300.0, // Size of the QR code
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -165,7 +321,7 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                             ),
                           ),
                           Text(
-                            'Please confirm the order before: 11/4/24 13:30',
+                            'Please confirm the order before: ${endedAt!.replaceAll("-", "/")}',
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
                                 fontSize: 14,
@@ -174,38 +330,39 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                               ),
                             ),
                           ),
+                        ] else ... [
+                          Container(
+                            height: 300,
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.1),
+                                  spreadRadius: 4,
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              'No Overdue balance Available',
+                              style: GoogleFonts.poppins(
+                                textStyle: const TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.grey,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ),
+                          ),
+                          ]
                         ],
                       ),
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Payment Button
-                  Center(
-  child: SizedBox(
-    width: 300, // Set a custom width as needed
-    height: 50,
-    child: ElevatedButton(
-      onPressed: () {
-        // Show payment confirmation dialog
-        _showPaymentConfirmationDialog();
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: const Color(0xFF87C4FF),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(25),
-        ),
-      ),
-      child: Text(
-        'Proceed to Payment',
-        style: GoogleFonts.poppins(
-          textStyle: const TextStyle(fontSize: 18),
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-      ),
-    ),
-  ),
-),
 
                 ],
               ),
@@ -266,7 +423,7 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
             ),
           ),
           TextSpan(
-            text: '\$${serviceFee.toStringAsFixed(2)}',
+            text: '\$${amount}',
             style: GoogleFonts.poppins(
               color: Colors.black,
             ),

@@ -43,6 +43,9 @@ class WorkerOrder {
   @JsonKey(name: 'price')
   final double? price;
 
+  @JsonKey(name: 'paid')
+  final bool? paid;
+
   @JsonKey(name: 'created_at')
   final String? createdAt;
 
@@ -53,6 +56,7 @@ class WorkerOrder {
     required this.id,
     required this.userID,
     required this.price,
+    required this.paid,
     required this.payment,
     required this.postID,
     required this.status,

@@ -1,20 +1,105 @@
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/models/userorder.dart';
+import 'package:hoca_frontend/pages/progress.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class PaymentSuccessPage extends StatelessWidget {
-  final String customerName;
-  final String orderId;
-  
-  const PaymentSuccessPage({
-    super.key, 
-    this.customerName = "Artiwara Kongmalai",
-    this.orderId = "ID344546",
+class PaymentSuccessPage extends StatefulWidget {
+  final String orderID;
+  final String? latitude;
+  final String? longitude;
+  final String? address;
+
+  const PaymentSuccessPage({super.key, required this.orderID,
+    this.latitude,
+    this.longitude,
+    this.address,
   });
+
+  @override
+  State<PaymentSuccessPage> createState() => _PaymentSuccessPageState();
+}
+
+class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
+  late Future<UserOrder?> orderFuture;
+
+   @override
+    void initState() {
+      super.initState();
+      orderFuture = fetchOrderById(widget.orderID);
+    }
+
+  Future<UserOrder?> fetchOrderById(String orderID) async {
+    String url = "/v1/order/user/$orderID";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        options: Options(
+          headers: {
+            'x-auth-token': '$token', // Add token to header
+          },
+        ),
+      );
+      if (response.statusCode == 200) {
+        return UserOrder.fromJson(response.data);
+      } else if (response.statusCode == 404 || response.statusCode == 500) {
+        return null;
+      } else {
+        throw Exception('Failed to load post');
+      } 
+    } catch (error) {
+      Caller.handle(context, error as DioError); 
+      rethrow; 
+    }
+  }
+
+  void handleNavigation(UserOrder? order) {
+    if (order == null || order.status == "complete" || order.status == "cancelled") {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => ProgressPage()),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
+      body: FutureBuilder<UserOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+            } else {
+              final order = snapshot.data!;
+
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                handleNavigation(order);
+              });
+
+
+              return SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
@@ -50,7 +135,6 @@ class PaymentSuccessPage extends StatelessWidget {
                     _buildProgressStep('Confirm', isActive: false, isCompleted: false),
                     _buildProgressStep('Preparing', isActive: false, isCompleted: false),
                     _buildProgressStep('Working', isActive: true, isCompleted: true),
-                    _buildProgressStep('Complete', isActive: false, isCompleted: false),
                   ],
                 ),
               ),
@@ -60,18 +144,24 @@ class PaymentSuccessPage extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 28,
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, color: Colors.white, size: 30),
-                    ),
+                    order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+                    ? CircleAvatar(
+                        radius: 28,
+                        backgroundImage: NetworkImage(order.workerAvatar!),
+                        backgroundColor: Colors.transparent, // Optional
+                      )
+                    : const CircleAvatar(
+                        radius: 28,
+                        backgroundColor: Colors.grey,
+                        child: Icon(Icons.person, color: Colors.white, size: 30),
+                      ),
                     const SizedBox(width: 15),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start, // Corrected property name
                         children: [
                           Text(
-                            customerName,
+                            order.workerName!,
                             style: GoogleFonts.poppins(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -94,7 +184,7 @@ class PaymentSuccessPage extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Order ID: $orderId',
+                                'Order ID: ${widget.orderID}',
                                 style: GoogleFonts.poppins(
                                   fontSize: 14,
                                   color: Colors.black,
@@ -173,9 +263,15 @@ Padding(
             ],
           ),
         ),
+              );
+            }
+        },
       ),
     );
   }
+
+            }
+      
 
   Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
     return Expanded(
@@ -204,4 +300,4 @@ Padding(
       ),
     );
   }
-}
+

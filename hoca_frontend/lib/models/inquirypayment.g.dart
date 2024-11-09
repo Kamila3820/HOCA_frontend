@@ -8,7 +8,7 @@ part of 'inquirypayment.dart';
 
 InquiryPayment _$InquiryPaymentFromJson(Map<String, dynamic> json) =>
     InquiryPayment(
-      paymentSuccess: json['paymentSuccess'] as String?,
+      paymentSuccess: json['paymentSuccess'] as bool?,
       message: json['message'] as String?,
     );
 

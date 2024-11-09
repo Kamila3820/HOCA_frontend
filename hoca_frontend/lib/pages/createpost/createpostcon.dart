@@ -34,6 +34,7 @@ class _CreatePostConState extends State<CreatePostCon> {
   final List<int> _selectedBoxIndices = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _selectedFamilyAmount;
+  String? _selectedDuration;
   LatLng? _currentLocation;
   String _locationName = "Choose Your Location"; // Default location text
   bool _isDurationSelected = false;
@@ -196,10 +197,18 @@ class _CreatePostConState extends State<CreatePostCon> {
         "prompt_pay": widget.formData?["idLine"],
         "gender": widget.formData?["gender"],
         "amount_family": _selectedFamilyAmount,
-        // "duration": ,
+        "duration": _selectedDuration,
         "available_start": widget.formData?["availableStart"],
         "available_end": widget.formData?["availableEnd"],
       });
+
+      print(widget.formData?["categories"]);
+      print(widget.formData?["availableStart"]);
+      print(widget.formData?["availableEnd"]);
+      print(_locationName);
+      print(_currentLocation?.latitude.toString());
+      print( _currentLocation?.longitude.toString());
+      print(_selectedDuration);
 
       final prefs = await SharedPreferences.getInstance();
       final token = prefs.getString('token');
@@ -208,6 +217,7 @@ class _CreatePostConState extends State<CreatePostCon> {
           'x-auth-token': '$token', 
         },
       ),);
+
 
       Navigator.pushReplacement(
         context,
@@ -252,6 +262,15 @@ class _CreatePostConState extends State<CreatePostCon> {
             onDurationSelected: (selected) {
               setState(() {
                 _isDurationSelected = selected;
+                print("Testttttttt Duration");
+                print(_isDurationSelected);
+              });
+            },
+            durationForm: (value) {
+              setState(() {
+                _selectedDuration = value;
+                print("Testttttttt Duration");
+                print(_selectedDuration);
               });
             },
           ),

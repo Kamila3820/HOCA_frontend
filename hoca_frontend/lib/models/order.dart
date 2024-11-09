@@ -37,6 +37,9 @@ class Order {
   @JsonKey(name: 'price')
   final double? price;
 
+  @JsonKey(name: 'paid')
+  final bool? paid;
+
   @JsonKey(name: 'is_cancel')
   final bool? isCancel;
 
@@ -61,6 +64,7 @@ class Order {
     required this.duration,
     required this.specPlace,
     required this.price,
+    required this.paid,
     required this.payment,
     required this.postID,
     required this.status,

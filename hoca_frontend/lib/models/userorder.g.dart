@@ -10,6 +10,7 @@ UserOrder _$UserOrderFromJson(Map<String, dynamic> json) => UserOrder(
       id: (json['id'] as num).toInt(),
       userID: json['user_id'] as String?,
       price: (json['price'] as num?)?.toDouble(),
+      paid: json['paid'] as bool?,
       payment: json['payment_type'] as String?,
       postID: (json['worker_post_id'] as num?)?.toInt(),
       status: json['order_status'] as String?,
@@ -28,4 +29,5 @@ Map<String, dynamic> _$UserOrderToJson(UserOrder instance) => <String, dynamic>{
       'payment_type': instance.payment,
       'order_status': instance.status,
       'price': instance.price,
+      'paid': instance.paid,
     };

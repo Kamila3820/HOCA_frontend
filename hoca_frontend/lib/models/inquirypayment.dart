@@ -5,7 +5,7 @@ part 'inquirypayment.g.dart';
 @JsonSerializable()
 class InquiryPayment {
   @JsonKey(name: 'paymentSuccess')
-  final String? paymentSuccess;
+  final bool? paymentSuccess;
 
   @JsonKey(name: 'message')
   final String? message;

@@ -122,7 +122,7 @@ class _ManagePostPageState extends State<ManagePostPage> {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (context) => const PaymentServiceFeePage(),
+      builder: (context) => PaymentServiceFeePage(postID: postID,),
     ),
   );
   break;

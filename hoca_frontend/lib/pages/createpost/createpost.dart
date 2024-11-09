@@ -23,6 +23,14 @@ class _CreatePostPageState extends State<CreatePostPage> {
   TimeOfDay _startTime = TimeOfDay.now();
   TimeOfDay _endTime = TimeOfDay.now();
 
+  String formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod; // Convert 0 to 12 for AM/PM format
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    final minutes = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minutes $period';
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -44,19 +52,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
   }
 
   void _toggleCategory(int category) {
-    setState(() {
-      if (_selectedCategories.contains(category)) {
-        _selectedCategories.remove(category);
-      } else if (_selectedCategories.length < 3) {
-        _selectedCategories.add(category);
-      }
-      if (_selectedCategories.contains(category)) {
-        _selectedCategories.remove(category);
-      } else if (_selectedCategories.length < 3) {
-        _selectedCategories.add(category);
-      }
-    });
-  }
+  setState(() {
+    if (_selectedCategories.contains(category)) {
+      _selectedCategories.remove(category);
+    } else if (_selectedCategories.length < 3) {
+      _selectedCategories.add(category);
+    }
+  });
+}
+
 
 // In CreatePostPage class, update the _submitForm method:
 
@@ -101,9 +105,11 @@ void _submitForm() {
       "description": _controllers['description']!.text,
       "gender": _selectedGender,
       "categories": _selectedCategories.join(','),
-      "availableStart": _startTime.toString(),
-      "availableEnd": _endTime.toString(),
+      "availableStart": formatTimeOfDay(_startTime),
+      "availableEnd": formatTimeOfDay(_endTime),
     };
+    print(formatTimeOfDay(_startTime));
+    print(formatTimeOfDay(_endTime));
 Navigator.push(
   context,
   PageTransition(

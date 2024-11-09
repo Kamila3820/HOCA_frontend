@@ -1,3 +1,8 @@
+import 'dart:async';
+import 'dart:convert';
+import 'package:hoca_frontend/models/inquirypayment.dart';
+import 'package:hoca_frontend/pages/UserProgress/paymentsucces.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPaymentPage extends StatefulWidget {
   final String orderID;
-    final String? latitude;
+  final String? latitude;
   final String? longitude;
   final String? address;
 
@@ -26,6 +31,8 @@ class UserPaymentPage extends StatefulWidget {
 
 class _UserPaymentPageState extends State<UserPaymentPage> {
   late Future<UserOrder?> orderFuture;
+  String? qrImageBase64; // To store the base64 image data
+  Timer? _timer;
 
  Future<Map<String, String>> _getSavedLocation() async {
     final prefs = await SharedPreferences.getInstance();
@@ -40,6 +47,28 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
   void initState() {
     super.initState();
     orderFuture = fetchOrderById(widget.orderID);
+    _initializePaymentProcess(widget.orderID);
+  }
+
+  Future<void> _initializePaymentProcess(String orderID) async {
+  String? transactionId = await _fetchQRPayment(orderID);
+  if (transactionId != null) {
+    _startPollingPaymentStatus(transactionId);
+  } else {
+    print('Transaction ID not available');
+  }
+}
+
+  @override
+  void dispose() {
+    _timer?.cancel(); // Cancel the timer when the widget is disposed
+    super.dispose();
+  }
+
+  void _startPollingPaymentStatus(String transactionId) {
+    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
+      checkPaymentStatus(transactionId);
+    });
   }
 
   Future<UserOrder?> fetchOrderById(String orderID) async {
@@ -69,7 +98,23 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     }
   }
 
-  Future<void> callQRpayment(String orderID) async {
+  Future<String?> _fetchQRPayment(String orderID) async {
+  try {
+    final response = await callQRpayment(orderID);
+    if (response != null && response['transactionId'] != null) {
+      setState(() {
+        qrImageBase64 = response['qrImageBase64']; // Set QR code data if applicable
+      });
+      return response['transactionId']; // Return the transaction ID
+    }
+  } catch (e) {
+    print('Error fetching QR payment: $e');
+  }
+  return null;
+}
+
+
+  Future<Map<String, dynamic>?> callQRpayment(String orderID) async {
     String url = "/v1/order/payment/qr/$orderID";
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
@@ -79,17 +124,86 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
         url,
         options: Options(
           headers: {
+            'x-auth-token': '$token',
+          },
+        ),
+      );
+
+      if (response.statusCode == 201) {
+        // Assuming the response data includes 'transactionId' and 'qrImageBase64'
+        return {
+          'transactionId': response.data['transactionId'],
+          'qrImageBase64': response.data['qrRawData'],
+        };
+      } else {
+        print('Failed to get QR payment');
+      }
+    } catch (error) {
+      Caller.handle(context, error as DioError);
+      print('Error in callQRpayment: $error');
+    }
+    return null;
+}
+
+
+  Future<void> checkPaymentStatus(String transactionId) async {
+    String url = "/v1/order/payment/inquiry"; // Adjust the endpoint accordingly
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await Caller.dio.get(
+        url,
+        data: {
+          "transactionId": transactionId,
+        },
+        options: Options(
+          headers: {
             'x-auth-token': '$token', // Add token to header
           },
         ),
       );
 
-      final qrpay = QRpayment.fromJson(response.data);
+      if (response.statusCode == 200) {
+        final inquiry = InquiryPayment.fromJson(response.data);
+        // Handle the response data (e.g., payment status, transaction details)
+        print("Payment status: ${inquiry.paymentSuccess}");
+        if (inquiry.paymentSuccess == true) {
+          _timer?.cancel();
+          // If payment is successful, handle the success scenario
+          showPaymentSuccess();
+        }
+      } else {
+        print('Failed to check payment status');
+      }
     } catch (error) {
-      Caller.handle(context, error as DioError); 
-      rethrow; 
+      Caller.handle(context, error as DioError);
+      print('Error in checkPaymentStatus: $error');
     }
   }
+
+  void showPaymentSuccess() {
+    // Display a success message or navigate to a success page
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Payment Success'),
+        content: Text('The payment has been confirmed.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => PaymentSuccessPage(orderID: widget.orderID,)),
+          );
+              // Optionally, navigate to another page
+            },
+            child: Text('OK'),
+          ),
+        ],
+      ),
+    );
+  } 
 
   void handleNavigation(UserOrder? order) {
     if (order == null || order.status == "complete" || order.status == "cancelled") {
@@ -135,6 +249,10 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 handleNavigation(order);
               });
+
+              if (order.payment == 'qrcode' && qrImageBase64 == null) {
+                _fetchQRPayment(order.id.toString()); // Call method to fetch QR code
+              }
 
 
               return Column(
@@ -264,39 +382,33 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
 
           const SizedBox(height: 10),
 
-          // PromptPay Image
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            child: Image.asset(
-              'assets/images/promptpay.png',
-              height: 70,
-              fit: BoxFit.contain,
+          if (order.payment == 'qrcode' && qrImageBase64 != null && qrImageBase64!.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 4,
+                    blurRadius: 8,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: QrImageView(
+                data: qrImageBase64!, // The text to encode
+                size: 300.0, // Size of the QR code
+              ),
+            )
+          else
+            Icon(
+              Icons.monetization_on,
+              size: 100,
+              color: Colors.green,
             ),
-          ),
 
-          const SizedBox(height: 10),
-
-          // QR Code Image
-          Container(
-            padding: const EdgeInsets.all(1),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  spreadRadius: 4,
-                  blurRadius: 8,
-                  offset: const Offset(0, 6),
-                ),
-              ],
-            ),
-            child: Image.asset(
-              'assets/images/qrcode.png',
-              height: 300,
-              fit: BoxFit.contain,
-            ),
-          ),
 
           const SizedBox(height: 10),
 
@@ -309,22 +421,26 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
             ),
           ),
 
-          Text(
-            'This QR Code can use only 1 time',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.red,
+          if (order.payment == 'qrcode')
+            Column(
+              children: [
+                Text(
+                  'This QR Code can be used only 1 time',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.red,
+                  ),
+                ),
+                Text(
+                  'Please pay within 30 minutes',
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.black87,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
             ),
-          ),
-
-          Text(
-            'Please pay within 30 minutes',
-            style: GoogleFonts.poppins(
-              fontSize: 14,
-              color: Colors.black87,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
         ],
               );
             }

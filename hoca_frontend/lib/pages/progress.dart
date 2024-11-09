@@ -6,6 +6,7 @@ import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/models/workerorder.dart';
 import 'package:hoca_frontend/pages/UserProgress/confirm.dart';
 import 'package:hoca_frontend/pages/UserProgress/payment.dart';
+import 'package:hoca_frontend/pages/UserProgress/paymentsucces.dart';
 import 'package:hoca_frontend/pages/UserProgress/preparing.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/comfirm.dart';
 import 'package:hoca_frontend/pages/WorkerProgress/preparing.dart';
@@ -50,12 +51,21 @@ class _ProgressPageState extends State<ProgressPage> {
         );
         break;
       case 'working':
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => UserPaymentPage(orderID: customerOrder.id.toString()),
-          ),
-        );
+        if (customerOrder.paid == true) {
+            Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => UserPaymentPage(orderID: customerOrder.id.toString()),
+            ),
+          );
+        } else if (customerOrder.paid == false) {
+            Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PaymentSuccessPage(orderID: customerOrder.id.toString()),
+            ),
+          );
+        }
         break;
       default:
         break;
