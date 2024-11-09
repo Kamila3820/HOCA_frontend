@@ -4,10 +4,7 @@ import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/location.dart';
 import 'package:hoca_frontend/pages/locatelocation.dart';
-import 'package:http/http.dart' as http;
 import 'package:page_transition/page_transition.dart';
-import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CheckUserLocationPage extends StatefulWidget {
@@ -33,7 +30,6 @@ class _CheckUserLocationPageState extends State<CheckUserLocationPage> {
     String? token = prefs.getString('token');
     
     try {
-      // Replace with your API endpoint
       final response = await Caller.dio.get(
         '/v1/user/location',
         options: Options(
@@ -52,79 +48,72 @@ class _CheckUserLocationPageState extends State<CheckUserLocationPage> {
             longtitude = userLo?.longtitude!;
           });
         }
-      }
 
-      setState(() {
-        _isLoading = false;
-      });
-
-      // Delay for 2 seconds, then navigate to another page based on location availability
-      if (userLo != null && userLo!.location!.isNotEmpty) {
-        Navigator.of(context).pushReplacement(
-          PageTransition(
-            type: PageTransitionType.fade,
-            child: MainScreen(
-              latitude: userLo?.latitude!,
-              longitude: userLo?.longtitude!,
-              address: userLo?.location!,
-            ),
-            duration: const Duration(milliseconds: 10000),
-            curve: Curves.easeInOut,
-          ),
-        );
+        // Navigate based on whether location exists
+        if (userLo != null && userLo!.location!.isNotEmpty) {
+          if (mounted) {  // Check if widget is still mounted
+            Navigator.of(context).pushReplacement(
+              PageTransition(
+                type: PageTransitionType.rightToLeft,
+                child: MainScreen(
+                  latitude: userLo?.latitude!,
+                  longitude: userLo?.longtitude!,
+                  address: userLo?.location!,
+                ),
+                duration: const Duration(milliseconds: 300),  // Reduced duration
+                curve: Curves.easeInOut,
+              ),
+            );
+          }
+        } else {
+          if (mounted) {  // Check if widget is still mounted
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => LocateLocationPage(),
+              ),
+            );
+          }
+        }
       } else {
-        Future.delayed(Duration(seconds: 2), () {
-          Navigator.push(
-            context,
+        // Handle non-200 status code
+        if (mounted) {
+          Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => LocateLocationPage(),
             ),
           );
-        });
+        }
       }
     } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
       print('Error checking user location: $e');
+      // Navigate to LocateLocationPage on error
+      if (mounted) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => LocateLocationPage(),
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
-
-    if (userLo != null && userLo!.location!.isNotEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('User Location'),
-        ),
-        body: Center(
-          child: Text(
-            'Your current location:\n${userLo!.location}\nLatitude: ${userLo!.latitude}\nLongitude: ${userLo!.longtitude}',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-    } else {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Locate Your Location!'),
-        ),
-        body: Center(
-          child: Text(
-            'Please choose the area to find worker.',
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-        ),
-      );
-    }
+    return Scaffold(
+      body: Center(
+        child: _isLoading
+            ? CircularProgressIndicator()
+            : Text(
+                'Please choose the area to find worker.',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+      ),
+    );
   }
 }

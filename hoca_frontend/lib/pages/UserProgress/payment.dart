@@ -1,17 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:hoca_frontend/models/inquirypayment.dart';
-import 'package:hoca_frontend/pages/UserProgress/paymentsucces.dart';
-import 'package:qr_flutter/qr_flutter.dart';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/main.dart';
-import 'package:hoca_frontend/models/qrpayment.dart';
+import 'package:hoca_frontend/models/inquirypayment.dart';
 import 'package:hoca_frontend/models/userorder.dart';
+import 'package:hoca_frontend/pages/UserProgress/paymentsucces.dart';
 import 'package:hoca_frontend/pages/progress.dart';
 import 'package:page_transition/page_transition.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPaymentPage extends StatefulWidget {
@@ -80,11 +79,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     });
   }
 
-  Future<void> _refreshOrder() async {
-    setState(() {
-      orderFuture = fetchOrderById(widget.orderID);
-    });
-  }
+  
 
   Future<UserOrder?> fetchOrderById(String orderID) async {
     String url = "/v1/order/user/$orderID";
@@ -509,6 +504,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               ],
             ),
         ],
+                ),
               );
             }
           },
