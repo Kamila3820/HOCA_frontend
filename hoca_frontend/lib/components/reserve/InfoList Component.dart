@@ -31,7 +31,7 @@ class InfoList extends StatelessWidget {
         buildInfoTile(Icons.phone, phoneNumber!),
         buildInfoTile(Icons.home, placeTypeNames),
         buildInfoTile(Icons.people, 'Acceptable range of family size: $amountPeople'),
-         buildInfoTile(Icons.av_timer, 'Max: ${duration}'),
+         buildInfoTile(Icons.av_timer, 'Max: $duration'),
         const SizedBox(height: 10), // Add some spacing
         Row(
           children: [

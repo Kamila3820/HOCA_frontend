@@ -11,6 +11,7 @@ import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/qrpayment.dart';
 import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/progress.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class UserPaymentPage extends StatefulWidget {
@@ -19,8 +20,10 @@ class UserPaymentPage extends StatefulWidget {
   final String? longitude;
   final String? address;
 
-  const UserPaymentPage({super.key, required this.orderID,
-   this.latitude,
+  const UserPaymentPage({
+    super.key,
+    required this.orderID,
+    this.latitude,
     this.longitude,
     this.address,
   });
@@ -34,7 +37,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
   String? qrImageBase64; // To store the base64 image data
   Timer? _timer;
 
- Future<Map<String, String>> _getSavedLocation() async {
+  Future<Map<String, String>> _getSavedLocation() async {
     final prefs = await SharedPreferences.getInstance();
     return {
       'latitude': prefs.getString('latitude') ?? '',
@@ -71,6 +74,18 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     });
   }
 
+  Future<void> _refreshOrder() async {
+    setState(() {
+      orderFuture = fetchOrderById(widget.orderID);
+    });
+  }
+
+  Future<void> _refreshOrder() async {
+    setState(() {
+      orderFuture = fetchOrderById(widget.orderID);
+    });
+  }
+
   Future<UserOrder?> fetchOrderById(String orderID) async {
     String url = "/v1/order/user/$orderID";
     final prefs = await SharedPreferences.getInstance();
@@ -91,10 +106,10 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
         return null;
       } else {
         throw Exception('Failed to load post');
-      } 
+      }
     } catch (error) {
-      Caller.handle(context, error as DioError); 
-      rethrow; 
+      Caller.handle(context, error as DioError);
+      rethrow;
     }
   }
 
@@ -206,43 +221,51 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
   } 
 
   void handleNavigation(UserOrder? order) {
-    if (order == null || order.status == "complete" || order.status == "cancelled") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ProgressPage()),
-      );
-    } else if (order.status == "complete") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => UserPaymentPage(orderID: widget.orderID)),
-      );
+    if (order == null ||
+        order.status == "complete" ||
+        order.status == "cancelled") {
+      _getSavedLocation().then((locationData) {
+        Navigator.pushReplacement(
+          context,
+          PageTransition(
+            type: PageTransitionType.fade,
+            child: MainScreen(
+              latitude: locationData['latitude'],
+              longitude: locationData['longitude'],
+              address: locationData['address'],
+            ),
+          ),
+        );
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: FutureBuilder<UserOrder?>(
-        future: orderFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProgressPage()),
-                );
-              });
-              return const Center(child: CircularProgressIndicator()); 
-          } else if (!snapshot.hasData) {
+      body: RefreshIndicator(
+        onRefresh: _refreshOrder,
+        child: FutureBuilder<UserOrder?>(
+          future: orderFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => ProgressPage()),
                 );
               });
-              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
+              return const Center(child: CircularProgressIndicator());
+            } else if (!snapshot.hasData) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator());
             } else {
               final order = snapshot.data!;
 
@@ -254,133 +277,144 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
                 _fetchQRPayment(order.id.toString()); // Call method to fetch QR code
               }
 
-
-              return Column(
-        children: [
-          // New Header Container
-           Container(
-  height: 120.0,
-  width: double.infinity,
-  decoration: BoxDecoration(
-    color: const Color(0xFF87C4FF).withOpacity(0.6),
-  ),
-  child: Padding(
-    padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
-    child: Stack(
-      children: [
-        Align(
-          alignment: Alignment.centerLeft,
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-            onPressed: () async {
-                          // Get saved location data
-                          final locationData = await _getSavedLocation();
-
-                          // Navigate to MainScreen with location data
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => MainScreen(
-                                latitude: locationData['latitude'],
-                                longitude: locationData['longitude'],
-                                address: locationData['address'],
-                              ),
-                            ),
-                          );
-                        },
-          ),
-        ),
-        Center(
-          child: Text(
-            'Progress',
-            style: GoogleFonts.poppins(
-              textStyle: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
-        ),
-      ],
+              return SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    // Header Container
+                    Container(
+                      height: 120.0,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF87C4FF).withOpacity(0.6),
+                      ),
+                      child: Padding(
+                        padding:
+                            const EdgeInsets.only(top: 20, left: 20, right: 10),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 40.0),
+                                onPressed: () async {
+                                  final locationData =
+                                      await _getSavedLocation();
+                                  Navigator.pushReplacement(
+  context,
+  PageTransition(
+    type: PageTransitionType.fade, // Choose the transition type you want
+    child: MainScreen(
+      latitude: locationData['latitude'],
+      longitude: locationData['longitude'],
+      address: locationData['address'],
     ),
   ),
-),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            color: const Color(0xFF87C4FF).withOpacity(0.6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildProgressStep('Confirm', isActive: false, isCompleted: false),
-                _buildProgressStep('Preparing', isActive: false, isCompleted: false),
-                _buildProgressStep('Working', isActive: true, isCompleted: true),
-               
-              ],
-            ),
-          ),
-
-          // Customer Info
-          Container(
-            padding: const EdgeInsets.all(20),
-            child: Row(
-              children: [
-                 order.workerAvatar != null && order.workerAvatar!.isNotEmpty
-        ? CircleAvatar(
-            radius: 28,
-            backgroundImage: NetworkImage(order.workerAvatar!),
-            backgroundColor: Colors.transparent, // Optional
-          )
-        : const CircleAvatar(
-            radius: 28,
-            backgroundColor: Colors.grey,
-            child: Icon(Icons.person, color: Colors.white, size: 30),
-          ),
-                const SizedBox(width: 15),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      order.workerName!,
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Row(
-                      children: [
-                        const Icon(Icons.cleaning_services, size: 16, color: Color.fromARGB(255, 0, 0, 0)),
-                        const SizedBox(width: 5),
-                        Text(
-                          'Working time!',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
+);
+                                },
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'Progress',
+                                style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    Text(
-                      'Order ID: ${order.id}',
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        color: const Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
-                  ],
-                ),
-              ],
-            ),
-          ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 20, horizontal: 16),
+                      color: const Color(0xFF87C4FF).withOpacity(0.6),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildProgressStep('Confirm',
+                              isActive: false, isCompleted: false),
+                          _buildProgressStep('Preparing',
+                              isActive: false, isCompleted: false),
+                          _buildProgressStep('Working',
+                              isActive: true, isCompleted: true),
+                        ],
+                      ),
+                    ),
 
-          const Divider(
-            thickness: 1,
-            color: Colors.grey,
-            indent: 20,
-            endIndent: 20,
-          ),
+                    // Customer Info
+                    Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        children: [
+                          order.workerAvatar != null &&
+                                  order.workerAvatar!.isNotEmpty
+                              ? CircleAvatar(
+                                  radius: 28,
+                                  backgroundImage:
+                                      NetworkImage(order.workerAvatar!),
+                                  backgroundColor:
+                                      Colors.transparent, // Optional
+                                )
+                              : const CircleAvatar(
+                                  radius: 28,
+                                  backgroundColor: Colors.grey,
+                                  child: Icon(Icons.person,
+                                      color: Colors.white, size: 30),
+                                ),
+                          const SizedBox(width: 15),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                order.workerName!,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              Row(
+                                children: [
+                                  const Icon(Icons.cleaning_services,
+                                      size: 16,
+                                      color: Color.fromARGB(255, 0, 0, 0)),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    'Working time!',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              Text(
+                                'Order ID: ${order.id}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
 
-          const SizedBox(height: 10),
+                    const Divider(
+                      thickness: 1,
+                      color: Colors.grey,
+                      indent: 20,
+                      endIndent: 20,
+                    ),
+
+                    const SizedBox(height: 10),
 
           if (order.payment == 'qrcode' && qrImageBase64 != null && qrImageBase64!.isNotEmpty)
             Container(
@@ -409,17 +443,50 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               color: Colors.green,
             ),
 
+                    // PromptPay Image
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Image.asset(
+                        'assets/images/promptpay.png',
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
 
-          const SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
-          Text(
-            'Total: ${order.price} THB',
-            style: GoogleFonts.poppins(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.green,
-            ),
-          ),
+                    // QR Code Image
+                    Container(
+                      padding: const EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade100,
+                        borderRadius: BorderRadius.circular(16),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            spreadRadius: 4,
+                            blurRadius: 8,
+                            offset: const Offset(0, 6),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/qrcode.png',
+                        height: 300,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+                    Text(
+                      'Total: ${order.price} THB',
+                      style: GoogleFonts.poppins(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.green,
+                      ),
+                    ),
 
           if (order.payment == 'qrcode')
             Column(
@@ -444,33 +511,39 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
         ],
               );
             }
-        },
+          },
+        ),
       ),
     );
   }
-            }
+}
 
-  Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
-    return Column(
-      children: [
-        Container(
-          width: 100,
-          height: 4,
-          color: isCompleted
-              ? Colors.blue
-              : (isActive ? Colors.blue : const Color.fromARGB(255, 255, 255, 255)),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          label,
-          style: GoogleFonts.poppins(
-            textStyle: TextStyle(
-              fontSize: 15,
-              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-              color: isActive ? Colors.blue : const Color.fromARGB(255, 255, 255, 255),
-            ),
+Widget _buildProgressStep(String label,
+    {required bool isActive, required bool isCompleted}) {
+  return Column(
+    children: [
+      Container(
+        width: 100,
+        height: 4,
+        color: isCompleted
+            ? Colors.blue
+            : (isActive
+                ? Colors.blue
+                : const Color.fromARGB(255, 255, 255, 255)),
+      ),
+      const SizedBox(height: 8),
+      Text(
+        label,
+        style: GoogleFonts.poppins(
+          textStyle: TextStyle(
+            fontSize: 15,
+            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+            color: isActive
+                ? Colors.blue
+                : const Color.fromARGB(255, 255, 255, 255),
           ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}

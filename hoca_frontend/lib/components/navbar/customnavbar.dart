@@ -12,13 +12,12 @@ class CustomBottomNavigationBar extends StatelessWidget {
     required this.onItemTapped,
   });
 
-  @override
+   @override
   Widget build(BuildContext context) {
-    // Only show navigation bar when keyboard is not visible
     final bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom > 0;
     
     if (isKeyboardVisible) {
-      return const SizedBox.shrink(); // Hide when keyboard is visible
+      return const SizedBox.shrink();
     }
 
     return Container(
@@ -29,7 +28,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withOpacity(0.1), // Reduced opacity
             spreadRadius: 1,
             blurRadius: 4,
             offset: const Offset(0, -1),
@@ -42,6 +41,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
           topRight: Radius.circular(20),
         ),
         child: BottomAppBar(
+          elevation: 0, // Add this to remove material shadow
+          color: Colors.white.withOpacity(0.9), // Make background slightly transparent
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Row(

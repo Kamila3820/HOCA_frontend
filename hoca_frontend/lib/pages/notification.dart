@@ -1,5 +1,6 @@
-import 'package:dio/dio.dart';
 import 'dart:async';
+
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
@@ -27,24 +28,33 @@ class _NotiPageState extends State<NotiPage> {
     _startPolling();
   }
 
+  Future<void> _refreshNotifications() async {
+    init(); // Fetch notifications again
+    setState(() {}); // Rebuild the widget with the updated data
+  }
+
   void init() async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
-    
-    Caller.dio.get("/v1/notification/", 
-    options: Options(
+
+    try {
+      final response = await Caller.dio.get(
+        "/v1/notification/",
+        options: Options(
           headers: {
             'x-auth-token': '$token', // Add token to header
           },
-        ),).then((response) {
+        ),
+      );
+
       setState(() {
         print(response.data);
         notificationsList = (response.data as List)
             .map((notiJson) => Notifications.fromJson(notiJson))
             .toList();
 
-         if (notificationsList.isNotEmpty) {
-          String latestNotiID = notificationsList.first.notiID.toString()!;
+        if (notificationsList.isNotEmpty) {
+          String latestNotiID = notificationsList.first.notiID.toString();
 
           // If the latest notiID is different from the last fetched one, mark it as new
           if (lastFetchedNotiID == null || lastFetchedNotiID != latestNotiID) {
@@ -56,9 +66,18 @@ class _NotiPageState extends State<NotiPage> {
           }
         }
       });
-    }).onError((DioException error, _) {
-      Caller.handle(context, error);
-    });
+    } catch (error) {
+      if (error is DioException) {
+        Caller.handle(context, error);
+      } else {
+        // Handle other types of errors
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('An error occurred while fetching notifications.'),
+          ),
+        );
+      }
+    }
   }
 
   void _startPolling() {
@@ -72,7 +91,6 @@ class _NotiPageState extends State<NotiPage> {
     _pollingTimer?.cancel(); // Cancel the timer when the widget is disposed
     super.dispose();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -88,114 +106,113 @@ class _NotiPageState extends State<NotiPage> {
     };
 
     const notificationTitles = {
-    "confirmation": "Confirmation",
-    "preparing": "Preparing",
-    "working": "Working",
-    "complete": "Complete",
-    "user_cancel": "User Cancel",
-    "worker_cancel": "Worker Cancel",
-    "system_cancel": "System Cancel",
-    "user_rating": "User Rating",
-  };
+      "confirmation": "Confirmation",
+      "preparing": "Preparing",
+      "working": "Working",
+      "complete": "Complete",
+      "user_cancel": "User Cancel",
+      "worker_cancel": "Worker Cancel",
+      "system_cancel": "System Cancel",
+      "user_rating": "User Rating",
+    };
 
     return Scaffold(
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 150.0,
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: const Color(0xFF87C4FF).withOpacity(0.6), // 60% opacity
-            ),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 30, left: 20, right: 10),
-              child: Stack(
-                children: [
-                  Align(
-                    alignment: Alignment.centerLeft,
-                    child: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+      body: RefreshIndicator(
+        onRefresh: _refreshNotifications,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 150.0,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: const Color(0xFF87C4FF).withOpacity(0.6), // 60% opacity
+              ),
+              child: Padding(
+                padding: const EdgeInsets.only(top: 30, left: 20, right: 10),
+                child: Stack(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
                     ),
-                  ),
-                  Center(
-                    child: Text(
-                      'Notification',
-                      style: GoogleFonts.poppins(
-                        textStyle: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                    Center(
+                      child: Text(
+                        'Notification',
+                        style: GoogleFonts.poppins(
+                          textStyle: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-          const SizedBox(height: 20), // Add some spacing
-          Expanded(
-            child: notificationsList.isNotEmpty
-                ? ListView.builder(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    itemCount: notificationsList.length,
-                    itemBuilder: (context, index) {
-                      Notifications notification = notificationsList[index];
-                      String title = notificationTitles[notification.type] ?? 'Unknown Notification';
-                      String message = notificationTypes[notification.type] ?? 'No message available';
+            const SizedBox(height: 20), // Add some spacing
+            Expanded(
+              child: notificationsList.isNotEmpty
+                  ? ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      itemCount: notificationsList.length,
+                      itemBuilder: (context, index) {
+                        Notifications notification = notificationsList[index];
+                        String title = notificationTitles[notification.type] ?? 'Unknown Notification';
+                        String message = notificationTypes[notification.type] ?? 'No message available';
 
-                    Color titleColor;
-                    if (notification.type == "complete") {
-                      titleColor = Colors.green; // Green for Complete
-                    } else if (notification.type == "confirmation") {
-                      titleColor = Colors.blue; // Blue for Confirmation
-                    } else if (notification.type == "user_cancel" ||
-                               notification.type == "worker_cancel" ||
-                               notification.type == "system_cancel") {
-                      titleColor = Colors.red;
-                    } else {
-                      titleColor = Colors.black; 
-                    }
+                        Color titleColor;
+                        if (notification.type == "complete") {
+                          titleColor = Colors.green; // Green for Complete
+                        } else if (notification.type == "confirmation") {
+                          titleColor = Colors.blue; // Blue for Confirmation
+                        } else if (notification.type == "user_cancel" ||
+                                   notification.type == "worker_cancel" ||
+                                   notification.type == "system_cancel") {
+                          titleColor = Colors.red;
+                        } else {
+                          titleColor = Colors.black;
+                        }
 
-                      return buildNotificationCard(
-                        imageUrl: notification.avatar!,
-                        title: notification.type!,
-                        message: message,
-                        titleColor: titleColor
-                      );
-                    },
-                  )
-                : const Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.notifications_none, // Bell icon
-                          size: 48.0,
-                          color: Colors.grey, // Customize color if needed
-                        ),
-                        SizedBox(height: 8.0), // Spacing between icon and text
-                        Text(
-                          "No notification yet",
-                          style: TextStyle(
-                            fontSize: 16.0,
+                        return buildNotificationCard(
+                          imageUrl: notification.avatar!,
+                          title: title,
+                          message: message,
+                          titleColor: titleColor,
+                        );
+                      },
+                    )
+                  : const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.notifications_none, // Bell icon
+                            size: 48.0,
                             color: Colors.grey, // Customize color if needed
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 8.0), // Spacing between icon and text
+                          Text(
+                            "No notification yet",
+                            style: TextStyle(
+                              fontSize: 16.0,
+                              color: Colors.grey, // Customize color if needed
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-
-          ),
-
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
-
-
 }

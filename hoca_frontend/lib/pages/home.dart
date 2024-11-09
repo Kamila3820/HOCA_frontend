@@ -26,6 +26,7 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
+
 class _HomePageState extends State<HomePage> {
   String? username;
   Profile? profile;
@@ -35,6 +36,7 @@ class _HomePageState extends State<HomePage> {
   String _locationName = "Choose Your Location"; // Default location text
   bool? hasNewNoti = false;
 
+
   String get shortenedLocation {
     if (_locationName.length > 20) {
       return '${_locationName.substring(0, 20)}...';
@@ -42,42 +44,64 @@ class _HomePageState extends State<HomePage> {
     return _locationName;
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      checkNewNotifications();
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    checkNewNotifications();
       callUserName();
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    // Load location if provided, otherwise use saved location or show alert
+    if (widget.latitude != null && widget.longitude != null) {
+      setState(() {
+        selectedLatitude = widget.latitude!;
+        selectedLongitude = widget.longitude!;
+        _locationName = widget.address ?? prefs.getString('address') ?? "Choose Your Location";
+      });
 
-      if (widget.latitude != null && widget.longitude != null) {
+      await prefs.setString('latitude', selectedLatitude);
+      await prefs.setString('longitude', selectedLongitude);
+      await prefs.setString('address', _locationName);
+
+      load(selectedLatitude, selectedLongitude);
+    } else {
+      String? savedLat = prefs.getString('latitude');
+      String? savedLong = prefs.getString('longitude');
+      String? savedAddress = prefs.getString('address');
+
+      if (savedLat != null && savedLong != null) {
         setState(() {
-          selectedLatitude = widget.latitude!;
-          selectedLongitude = widget.longitude!;
-          _locationName = widget.address ?? prefs.getString('address') ?? "Choose Your Location";
+          selectedLatitude = savedLat;
+          selectedLongitude = savedLong;
+          _locationName = savedAddress ?? "Choose Your Location";
         });
-
-        await prefs.setString('latitude', selectedLatitude);
-        await prefs.setString('longitude', selectedLongitude);
-        await prefs.setString('address', _locationName);
-
         load(selectedLatitude, selectedLongitude);
       } else {
-        String? savedLat = prefs.getString('latitude');
-        String? savedLong = prefs.getString('longitude');
-        String? savedAddress = prefs.getString('address');
-
-        if (savedLat != null && savedLong != null) {
-          setState(() {
-            selectedLatitude = savedLat;
-            selectedLongitude = savedLong;
-            _locationName = savedAddress ?? "Choose Your Location";
-          });
-          load(selectedLatitude, selectedLongitude);
-        } else {
-          showLocationAlert();
-        }
+        showLocationAlert();
       }
+    }
+  });
+}
+
+ Future<void> _refreshPage() async {
+    await reload();
+  }
+
+  void callUserName() async {
+    String url = "/v1/user/profile";
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    Caller.dio.get(
+      url,
+      options: Options(
+        headers: {'x-auth-token': '$token'},
+      ),
+    ).then((response) {
+      profile = Profile.fromJson(response.data);
+    }).onError((DioException error, _) {
+      Caller.handle(context, error);
     });
   }
 
@@ -99,121 +123,134 @@ class _HomePageState extends State<HomePage> {
   }
 
   void navigateToLocateLocation() async {
-    final result = await Navigator.push(
-      context,
-       PageTransition(
-        type: PageTransitionType.leftToRight,
-        child: const LocateLocationPage(),
-        duration: const Duration(milliseconds: 400),
-      ),
-    );
-    
+  final result = await Navigator.push(
+    context,
+    PageTransition(
+      type: PageTransitionType.leftToRight,
+      child: const LocateLocationPage(),
+      duration: const Duration(milliseconds: 400),
+    ),
+  );
 
-    if (result is Map && result.containsKey('address')) {
-      setState(() {
-        _locationName = result['address'];
-        selectedLatitude = result['latitude'].toString();
-        selectedLongitude = result['longitude'].toString();
-      });
+  if (result is Map && result.containsKey('address')) {
+    setState(() {
+      _locationName = result['address'];
+      selectedLatitude = result['latitude'].toString();
+      selectedLongitude = result['longitude'].toString();
+    });
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('latitude', selectedLatitude);
-      await prefs.setString('longitude', selectedLongitude);
-      await prefs.setString('address', _locationName);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString('latitude', selectedLatitude);
+    await prefs.setString('longitude', selectedLongitude);
+    await prefs.setString('address', _locationName);
 
-      load(selectedLatitude, selectedLongitude);
-    }
+    load(selectedLatitude, selectedLongitude);
   }
+}
+
 
   reload() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? savedLat = prefs.getString('latitude');
-    String? savedLong = prefs.getString('longitude');
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  String? savedLat = prefs.getString('latitude');
+  String? savedLong = prefs.getString('longitude');
 
-    if (savedLat != null && savedLong != null) {
-      load(savedLat, savedLong);
-    } else {
-      showLocationAlert();
-    }
+  if (savedLat != null && savedLong != null) {
+    load(savedLat, savedLong);
+  } else {
+    showLocationAlert();
   }
+}
+
 
   void checkNewNotifications() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool? storedNewNoti = prefs.getBool('hasNewNoti');
-    setState(() {
-      hasNewNoti = storedNewNoti ?? false;
-    });
-  }
+  final prefs = await SharedPreferences.getInstance();
+  bool? storedNewNoti = prefs.getBool('hasNewNoti');
+  setState(() {
+    hasNewNoti = storedNewNoti ?? false;
+  });
+}
 
-  load(String latitude, String longitude) async {
-    String url = "/v1/post/list?lat=$latitude&long=$longitude";
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
 
-    Caller.dio.get(
-      url,
-      options: Options(
-        headers: {'x-auth-token': '$token'},
-      ),
-    ).then((response) {
-      if (mounted) {
-        setState(() {
-          posts = (response.data as List).map((postJson) => Post.fromJson(postJson)).toList();
-        });
-      }
-    }).onError((DioException error, _) {
-      Caller.handle(context, error);
-    });
-  }
+load(String latitude, String longitude) async {
+  String url = "/v1/post/list?lat=$latitude&long=$longitude";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
+
+  Caller.dio
+      .get(
+    url,
+    options: Options(
+      headers: {'x-auth-token': '$token'},
+    ),
+  )
+      .then((response) {
+    if (mounted) {
+      setState(() {
+        posts = (response.data as List)
+            .map((postJson) => Post.fromJson(postJson))
+            .toList();
+      });
+    }
+  }).onError((DioException error, _) {
+    Caller.handle(context, error);
+  });
+}
+
 
   showLocationAlert() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15.0),
-          ),
-          title: Row(
-            children: [
-              Icon(Icons.location_on, color: Colors.blue),
-              SizedBox(width: 8.0),
-              Text('Location Required', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
-            ],
-          ),
-          content: Text(
-            'Please choose a location to see available services.',
-            style: TextStyle(fontSize: 16.0, color: Colors.black54),
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                navigateToLocateLocation();
-              },
-              child: Text('Choose Location', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.location_on, color: Colors.blue),
+            SizedBox(width: 8.0),
+            Text('Location Required',
+                style:
+                    TextStyle(fontWeight: FontWeight.bold, fontSize: 18.0)),
           ],
-        );
-      },
-    );
-  }
+        ),
+        content: Text(
+          'Please choose a location to see available services.',
+          style: TextStyle(fontSize: 16.0, color: Colors.black54),
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              navigateToLocateLocation();
+            },
+            child: Text('Choose Location',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            height: 335.0,
-            decoration: BoxDecoration(
-              color: const Color(0xFF87C4FF).withOpacity(0.6),
-              borderRadius: const BorderRadius.only(
-                bottomLeft: Radius.circular(90),
-                bottomRight: Radius.circular(90),
+      body: RefreshIndicator(
+        onRefresh: _refreshPage, // This is the function that will be called on pull-to-refresh
+        child: Stack(
+          children: [
+            Container(
+              height: 335.0,
+              decoration: BoxDecoration(
+                color: const Color(0xFF87C4FF).withOpacity(0.6),
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(90),
+                  bottomRight: Radius.circular(90),
+                ),
               ),
             ),
-          ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -232,14 +269,16 @@ class _HomePageState extends State<HomePage> {
                           child: RichText(
                             text: TextSpan(
                               style: GoogleFonts.poppins(
-                                textStyle: const TextStyle(fontSize: 18, color: Colors.white),
+                                textStyle: const TextStyle(
+                                    fontSize: 18, color: Colors.white),
                               ),
                               children: [
                                 const TextSpan(text: 'Welcome!, '),
                                 TextSpan(
                                   text: profile?.username!,
                                   style: GoogleFonts.poppins(
-                                    textStyle: const TextStyle(fontWeight: FontWeight.bold),
+                                    textStyle: const TextStyle(
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ),
                               ],
@@ -249,40 +288,40 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                     IconButton(
-                        icon: Stack(
-                          children: [
-                            const SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: FaIcon(
-                                FontAwesomeIcons.bell,
-                                color: Color.fromARGB(255, 0, 0, 0),
-                                size: 35,
-                              ),
+                      icon: Stack(
+                        children: [
+                          const SizedBox(
+                            width: 40,
+                            height: 40,
+                            child: FaIcon(
+                              FontAwesomeIcons.bell,
+                              color: Color.fromARGB(255, 0, 0, 0),
+                              size: 35,
                             ),
-                            if (hasNewNoti!)
-                              Positioned(
-                                right: 0,
-                                top: 0,
-                                child: Container(
-                                  width: 10,
-                                  height: 10,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
-                                  ),
+                          ),
+                          if (hasNewNoti!)
+                            Positioned(
+                              right: 0,
+                              top: 0,
+                              child: Container(
+                                width: 10,
+                                height: 10,
+                                decoration: const BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.red,
                                 ),
                               ),
-                          ],
-                        ),
+                            ),
+                        ],
+                      ),
                       onPressed: () async {
                         Navigator.push(
                           context,
                           PageTransition(
-              type: PageTransitionType.topToBottom,
-              child: const NotiPage(),
-              duration: const Duration(milliseconds: 300),
-            ),
+                            type: PageTransitionType.topToBottom,
+                            child: const NotiPage(),
+                            duration: const Duration(milliseconds: 300),
+                          ),
                         ).then((_) async {
                           final prefs = await SharedPreferences.getInstance();
                           prefs.setBool('hasNewNoti', false);
@@ -298,7 +337,8 @@ class _HomePageState extends State<HomePage> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 6.0),
                     child: Container(
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 12, horizontal: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(8),
@@ -335,7 +375,8 @@ class _HomePageState extends State<HomePage> {
                   child: Text(
                     'Service',
                     style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      textStyle: const TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ),
@@ -344,88 +385,110 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
                     GestureDetector(
+  onTap: () {
+    List<Post> filteredPosts = posts
+        .where((post) => 
+          post.categoryID?.any((category) => category.groupID == 1) ?? false
+        )
+        .toList();
+    
+    setState(() {
+      posts = filteredPosts;
+    });
+
+    Navigator.push(
+      context,
+      PageTransition(
+        type: PageTransitionType.rightToLeft,
+        child: CleanPage(posts: filteredPosts),
+        duration: const Duration(milliseconds: 300),
+      ),
+    ).then((result) {
+      if (result == true) {
+        reload();
+      }
+    });
+  },
+  child: buildServiceOption(
+    'Cleaning', 
+    FontAwesomeIcons.broom
+  ),
+),
+                    GestureDetector(
                       onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => 
-                          post.categoryID == 1 || post.categoryID == 2 || post.categoryID == 3).toList();
-                        setState(() {
-                          posts = filteredPosts;
-                        });
+                        List<Post> filteredPosts = posts
+        .where((post) => 
+          post.categoryID?.any((category) => category.groupID == 2) ?? false
+        )
+        .toList();
+    
+    setState(() {
+      posts = filteredPosts;
+    });
                         // Removed the isEmpty check, directly navigate to CleanPage
                         Navigator.push(
                           context,
                           PageTransition(
-              type: PageTransitionType.rightToLeft,
-              child: CleanPage(posts: filteredPosts),
-              duration: const Duration(milliseconds: 300),
-            ),
-                   
+                            type: PageTransitionType.rightToLeft,
+                            child: ClothesPage(posts: filteredPosts),
+                            duration: const Duration(milliseconds: 300),
+                          ),
                         ).then((result) {
                           if (result == true) {
                             reload();
                           }
                         });
                       },
-                      child: buildServiceOption('Cleaning', FontAwesomeIcons.broom),
+                      child:
+                          buildServiceOption('Clothes', FontAwesomeIcons.shirt),
                     ),
-                     GestureDetector(
+                    GestureDetector(
                       onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 4 || post.categoryID == 5).toList();
-                        setState(() {
-                          posts = filteredPosts;
-                        });
-                        // Removed the isEmpty check, directly navigate to CleanPage
-                        Navigator.push(
-                          context,
-                          PageTransition(
-              type: PageTransitionType.rightToLeft,
-              child: ClothesPage(posts: filteredPosts),
-              duration: const Duration(milliseconds: 300),
-            ),
-                        ).then((result) {
-                          if (result == true) {
-                            reload();
-                          }
-                        });
-                      },
-                      child: buildServiceOption('Clothes', FontAwesomeIcons.shirt),
-                    ),
-                     GestureDetector(
-                      onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => 
-                          post.categoryID == 6 || post.categoryID == 7 || post.categoryID == 8).toList();
-                        setState(() {
-                          posts = filteredPosts;
-                        });
+                        List<Post> filteredPosts = posts
+        .where((post) => 
+          post.categoryID?.any((category) => category.groupID == 3) ?? false
+        )
+        .toList();
+    
+    setState(() {
+      posts = filteredPosts;
+    });
                         // Removed the isEmpty check, always navigate
                         Navigator.push(
                           context,
                           PageTransition(
-              type: PageTransitionType.rightToLeft,
-              child: GardeningPage(posts: filteredPosts),
-              duration: const Duration(milliseconds: 300),
-            ),
+                            type: PageTransitionType.rightToLeft,
+                            child: GardeningPage(posts: filteredPosts),
+                            duration: const Duration(milliseconds: 300),
+                          ),
                         ).then((result) {
                           if (result == true) {
                             reload();
                           }
                         });
                       },
-                      child: buildServiceOption('Gardening', FontAwesomeIcons.seedling),
+                      child: buildServiceOption(
+                          'Gardening', FontAwesomeIcons.seedling),
                     ),
                     GestureDetector(
                       onTap: () {
-                        List<Post> filteredPosts = posts.where((post) => post.categoryID == 9).toList();
-                        setState(() {
-                          posts = filteredPosts;
-                        });
+                        List<Post> filteredPosts = posts
+        .where((post) => 
+          post.categoryID?.any((category) => category.groupID == 4) ?? false
+        )
+        .toList();
+    
+    setState(() {
+      posts = filteredPosts;
+    });
                         // Removed the isEmpty check, directly navigate to CleanPage
                         Navigator.push(
                           context,
                           PageTransition(
-              type: PageTransitionType.rightToLeft,
-              child: PetsPage(posts: filteredPosts),
-              duration: const Duration(milliseconds: 300),
-            ),
+                            type: PageTransitionType.rightToLeft,
+                            child: PetsPage(posts: filteredPosts),
+                            duration: const Duration(milliseconds: 300),
+                          ),
                         ).then((result) {
                           if (result == true) {
                             reload();
@@ -434,7 +497,6 @@ class _HomePageState extends State<HomePage> {
                       },
                       child: buildServiceOption('Pets', Icons.pets),
                     ),
-
                   ],
                 ),
                 const SizedBox(height: 65),
@@ -464,9 +526,10 @@ class _HomePageState extends State<HomePage> {
                 const SizedBox(height: 8),
                 Expanded(
                   child: GridView.builder(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
                       crossAxisCount: 2,
-                      mainAxisSpacing: 15,
+                      mainAxisSpacing: 10,
                       crossAxisSpacing: 10,
                       childAspectRatio: 0.58,
                     ),
@@ -483,6 +546,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
         ],
+      ),
       ),
     );
   }

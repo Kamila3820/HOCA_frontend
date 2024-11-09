@@ -43,7 +43,7 @@ class VerifiedBadge extends StatelessWidget {
             ),
             const SizedBox(width: 4),
             Text(
-              '${availableStart}-${availableEnd}',
+              '$availableStart-$availableEnd',
               style: GoogleFonts.poppins(
                 color: Colors.grey[700],
                 fontSize: 14,

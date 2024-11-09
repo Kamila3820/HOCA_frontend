@@ -207,14 +207,14 @@ class _WorkerPostState extends State<WorkerPost> {
                             textAlign: TextAlign.center,
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
-                                fontSize: 9,
+                                fontSize: 5.1,
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromARGB(228, 0, 0, 0),
                               ),
                             ),
                           ),
                         ),
-                      )).toList(),
+                      )),
                     ],
                   ),
                 ),

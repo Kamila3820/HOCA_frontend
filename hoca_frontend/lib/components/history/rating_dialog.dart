@@ -212,11 +212,11 @@ class RatingSectionWithIcon extends StatefulWidget {
   final Function(int) onRatingUpdate; // Add callback to get rating
 
   const RatingSectionWithIcon({
-    Key? key, 
+    super.key, 
     required this.title,
     required this.tooltipMessage,
     required this.onRatingUpdate
-  }) : super(key: key);
+  });
 
   @override
   State<RatingSectionWithIcon> createState() => _RatingSectionWithIconState();
