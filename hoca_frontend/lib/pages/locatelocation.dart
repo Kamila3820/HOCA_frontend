@@ -20,12 +20,12 @@ class LocateLocationPage extends StatefulWidget {
 class _LocateLocationPageState extends State<LocateLocationPage> {
   LatLng? _selectedLocation;
   String? _selectedAddress;
-  GoogleMapController? _mapController; // เพิ่มตัวแปรสำหรับ GoogleMapController
+  GoogleMapController? _mapController; 
 
   @override
   void initState() {
     super.initState();
-    _selectedLocation = widget.location ?? LatLng(13.6507, 100.4937);
+    _selectedLocation = widget.location ?? LatLng(13.6523, 100.4940);
     _getAddress(_selectedLocation!);
     _checkPermissions();
   }
