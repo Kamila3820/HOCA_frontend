@@ -26,9 +26,10 @@ class EditPostCon extends StatefulWidget {
   final String? longtitude;
   final List<PlaceType>? placeTypes; // Add placeTypes field
   final String? amountFamily;
+  final String? duration;
   final String? imageUrl;
 
-  const EditPostCon({super.key, this.formData, required this.postID, required this.location, required this.latitude, required this.longtitude, required this.placeTypes, required this.imageUrl, required this.amountFamily});
+  const EditPostCon({super.key, this.formData, required this.postID, required this.location, required this.latitude, required this.longtitude, required this.placeTypes, required this.imageUrl, required this.amountFamily, required this.duration});
 
   @override
   _EditPostConState createState() => _EditPostConState();
@@ -41,6 +42,7 @@ class _EditPostConState extends State<EditPostCon> {
   final List<int> _selectedBoxIndices = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   String? _selectedFamilyAmount;
+  String? _selectedDuration;
   LatLng? _currentLocation;
   String _locationName = "Choose Your Location"; // Default location text
   bool _isDurationSelected = false;
@@ -257,18 +259,27 @@ class _EditPostConState extends State<EditPostCon> {
           onBoxTapped: _onBoxTapped,
         ),
         FamilyAmountSelector(
-    formKey: _formKey,
-    selectedFamilyAmount: _selectedFamilyAmount,
-    onFamilyAmountChanged: (value) {
-      setState(() {
-        _selectedFamilyAmount = value;
-      });
-    },
-    onDurationSelected: (selected) {
-      setState(() {
-        _isDurationSelected = selected;
-      });
-    },
+          formKey: _formKey,
+          selectedFamilyAmount: _selectedFamilyAmount,
+          onFamilyAmountChanged: (value) {
+            setState(() {
+              _selectedFamilyAmount = value;
+            });
+          },
+          onDurationSelected: (selected) {
+            setState(() {
+              _isDurationSelected = selected;
+              print("Testttttttt Duration");
+              print(_isDurationSelected);
+            });
+          },
+          durationForm: (selected) {
+            setState(() {
+              _selectedDuration = selected;
+              print("Testttttttt Duration");
+              print(_selectedDuration);
+            });
+          },
   ),
         Positioned(
           top: 170,

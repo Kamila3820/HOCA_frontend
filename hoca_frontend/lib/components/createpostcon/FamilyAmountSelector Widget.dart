@@ -6,6 +6,7 @@ class FamilyAmountSelector extends StatefulWidget {
   final String? selectedFamilyAmount;
   final Function(String?) onFamilyAmountChanged;
   final Function(bool) onDurationSelected;
+  final Function(String?) durationForm;
 
   const FamilyAmountSelector({
     super.key,
@@ -13,6 +14,7 @@ class FamilyAmountSelector extends StatefulWidget {
     required this.selectedFamilyAmount,
     required this.onFamilyAmountChanged,
     required this.onDurationSelected,
+    required this.durationForm
   });
 
   @override
@@ -38,6 +40,7 @@ class _FamilyAmountSelectorState extends State<FamilyAmountSelector> {
               _isDurationSelected = true;
             });
             widget.onDurationSelected(true);
+            widget.durationForm("${area} m²/${taskers} taskers/${hours} hours");
           },
         );
       },

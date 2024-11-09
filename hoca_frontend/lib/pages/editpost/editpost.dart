@@ -5,6 +5,7 @@ import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/createpost/FormContainer.dart';
 import 'package:hoca_frontend/components/createpost/HeaderSection.dart';
 import 'package:hoca_frontend/models/categories.dart';
+import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/placetype.dart';
 import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/editpost/editpostcon.dart';
@@ -39,6 +40,7 @@ class _EditPostPageState extends State<EditPostPage> {
   String? longitude;
   List<PlaceType>? placeTypes;
   String? amntFamily;
+  String? duration;
   String? imageUrl;
   String _selectedGender = "Male";
   List<Categories> availableCategories = [];
@@ -46,11 +48,32 @@ class _EditPostPageState extends State<EditPostPage> {
   bool _isLoading = true; // Add loading state
   bool _hasError = false; // Add error state
 
+  TimeOfDay parseTime(String timeString) {
+    // Split time and period (AM/PM)
+    final timeParts = timeString.split(' ');
+    final time = timeParts[0];
+    final period = timeParts[1];
+
+    // Split hour and minute
+    final timeSplit = time.split('.');
+    int hour = int.parse(timeSplit[0]);
+    int minute = int.parse(timeSplit[1]);
+
+    // Convert to 24-hour format if needed
+    if (period == 'PM' && hour != 12) {
+      hour += 12;
+    } else if (period == 'AM' && hour == 12) {
+      hour = 0;
+    }
+
+    return TimeOfDay(hour: hour, minute: minute);
+  }
+
   @override
   void initState() {
     super.initState();
     // Initialize with default times
-    _startTime = const TimeOfDay(hour: 9, minute: 0);
+     _startTime = const TimeOfDay(hour: 9, minute: 0);
     _endTime = const TimeOfDay(hour: 17, minute: 0);
     _fetchPostData(widget.postID);
   }
@@ -69,6 +92,7 @@ class _EditPostPageState extends State<EditPostPage> {
           },
         ),
       );
+      print("API Response: ${response.data}");
       final post = Post.fromJson(response.data);
 
       // Populate fields with fetched data
@@ -78,66 +102,60 @@ class _EditPostPageState extends State<EditPostPage> {
       _phoneNumberController.text = post.phoneNumber ?? '';
       _descriptionController.text = post.description ?? '';
       _selectedGender = post.gender ?? "Male";
-      selectedCategories = post.categoryID!.where((cat) => post.categoryID!.contains(cat.id)).toList();
-      availableCategories = post.categoryID!;
+      // selectedCategories = post.categoryID!;
+      // availableCategories = post.categoryID!;
       location = post.location;
       latitude = post.locationLat;
       longitude = post.locationLong;
       placeTypes = post.placeTypeID;
       amntFamily = post.amountFamily;
+      duration = post.duration ?? '';
       imageUrl = post.avatarUrl;
-
-      // Parse and set time if available
-      // if (post.startTime != null) {
-      //   final startTimeParts = post.startTime!.split(':');
-      //   _startTime = TimeOfDay(
-      //     hour: int.parse(startTimeParts[0]),
-      //     minute: int.parse(startTimeParts[1]),
-      //   );
-      // }
-      
-      // if (post.endTime != null) {
-      //   final endTimeParts = post.endTime!.split(':');
-      //   _endTime = TimeOfDay(
-      //     hour: int.parse(endTimeParts[0]),
-      //     minute: int.parse(endTimeParts[1]),
-      //   );
-      // }
+      _startTime = post.availableStart != null ? parseTime(post.availableStart!) : TimeOfDay.now();
+      _endTime = post.availableEnd != null ? parseTime(post.availableEnd!) : TimeOfDay.now();
 
       setState(() {
         _isLoading = false;
         _hasError = false;
       });
-    } catch (error) {
-      Caller.handle(context, error as DioError);
-      setState(() {
-        _isLoading = false;
-        _hasError = true;
-      });
-    }
+    } on DioError catch (dioError) {
+        // Handle Dio-specific error
+        Caller.handle(context, dioError);
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
+      } catch (error) {
+        // Handle any other type of error, including RangeError
+        print('Unexpected error: $error');
+        setState(() {
+          _isLoading = false;
+          _hasError = true;
+        });
+      }
   }
 
   void toggleCategory(int categoryId) {
   setState(() {
-    // Find the category by its ID
-    final category = availableCategories.firstWhere((cat) => cat.id == categoryId);
-
-    if (selectedCategories.contains(category)) {
-      selectedCategories.remove(category);
+    final exists = selectedCategories.any((cat) => cat.id == categoryId);
+    if (exists) {
+      selectedCategories.removeWhere((cat) => cat.id == categoryId);
     } else if (selectedCategories.length < 3) {
-      selectedCategories.add(category);
+      // Safely return a default category or just skip if not found
+      final category = availableCategories.firstWhere(
+        (cat) => cat.id == categoryId,
+        orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'), // Default Category
+      );
+      
+      if (category.id != -1) {  // Check if it's not the default category
+        selectedCategories.add(category);
+      }
     }
   });
 }
 
-  String _formatTimeOfDay(TimeOfDay time) {
-    final hour = time.hour.toString().padLeft(2, '0');
-    final minute = time.minute.toString().padLeft(2, '0');
-    return '$hour:$minute';
-  }
-
   void _submitForm() {
-    if (selectedCategories.isEmpty) {
+    if (selectedCategories.isEmpty || _workerNameController.text.isEmpty) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -160,6 +178,8 @@ class _EditPostPageState extends State<EditPostPage> {
       return;
     }
 
+    String categoriesString = selectedCategories.map((cat) => cat.id.toString()).join(',');
+
     Map<String, dynamic> formData = {
       "name": _workerNameController.text,
       "price": _workingPriceController.text,
@@ -167,7 +187,7 @@ class _EditPostPageState extends State<EditPostPage> {
       "phoneNumber": _phoneNumberController.text,
       "description": _descriptionController.text,
       "gender": _selectedGender,
-      "categories": selectedCategories,
+      "categories": categoriesString,
     };
 
     Navigator.push(
@@ -182,6 +202,7 @@ class _EditPostPageState extends State<EditPostPage> {
           placeTypes: placeTypes,
           amountFamily: amntFamily,
           imageUrl: imageUrl,
+          duration: duration,
         ),
       ),
     );
