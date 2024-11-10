@@ -394,32 +394,23 @@ void initState() {
                     const SizedBox(height: 10),
 
           if (order.payment == 'qrcode' && qrImageBase64 != null && qrImageBase64!.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    spreadRadius: 4,
-                    blurRadius: 8,
-                    offset: const Offset(0, 6),
-                  ),
-                ],
-              ),
-              child: QrImageView(
-                data: qrImageBase64!, // The text to encode
-                size: 300.0, // Size of the QR code
-              ),
-            )
-          else
-            Icon(
-              Icons.monetization_on,
-              size: 100,
-              color: Colors.green,
-            ),
-
+              Container(
+                padding: const EdgeInsets.all(1),
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade100,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.1),
+                      spreadRadius: 4,
+                      blurRadius: 8,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
                     // PromptPay Image
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -429,32 +420,23 @@ void initState() {
                         fit: BoxFit.contain,
                       ),
                     ),
-
                     const SizedBox(height: 10),
-
-                    // QR Code Image
-                    Container(
-                      padding: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 4,
-                            blurRadius: 8,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        'assets/images/qrcode.png',
-                        height: 300,
-                        fit: BoxFit.contain,
-                      ),
+                    
+                    // QR Code
+                    QrImageView(
+                      data: qrImageBase64!, // The text to encode
+                      size: 300.0, // Size of the QR code
                     ),
+                  ],
+                ),
+              )
+            else
+              Icon(
+                Icons.monetization_on,
+                size: 100,
+                color: Colors.green,
+              ),
 
-          const SizedBox(height: 10),
 
           Text(
             'Total: ${order.price} THB',
