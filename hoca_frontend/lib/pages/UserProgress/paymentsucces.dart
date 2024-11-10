@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/classes/caller.dart';
+import 'package:hoca_frontend/main.dart';
 import 'package:hoca_frontend/models/userorder.dart';
 import 'package:hoca_frontend/pages/progress.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaymentSuccessPage extends StatefulWidget {
@@ -58,14 +60,32 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
     }
   }
 
-  void handleNavigation(UserOrder? order) {
-    if (order == null || order.status == "complete" || order.status == "cancelled") {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => ProgressPage()),
-      );
-    }
+  Future<Map<String, String>> _getSavedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    return {
+      'latitude': prefs.getString('latitude') ?? '',
+      'longitude': prefs.getString('longitude') ?? '',
+      'address': prefs.getString('address') ?? '',
+    };
   }
+
+ void handleNavigation(UserOrder? order) async {
+  if (order == null || order.status == "complete" || order.status == "cancelled") {
+    final locationData = await _getSavedLocation();
+    Navigator.pushReplacement(
+      context,
+      PageTransition(
+        type: PageTransitionType.fade, // Choose your preferred transition type
+        child: MainScreen(
+          latitude: locationData['latitude'],
+          longitude: locationData['longitude'],
+          address: locationData['address'],
+        ),
+      ),
+    );
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -104,26 +124,53 @@ class _PaymentSuccessPageState extends State<PaymentSuccessPage> {
           child: Column(
             children: [
               // Header
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF87C4FF).withOpacity(0.6),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.only(top: 20, left: 20, right: 10, bottom: 20),
-                  child: Text(
-                    'Progress',
-                    textAlign: TextAlign.center,
-                    style: GoogleFonts.poppins(
-                      textStyle: const TextStyle(
-                        fontSize: 30,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+               Container(
+                      height: 120.0,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF87C4FF).withOpacity(0.6),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
+                        child: Stack(
+                          children: [
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_back,
+                                    color: Colors.white, size: 40.0),
+                                onPressed: () async {
+                                  final locationData = await _getSavedLocation();
+                                  Navigator.pushReplacement(
+  context,
+  PageTransition(
+    type: PageTransitionType.fade, // Choose your preferred transition type
+    child: MainScreen(
+      latitude: locationData['latitude'],
+      longitude: locationData['longitude'],
+      address: locationData['address'],
+    ),
+  ),
+);
+                                },
+                              ),
+                            ),
+                            Center(
+                              child: Text(
+                                'Progress',
+                                style: GoogleFonts.poppins(
+                                  textStyle: const TextStyle(
+                                    fontSize: 30,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              ),
 
               // Progress Steps
               Container(
