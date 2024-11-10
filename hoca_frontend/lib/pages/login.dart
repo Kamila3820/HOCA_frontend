@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/login/login_components.dart';
 import 'package:hoca_frontend/pages/checklocation.dart';
-import 'package:hoca_frontend/pages/locatelocation.dart';
 import 'package:page_transition/page_transition.dart'; // Import the page_transition package
 import 'package:shared_preferences/shared_preferences.dart';
 

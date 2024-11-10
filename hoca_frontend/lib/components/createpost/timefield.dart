@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class TimeField extends StatefulWidget {
@@ -24,11 +25,16 @@ class TimeField extends StatefulWidget {
 class _TimeFieldState extends State<TimeField> {
   bool _hasSelectedTime = false;
   String? _errorText;
+  final GlobalKey _tooltipKey = GlobalKey();
+
+  void _showTooltip() {
+    final dynamic tooltip = _tooltipKey.currentState;
+    tooltip?.ensureTooltipVisible();
+  }
 
   @override
   void initState() {
     super.initState();
-    // Initialize error text from widget if provided
     _errorText = widget.errorText;
   }
 
@@ -84,27 +90,72 @@ class _TimeFieldState extends State<TimeField> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text.rich(
-              TextSpan(
-                children: [
+            Row(
+              children: [
+                Text.rich(
                   TextSpan(
-                    text: widget.label,
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                    children: [
+                      TextSpan(
+                        text: widget.label,
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      if (widget.isRequired)
+                        TextSpan(
+                          text: ' ',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.red,
+                          ),
+                        ),
+                    ],
                   ),
-                  if (widget.isRequired)
-                    TextSpan(
-                      text: ' ',
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.red,
+                ),
+                if (widget.label == 'Time Available') ...[
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: _showTooltip,
+                    child: Tooltip(
+                      key: _tooltipKey,
+                      message: "Select your working hours", // Tooltip message
+                      preferBelow: false,
+                      verticalOffset: -5,
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.all(16),
+                      triggerMode: TooltipTriggerMode.manual,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.95),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      textStyle: GoogleFonts.poppins(
+                        textStyle: const TextStyle(
+                          color: Color.fromARGB(192, 0, 0, 0),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      child: MouseRegion(
+                        cursor: SystemMouseCursors.help,
+                        child: FaIcon(
+                          FontAwesomeIcons.circleQuestion,
+                          size: 17,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
+                  ),
                 ],
-              ),
+              ],
             ),
             const SizedBox(height: 8),
             InkWell(
@@ -140,13 +191,13 @@ class _TimeFieldState extends State<TimeField> {
                       _errorText = null;
                     });
                     widget.onTimeChanged(picked);
-                    field.didChange(picked); // Update form field state
+                    field.didChange(picked);
                   } else {
                     setState(() {
                       _errorText = 'Please select a time other than 00:00';
                     });
                     _showErrorDialog('Please select a time other than 00:00');
-                    field.validate(); // Trigger validation
+                    field.validate();
                   }
                 }
               },

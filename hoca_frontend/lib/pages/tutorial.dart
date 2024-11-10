@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class PetComparisonPage extends StatelessWidget {
-  const PetComparisonPage({super.key});
+class CreatePostPage extends StatelessWidget {
+  const CreatePostPage({super.key});
 
   @override
   Widget build(BuildContext context) {
