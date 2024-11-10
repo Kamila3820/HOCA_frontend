@@ -78,6 +78,13 @@ class _EditPostPageState extends State<EditPostPage> {
     return TimeOfDay(hour: hour, minute: minute);
   }
 
+  String formatTimeOfDay(TimeOfDay time) {
+    final hour = time.hourOfPeriod == 0 ? 12 : time.hourOfPeriod; // Convert 0 to 12 for AM/PM format
+    final period = time.period == DayPeriod.am ? 'AM' : 'PM';
+    final minutes = time.minute.toString().padLeft(2, '0');
+    return '$hour:$minutes $period';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -212,9 +219,6 @@ class _EditPostPageState extends State<EditPostPage> {
 }
 
 
-
-
-
   void _submitForm() {
     if (selectedCategories.isEmpty || _workerNameController.text.isEmpty) {
       showDialog(
@@ -240,6 +244,8 @@ class _EditPostPageState extends State<EditPostPage> {
     }
 
     String categoriesString = selectedCategories.map((cat) => cat?.id.toString()).join(',');
+    print(categoriesString);
+    print(selectedCategories);
 
     Map<String, dynamic> formData = {
       "name": _workerNameController.text,
@@ -249,6 +255,8 @@ class _EditPostPageState extends State<EditPostPage> {
       "description": _descriptionController.text,
       "gender": _selectedGender,
       "categories": categoriesString,
+      "availableStart": formatTimeOfDay(_startTime),
+      "availableEnd": formatTimeOfDay(_endTime),
     };
 
     Navigator.push(
