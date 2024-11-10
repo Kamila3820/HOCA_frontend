@@ -105,23 +105,6 @@ void initState() {
     });
   }
 
-  void callUserName() async {
-    String url = "/v1/user/profile";
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
-
-    Caller.dio.get(
-      url,
-      options: Options(
-        headers: {'x-auth-token': '$token'},
-      ),
-    ).then((response) {
-      profile = Profile.fromJson(response.data);
-    }).onError((DioException error, _) {
-      Caller.handle(context, error);
-    });
-  }
-
   void navigateToLocateLocation() async {
   final result = await Navigator.push(
     context,

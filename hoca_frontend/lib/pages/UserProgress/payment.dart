@@ -80,12 +80,6 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     });
   }
 
-  Future<void> _refreshOrder() async {
-    setState(() {
-      orderFuture = fetchOrderById(widget.orderID);
-    });
-  }
-
   Future<UserOrder?> fetchOrderById(String orderID) async {
     String url = "/v1/order/user/$orderID";
     final prefs = await SharedPreferences.getInstance();
@@ -509,6 +503,7 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               ],
             ),
         ],
+                ),
               );
             }
           },
