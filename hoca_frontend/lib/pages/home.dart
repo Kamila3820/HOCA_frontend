@@ -105,7 +105,6 @@ void initState() {
     });
   }
 
-
   void navigateToLocateLocation() async {
   final result = await Navigator.push(
     context,

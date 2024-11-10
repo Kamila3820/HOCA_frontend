@@ -79,8 +79,6 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     });
   }
 
-  
-
   Future<UserOrder?> fetchOrderById(String orderID) async {
     String url = "/v1/order/user/$orderID";
     final prefs = await SharedPreferences.getInstance();

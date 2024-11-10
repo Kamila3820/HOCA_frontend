@@ -17,7 +17,7 @@ class FormContainer extends StatelessWidget {
   final TextEditingController descriptionController;
   final String selectedGender;
   final Function(String?) onGenderChanged;
-  final List<int> selectedCategories;
+  final List<int?> selectedCategories;
   final Function(int) toggleCategory;
   final TimeOfDay startTime;
   final TimeOfDay endTime;

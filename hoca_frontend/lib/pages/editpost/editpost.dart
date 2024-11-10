@@ -41,8 +41,8 @@ class _EditPostPageState extends State<EditPostPage> {
   String? duration;
   String? imageUrl;
   String _selectedGender = "Male";
-  List<Categories> availableCategories = [];
-  List<Categories> selectedCategories = []; // Updated to track selected categories
+  List<Categories?> availableCategories = [];
+  List<Categories?> selectedCategories = []; // Updated to track selected categories
   bool _isLoading = true; // Add loading state
   bool _hasError = false; // Add error state
 
@@ -177,23 +177,31 @@ class _EditPostPageState extends State<EditPostPage> {
       }
   }
 
-  void toggleCategory(int categoryId) {
+ void toggleCategory(int categoryId) {
   setState(() {
-    final exists = selectedCategories.any((cat) => cat.id == categoryId);
+    // Check if the category is already selected
+    final exists = selectedCategories.any((cat) => cat?.id == categoryId);
+
     if (exists) {
-      selectedCategories.removeWhere((cat) => cat.id == categoryId);
+      // Remove the category if it already exists
+      selectedCategories.removeWhere((cat) => cat?.id == categoryId);
     } else if (selectedCategories.length < 3) {
+      // Safely return a default category or just skip if not found
       final category = availableCategories.firstWhere(
-        (cat) => cat.id == categoryId,
-        orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'), // Default Category
+        (cat) => cat?.id == categoryId,
+        orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'),
       );
 
-      if (category.id != -1) { // Check if it's not the default category
+      // Only add the category if it is not the placeholder with id -1
+      if (category?.id != -1) {
         selectedCategories.add(category);
       }
     }
   });
 }
+
+
+
 
 
   void _submitForm() {
@@ -220,7 +228,7 @@ class _EditPostPageState extends State<EditPostPage> {
       return;
     }
 
-    String categoriesString = selectedCategories.map((cat) => cat.id.toString()).join(',');
+    String categoriesString = selectedCategories.map((cat) => cat?.id.toString()).join(',');
 
     Map<String, dynamic> formData = {
       "name": _workerNameController.text,
@@ -306,7 +314,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() => _selectedGender = value);
             }
           },
-          selectedCategories: selectedCategories.map((cat) => cat.id).toList(),
+          selectedCategories: selectedCategories.map((cat) => cat?.id).toList(),
           toggleCategory: toggleCategory,
           startTime: _startTime,
           endTime: _endTime,
