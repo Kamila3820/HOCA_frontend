@@ -5,7 +5,7 @@ import 'package:hoca_frontend/components/createpost/buildCategoryChip.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class CategoriesSection extends StatefulWidget {
-  final List<int> selectedCategories;
+  final List<int?> selectedCategories;
   final Function(int) toggleCategory;
 
   const CategoriesSection({
