@@ -5,9 +5,7 @@ import 'package:hoca_frontend/classes/caller.dart';
 import 'package:hoca_frontend/components/createpost/FormContainer.dart';
 import 'package:hoca_frontend/components/createpost/HeaderSection.dart';
 import 'package:hoca_frontend/models/categories.dart';
-import 'package:hoca_frontend/models/categories.dart';
 import 'package:hoca_frontend/models/placetype.dart';
-import 'package:hoca_frontend/models/post.dart';
 import 'package:hoca_frontend/pages/editpost/editpostcon.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -47,6 +45,17 @@ class _EditPostPageState extends State<EditPostPage> {
   List<Categories?> selectedCategories = []; // Updated to track selected categories
   bool _isLoading = true; // Add loading state
   bool _hasError = false; // Add error state
+  final List<Categories> mockCategories = [
+  Categories(id: 1, groupID: 1, name: 'Deep cleaning', description: 'Cleaning'),
+  Categories(id: 2, groupID: 1, name: 'Floor care', description: 'Cleaning'),
+  Categories(id: 3, groupID: 1, name: 'Window care', description: 'Cleaning'),
+  Categories(id: 4, groupID: 2, name: 'Laundry', description: 'Clothes'),
+  Categories(id: 5, groupID: 2, name: 'Sewing', description: 'Clothes'),
+  Categories(id: 6, groupID: 3, name: 'Lawn Mowing', description: 'Garden'),
+  Categories(id: 7, groupID: 3, name: 'Watering', description: 'Garden'),
+  Categories(id: 8, groupID: 3, name: 'Yard cleanup', description: 'Garden'),
+  Categories(id: 9, groupID: 4, name: 'Pet sitting', description: 'Pets'),
+];
 
   TimeOfDay parseTime(String timeString) {
     // Split time and period (AM/PM)
@@ -55,7 +64,7 @@ class _EditPostPageState extends State<EditPostPage> {
     final period = timeParts[1];
 
     // Split hour and minute
-    final timeSplit = time.split('.');
+    final timeSplit = time.split(':');
     int hour = int.parse(timeSplit[0]);
     int minute = int.parse(timeSplit[1]);
 
@@ -125,7 +134,7 @@ class _EditPostPageState extends State<EditPostPage> {
         _selectedGender = data['gender']?.toString() ?? 'Male';
         
         selectedCategories = List<Categories>.from(categories);
-        availableCategories = List<Categories>.from(categories);
+        availableCategories = mockCategories;
         
         location = data['location']?.toString();
         latitude = data['latitude']?.toString();
@@ -188,7 +197,7 @@ class _EditPostPageState extends State<EditPostPage> {
       // Remove the category if it already exists
       selectedCategories.removeWhere((cat) => cat?.id == categoryId);
     } else if (selectedCategories.length < 3) {
-      // Find the category in availableCategories
+      // Safely return a default category or just skip if not found
       final category = availableCategories.firstWhere(
         (cat) => cat?.id == categoryId,
         orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'),
@@ -201,6 +210,7 @@ class _EditPostPageState extends State<EditPostPage> {
     }
   });
 }
+
 
 
 

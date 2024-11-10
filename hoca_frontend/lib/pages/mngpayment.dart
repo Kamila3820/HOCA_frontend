@@ -259,9 +259,9 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                             ),
                           ),
                           const SizedBox(height: 8),
-                          _buildFeatureItem('Period: ${startFrom!.replaceAll("-", "/")} - ${endFrom!.replaceAll("-", "/")}'),
-                          _buildFeatureItem('Cash order amount: ${orderCount}'),
-                          _buildFeatureItem('A fee collected to pay for services \nrelated to the order by cash'),
+                          _buildFeatureItem('Period: ${startFrom?.replaceAll("-", "/") ?? "N/A"} - ${endFrom?.replaceAll("-", "/") ?? "N/A"}'),
+_buildFeatureItem('Cash order amount: ${orderCount ?? "N/A"} '),
+_buildFeatureItem('A fee collected to pay for services \nrelated to the order by cash'),
                         ],
                       ),
                     ),
@@ -321,7 +321,7 @@ class _PaymentServiceFeePageState extends State<PaymentServiceFeePage> {
                             ),
                           ),
                           Text(
-                            'Please confirm the order before: ${endedAt!.replaceAll("-", "/")}',
+                            'Please confirm the order before: ${endedAt!.replaceAll("-", "/") ?? "N/A"}',
                             style: GoogleFonts.poppins(
                               textStyle: const TextStyle(
                                 fontSize: 14,
