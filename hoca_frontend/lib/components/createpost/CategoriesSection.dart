@@ -4,7 +4,7 @@ import 'package:hoca_frontend/components/createpost/buildCategoryChip.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
 class CategoriesSection extends StatelessWidget {
-  final List<int> selectedCategories; // Now stores multiple selected categories as a list of integers
+  final List<int?> selectedCategories; // Now stores multiple selected categories as a list of integers
   final Function(int) toggleCategory; // Expects an integer for category selection
 
   const CategoriesSection({

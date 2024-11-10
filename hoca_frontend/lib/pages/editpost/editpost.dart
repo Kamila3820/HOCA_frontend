@@ -43,8 +43,8 @@ class _EditPostPageState extends State<EditPostPage> {
   String? duration;
   String? imageUrl;
   String _selectedGender = "Male";
-  List<Categories> availableCategories = [];
-  List<Categories> selectedCategories = []; // Updated to track selected categories
+  List<Categories?> availableCategories = [];
+  List<Categories?> selectedCategories = []; // Updated to track selected categories
   bool _isLoading = true; // Add loading state
   bool _hasError = false; // Add error state
 
@@ -93,31 +93,75 @@ class _EditPostPageState extends State<EditPostPage> {
         ),
       );
       print("API Response: ${response.data}");
-      final post = Post.fromJson(response.data);
+      final data = response.data;
+      if (data == null) throw Exception('No data received');
 
-      // Populate fields with fetched data
-      _workerNameController.text = post.name ?? '';
-      _workingPriceController.text = post.price.toString();
-      _idLineController.text = post.promptPay ?? '';
-      _phoneNumberController.text = post.phoneNumber ?? '';
-      _descriptionController.text = post.description ?? '';
-      _selectedGender = post.gender ?? "Male";
-      // selectedCategories = post.categoryID!;
-      // availableCategories = post.categoryID!;
-      location = post.location;
-      latitude = post.locationLat;
-      longitude = post.locationLong;
-      placeTypes = post.placeTypeID;
-      amntFamily = post.amountFamily;
-      duration = post.duration ?? '';
-      imageUrl = post.avatarUrl;
-      _startTime = post.availableStart != null ? parseTime(post.availableStart!) : TimeOfDay.now();
-      _endTime = post.availableEnd != null ? parseTime(post.availableEnd!) : TimeOfDay.now();
+      List<Categories> categories = (response.data['categories'] as List)
+        .map((category) => Categories(
+              id: category['id'],
+              groupID: category['group_id'],
+              name: category['name'],
+              description: category['description'],
+            ))
+        .toList();
 
-      setState(() {
+    // Convert place types from API response
+    List<PlaceType> placeTypesList = (response.data['place_types'] as List)
+        .map((placeType) => PlaceType(
+              id: placeType['id'],
+              name: placeType['name'],
+              description: placeType['description'],
+            ))
+        .toList();
+
+      // Update state with safe null checks
+    setState(() {
+      try {
+        _workerNameController.text = data['name']?.toString() ?? '';
+        _workingPriceController.text = (data['price']?.toString() ?? '0');
+        _idLineController.text = data['prompt_pay']?.toString() ?? '';
+        _phoneNumberController.text = data['phone_number']?.toString() ?? '';
+        _descriptionController.text = data['description']?.toString() ?? '';
+        _selectedGender = data['gender']?.toString() ?? 'Male';
+        
+        selectedCategories = List<Categories>.from(categories);
+        availableCategories = List<Categories>.from(categories);
+        
+        location = data['location']?.toString();
+        latitude = data['latitude']?.toString();
+        longitude = data['longitude']?.toString();
+        placeTypes = List<PlaceType>.from(placeTypesList);
+        amntFamily = data['amount_family']?.toString();
+        duration = data['duration']?.toString();
+        imageUrl = data['avatar']?.toString();
+
+        // Safely parse times
+        if (data['available_start'] != null) {
+          try {
+            _startTime = parseTime(data['available_start']);
+          } catch (e) {
+            print('Error parsing start time: $e');
+            _startTime = const TimeOfDay(hour: 9, minute: 0);
+          }
+        }
+
+        if (data['available_end'] != null) {
+          try {
+            _endTime = parseTime(data['available_end']);
+          } catch (e) {
+            print('Error parsing end time: $e');
+            _endTime = const TimeOfDay(hour: 17, minute: 0);
+          }
+        }
+
         _isLoading = false;
         _hasError = false;
-      });
+      } catch (e) {
+        print('Error in setState: $e');
+        _isLoading = false;
+        _hasError = true;
+      }
+    });
     } on DioError catch (dioError) {
         // Handle Dio-specific error
         Caller.handle(context, dioError);
@@ -135,24 +179,31 @@ class _EditPostPageState extends State<EditPostPage> {
       }
   }
 
-  void toggleCategory(int categoryId) {
+ void toggleCategory(int categoryId) {
   setState(() {
-    final exists = selectedCategories.any((cat) => cat.id == categoryId);
+    // Check if the category is already selected
+    final exists = selectedCategories.any((cat) => cat?.id == categoryId);
+
     if (exists) {
-      selectedCategories.removeWhere((cat) => cat.id == categoryId);
+      // Remove the category if it already exists
+      selectedCategories.removeWhere((cat) => cat?.id == categoryId);
     } else if (selectedCategories.length < 3) {
-      // Safely return a default category or just skip if not found
+      // Find the category in availableCategories
       final category = availableCategories.firstWhere(
-        (cat) => cat.id == categoryId,
-        orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'), // Default Category
+        (cat) => cat?.id == categoryId,
+        orElse: () => Categories(id: -1, groupID: -1, name: 'Unknown', description: 'N/A'),
       );
-      
-      if (category.id != -1) {  // Check if it's not the default category
+
+      // Only add the category if it is not the placeholder with id -1
+      if (category?.id != -1) {
         selectedCategories.add(category);
       }
     }
   });
 }
+
+
+
 
   void _submitForm() {
     if (selectedCategories.isEmpty || _workerNameController.text.isEmpty) {
@@ -178,7 +229,7 @@ class _EditPostPageState extends State<EditPostPage> {
       return;
     }
 
-    String categoriesString = selectedCategories.map((cat) => cat.id.toString()).join(',');
+    String categoriesString = selectedCategories.map((cat) => cat?.id.toString()).join(',');
 
     Map<String, dynamic> formData = {
       "name": _workerNameController.text,
@@ -264,7 +315,7 @@ class _EditPostPageState extends State<EditPostPage> {
               setState(() => _selectedGender = value);
             }
           },
-          selectedCategories: selectedCategories.map((cat) => cat.id).toList(),
+          selectedCategories: selectedCategories.map((cat) => cat?.id).toList(),
           toggleCategory: toggleCategory,
           startTime: _startTime,
           endTime: _endTime,

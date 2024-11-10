@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 Widget buildCategoryChip(
-    List<int> selectedCategories, String label, IconData icon, int value, Function(int) toggleCategory) {
+    List<int?> selectedCategories, String label, IconData icon, int value, Function(int) toggleCategory) {
   // Check if the category is selected
   bool isSelected = selectedCategories.contains(value);
   
