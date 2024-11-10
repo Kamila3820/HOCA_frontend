@@ -45,16 +45,19 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     };
   }
 
-  @override
-  void initState() {
-    super.initState();
+
+@override
+void initState() {
+  super.initState();
     orderFuture = fetchOrderById(widget.orderID);
     _initializePaymentProcess(widget.orderID);
-  }
+}
 
   Future<void> _initializePaymentProcess(String orderID) async {
+  print('Initializing payment process for order ID: $orderID'); // Debug
   String? transactionId = await _fetchQRPayment(orderID);
   if (transactionId != null) {
+    print('Transaction ID obtained: $transactionId'); // Debug
     _startPollingPaymentStatus(transactionId);
   } else {
     print('Transaction ID not available');
@@ -68,16 +71,11 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
   }
 
   void _startPollingPaymentStatus(String transactionId) {
-    _timer = Timer.periodic(const Duration(seconds: 2), (timer) {
-      checkPaymentStatus(transactionId);
-    });
-  }
-
-  Future<void> _refreshOrder() async {
-    setState(() {
-      orderFuture = fetchOrderById(widget.orderID);
-    });
-  }
+  _timer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+    print('Checking payment status for transaction ID: $transactionId'); // Debug
+    await checkPaymentStatus(transactionId);
+  });
+}
 
   Future<UserOrder?> fetchOrderById(String orderID) async {
     String url = "/v1/order/user/$orderID";
@@ -112,6 +110,9 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     if (response != null && response['transactionId'] != null) {
       setState(() {
         qrImageBase64 = response['qrImageBase64']; // Set QR code data if applicable
+        print("testttt");
+        print(qrImageBase64);
+
       });
       return response['transactionId']; // Return the transaction ID
     }
@@ -123,35 +124,36 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
 
 
   Future<Map<String, dynamic>?> callQRpayment(String orderID) async {
-    String url = "/v1/order/payment/qr/$orderID";
-    final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+  String url = "/v1/order/payment/qr/$orderID";
+  final prefs = await SharedPreferences.getInstance();
+  final token = prefs.getString('token');
 
-    try {
-      final response = await Caller.dio.post(
-        url,
-        options: Options(
-          headers: {
-            'x-auth-token': '$token',
-          },
-        ),
-      );
+  try {
+    final response = await Caller.dio.post(
+      url,
+      options: Options(
+        headers: {
+          'x-auth-token': '$token',
+        },
+      ),
+    );
 
-      if (response.statusCode == 201) {
-        // Assuming the response data includes 'transactionId' and 'qrImageBase64'
-        return {
-          'transactionId': response.data['transactionId'],
-          'qrImageBase64': response.data['qrRawData'],
-        };
-      } else {
-        print('Failed to get QR payment');
-      }
-    } catch (error) {
-      Caller.handle(context, error as DioError);
-      print('Error in callQRpayment: $error');
+    if (response.statusCode == 201) {
+      // Assuming the response data includes 'transactionId' and 'qrImageBase64'
+      return {
+        'transactionId': response.data['transactionId'],
+        'qrImageBase64': response.data['qrRawData'],
+      };
+    } else {
+      print('Failed to get QR payment');
     }
-    return null;
+  } catch (error) {
+    Caller.handle(context, error as DioError);
+    print('Error in callQRpayment: $error');
+  }
+  return null;
 }
+
 
 
   Future<void> checkPaymentStatus(String transactionId) async {
@@ -233,32 +235,30 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
     }
   }
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: _refreshOrder,
-        child: FutureBuilder<UserOrder?>(
-          future: orderFuture,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (snapshot.hasError) {
+      body: FutureBuilder<UserOrder?>(
+        future: orderFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => ProgressPage()),
+                );
+              });
+              return const Center(child: CircularProgressIndicator()); 
+          } else if (!snapshot.hasData) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => ProgressPage()),
                 );
               });
-              return const Center(child: CircularProgressIndicator());
-            } else if (!snapshot.hasData) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => ProgressPage()),
-                );
-              });
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator()); // Show a loading indicator until the page is replaced
             } else {
               final order = snapshot.data!;
 
@@ -266,148 +266,132 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
                 handleNavigation(order);
               });
 
-              if (order.payment == 'qrcode' && qrImageBase64 == null) {
-                _fetchQRPayment(order.id.toString()); // Call method to fetch QR code
-              }
+              return Column(
+        children: [
+          // New Header Container
+           Container(
+  height: 120.0,
+  width: double.infinity,
+  decoration: BoxDecoration(
+    color: const Color(0xFF87C4FF).withOpacity(0.6),
+  ),
+  child: Padding(
+    padding: const EdgeInsets.only(top: 20, left: 20, right: 10),
+    child: Stack(
+      children: [
+        Align(
+          alignment: Alignment.centerLeft,
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Colors.white, size: 40.0),
+            onPressed: () async {
+                          // Get saved location data
+                          final locationData = await _getSavedLocation();
 
-              return SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    // Header Container
-                    Container(
-                      height: 120.0,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF87C4FF).withOpacity(0.6),
-                      ),
-                      child: Padding(
-                        padding:
-                            const EdgeInsets.only(top: 20, left: 20, right: 10),
-                        child: Stack(
-                          children: [
-                            Align(
-                              alignment: Alignment.centerLeft,
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_back,
-                                    color: Colors.white, size: 40.0),
-                                onPressed: () async {
-                                  final locationData =
-                                      await _getSavedLocation();
-                                  Navigator.pushReplacement(
-  context,
-  PageTransition(
-    type: PageTransitionType.fade, // Choose the transition type you want
-    child: MainScreen(
-      latitude: locationData['latitude'],
-      longitude: locationData['longitude'],
-      address: locationData['address'],
+                          // Navigate to MainScreen with location data
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => MainScreen(
+                                latitude: locationData['latitude'],
+                                longitude: locationData['longitude'],
+                                address: locationData['address'],
+                              ),
+                            ),
+                          );
+                        },
+          ),
+        ),
+        Center(
+          child: Text(
+            'Progress',
+            style: GoogleFonts.poppins(
+              textStyle: const TextStyle(
+                fontSize: 30,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      ],
     ),
   ),
-);
-                                },
-                              ),
-                            ),
-                            Center(
-                              child: Text(
-                                'Progress',
-                                style: GoogleFonts.poppins(
-                                  textStyle: const TextStyle(
-                                    fontSize: 30,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 20, horizontal: 16),
-                      color: const Color(0xFF87C4FF).withOpacity(0.6),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildProgressStep('Confirm',
-                              isActive: false, isCompleted: false),
-                          _buildProgressStep('Preparing',
-                              isActive: false, isCompleted: false),
-                          _buildProgressStep('Working',
-                              isActive: true, isCompleted: true),
-                        ],
-                      ),
-                    ),
+),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            color: const Color(0xFF87C4FF).withOpacity(0.6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                _buildProgressStep('Confirm', isActive: false, isCompleted: false),
+                _buildProgressStep('Preparing', isActive: false, isCompleted: false),
+                _buildProgressStep('Working', isActive: true, isCompleted: true),
+               
+              ],
+            ),
+          ),
 
-                    // Customer Info
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      child: Row(
-                        children: [
-                          order.workerAvatar != null &&
-                                  order.workerAvatar!.isNotEmpty
-                              ? CircleAvatar(
-                                  radius: 28,
-                                  backgroundImage:
-                                      NetworkImage(order.workerAvatar!),
-                                  backgroundColor:
-                                      Colors.transparent, // Optional
-                                )
-                              : const CircleAvatar(
-                                  radius: 28,
-                                  backgroundColor: Colors.grey,
-                                  child: Icon(Icons.person,
-                                      color: Colors.white, size: 30),
-                                ),
-                          const SizedBox(width: 15),
-                          Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                order.workerName!,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Row(
-                                children: [
-                                  const Icon(Icons.cleaning_services,
-                                      size: 16,
-                                      color: Color.fromARGB(255, 0, 0, 0)),
-                                  const SizedBox(width: 5),
-                                  Text(
-                                    'Working time!',
-                                    style: GoogleFonts.poppins(
-                                      fontSize: 14,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Text(
-                                'Order ID: ${order.id}',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 14,
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                ),
-                              ),
-                            ],
+          // Customer Info
+          Container(
+            padding: const EdgeInsets.all(20),
+            child: Row(
+              children: [
+                 order.workerAvatar != null && order.workerAvatar!.isNotEmpty
+        ? CircleAvatar(
+            radius: 28,
+            backgroundImage: NetworkImage(order.workerAvatar!),
+            backgroundColor: Colors.transparent, // Optional
+          )
+        : const CircleAvatar(
+            radius: 28,
+            backgroundColor: Colors.grey,
+            child: Icon(Icons.person, color: Colors.white, size: 30),
+          ),
+                const SizedBox(width: 15),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      order.workerName!,
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        const Icon(Icons.cleaning_services, size: 16, color: Color.fromARGB(255, 0, 0, 0)),
+                        const SizedBox(width: 5),
+                        Text(
+                          'Working time!',
+                          style: GoogleFonts.poppins(
+                            fontSize: 14,
+                            color: Colors.grey,
                           ),
-                        ],
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Order ID: ${order.id}',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        color: const Color.fromARGB(255, 0, 0, 0),
                       ),
                     ),
+                  ],
+                ),
+              ],
+            ),
+          ),
 
-                    const Divider(
-                      thickness: 1,
-                      color: Colors.grey,
-                      indent: 20,
-                      endIndent: 20,
-                    ),
+          const Divider(
+            thickness: 1,
+            color: Colors.grey,
+            indent: 20,
+            endIndent: 20,
+          ),
 
-                    const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
           if (order.payment == 'qrcode' && qrImageBase64 != null && qrImageBase64!.isNotEmpty)
             Container(
@@ -436,50 +420,17 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               color: Colors.green,
             ),
 
-                    // PromptPay Image
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Image.asset(
-                        'assets/images/promptpay.png',
-                        height: 70,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
 
-                    const SizedBox(height: 10),
+          const SizedBox(height: 10),
 
-                    // QR Code Image
-                    Container(
-                      padding: const EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
-                            spreadRadius: 4,
-                            blurRadius: 8,
-                            offset: const Offset(0, 6),
-                          ),
-                        ],
-                      ),
-                      child: Image.asset(
-                        'assets/images/qrcode.png',
-                        height: 300,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-                    Text(
-                      'Total: ${order.price} THB',
-                      style: GoogleFonts.poppins(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
+          Text(
+            'Total: ${order.price} THB',
+            style: GoogleFonts.poppins(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.green,
+            ),
+          ),
 
           if (order.payment == 'qrcode')
             Column(
@@ -502,42 +453,35 @@ class _UserPaymentPageState extends State<UserPaymentPage> {
               ],
             ),
         ],
-                ),
               );
             }
-          },
-        ),
+        },
       ),
     );
   }
-}
+            }
 
-Widget _buildProgressStep(String label,
-    {required bool isActive, required bool isCompleted}) {
-  return Column(
-    children: [
-      Container(
-        width: 100,
-        height: 4,
-        color: isCompleted
-            ? Colors.blue
-            : (isActive
-                ? Colors.blue
-                : const Color.fromARGB(255, 255, 255, 255)),
-      ),
-      const SizedBox(height: 8),
-      Text(
-        label,
-        style: GoogleFonts.poppins(
-          textStyle: TextStyle(
-            fontSize: 15,
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive
-                ? Colors.blue
-                : const Color.fromARGB(255, 255, 255, 255),
+  Widget _buildProgressStep(String label, {required bool isActive, required bool isCompleted}) {
+    return Column(
+      children: [
+        Container(
+          width: 100,
+          height: 4,
+          color: isCompleted
+              ? Colors.blue
+              : (isActive ? Colors.blue : const Color.fromARGB(255, 255, 255, 255)),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            textStyle: TextStyle(
+              fontSize: 15,
+              fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+              color: isActive ? Colors.blue : const Color.fromARGB(255, 255, 255, 255),
+            ),
           ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }

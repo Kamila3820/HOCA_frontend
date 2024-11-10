@@ -61,17 +61,17 @@ class _ProgressPageState extends State<ProgressPage> {
         break;
       case 'working':
         if (customerOrder.paid == true) {
-            Navigator.push(
+           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => UserPaymentPage(orderID: customerOrder.id.toString()),
+              builder: (context) => PaymentSuccessPage(orderID: customerOrder.id.toString()),
             ),
           );
         } else if (customerOrder.paid == false) {
             Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => PaymentSuccessPage(orderID: customerOrder.id.toString()),
+              builder: (context) => UserPaymentPage(orderID: customerOrder.id.toString()),
             ),
           );
         }
