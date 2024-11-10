@@ -78,6 +78,10 @@ class _EditPostConState extends State<EditPostCon> {
       _selectedFamilyAmount = widget.amountFamily;
     }
 
+    if (widget.duration != null) {
+      _selectedDuration = widget.duration;
+    }
+
      WidgetsBinding.instance.addPostFrameCallback((_) async {
       _getCurrentLocation();
     });
@@ -205,16 +209,19 @@ class _EditPostConState extends State<EditPostCon> {
         "name": widget.formData?["name"],
         "description": widget.formData?["desciption"],
         "file": imageFile,
-        "category_id": widget.formData?["categories"],
+        "category_ids": widget.formData?["categories"],
         "placetype_ids": placetypeIDs,
         "phone_number": widget.formData?["phoneNumber"],
-        "location": "Locate Me",
-        "latitude": "13.7563",
-        "longtitude": "100.5018",
+        "location": _locationName,
+        "latitude": _currentLocation?.latitude.toString(),
+        "longtitude": _currentLocation?.longitude.toString(),
         "price": widget.formData?["price"],
         "prompt_pay": widget.formData?["idLine"],
         "gender": widget.formData?["gender"],
         "amount_family": _selectedFamilyAmount,
+        "duration": _selectedDuration,
+        "available_start": widget.formData?["availableStart"],
+        "available_end": widget.formData?["availableEnd"],
       });
 
       String wpostID = widget.postID;
