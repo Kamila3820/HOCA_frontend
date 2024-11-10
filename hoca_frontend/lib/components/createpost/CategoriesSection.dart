@@ -25,6 +25,7 @@ class _CategoriesSectionState extends State<CategoriesSection> {
     final dynamic tooltip = _tooltipKey.currentState;
     tooltip?.ensureTooltipVisible();
   }
+  
 
   @override
   Widget build(BuildContext context) {

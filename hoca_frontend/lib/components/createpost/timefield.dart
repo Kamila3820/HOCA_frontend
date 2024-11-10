@@ -23,7 +23,7 @@ class TimeField extends StatefulWidget {
 }
 
 class _TimeFieldState extends State<TimeField> {
-  bool _hasSelectedTime = false;
+  bool _hasSelectedTime = true;
   String? _errorText;
   final GlobalKey _tooltipKey = GlobalKey();
 
