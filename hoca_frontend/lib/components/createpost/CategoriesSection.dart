@@ -4,9 +4,9 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:hoca_frontend/components/createpost/buildCategoryChip.dart';
 import 'package:hoca_frontend/components/createpost/buildRequiredLabel.dart';
 
-class CategoriesSection extends StatelessWidget {
-  final List<int?> selectedCategories; // Now stores multiple selected categories as a list of integers
-  final Function(int) toggleCategory; // Expects an integer for category selection
+class CategoriesSection extends StatefulWidget {
+  final List<int> selectedCategories;
+  final Function(int) toggleCategory;
 
   const CategoriesSection({
     super.key,
